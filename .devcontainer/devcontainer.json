@@ -1,0 +1,41 @@
+{
+  "name": "GameHub Dev Environment",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "runServices": ["db", "backend", "frontend"],
+  "shutdownAction": "stopCompose",
+  "workspaceFolder": "/var/www/html",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "amiralizadeh9480.laravel-extra-intellisense",
+        "onecentlin.laravel-blade",
+        "ryannaddy.laravel-artisan",
+        "codingyu.laravel-goto-view",
+        "xdebug.php-debug",
+        "Vue.volar",
+        "antfu.vite",
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "formulahendry.auto-rename-tag",
+        "formulahendry.auto-close-tag",
+        "mikestead.dotenv",
+        "eamodio.gitlens",
+        "usernamehw.errorlens",
+        "christian-kohler.path-intellisense",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-mysql",
+        "PKief.material-icon-theme"
+      ],
+      "settings": {
+        "workbench.iconTheme": "material-icon-theme",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "forwardPorts": [8000, 5173, 3306],
+  "postCreateCommand": "cd backend && [ -d vendor ] || composer install; [ -f .env ] || cp .env.example .env; grep -q '^APP_KEY=base64:' .env || php artisan key:generate --force",
+  "remoteUser": "root"
+}

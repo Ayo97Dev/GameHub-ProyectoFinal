@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: gamehub_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: gamehub_db
+      MYSQL_USER: gamehub_user
+      MYSQL_PASSWORD: gamehub_password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - gamehub_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile.backend
+    container_name: gamehub_backend
+    user: root
+    restart: unless-stopped
+    working_dir: /var/www/html/backend
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"
+    environment:
+      - AUTORUN_ENABLED=false
+    command: >
+      sh -c "php artisan serve --host=0.0.0.0 --port=8000"
+    depends_on:
+      - db
+    networks:
+      - gamehub_network
+
+  frontend:
+    image: node:20-alpine
+    container_name: gamehub_frontend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: >
+      sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173"
+    networks:
+      - gamehub_network
+
+volumes:
+  db_data:
+
+networks:
+  gamehub_network:
+    driver: bridge
