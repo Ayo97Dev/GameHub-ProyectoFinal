@@ -29,7 +29,7 @@ const gameStore = useGameStore()
       </div>
     </div>
 
-    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-20">
       <GameCard v-for="game in gameStore.games" :key="game.slug" :game="game" />
     </div>
   </section>
