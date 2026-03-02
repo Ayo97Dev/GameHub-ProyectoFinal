@@ -68,6 +68,7 @@ Esta parte es la que se debe usar, ya he preparado las herramientas y el codigo 
 3. Abre la paleta de comandos (`Ctrl+Shift+P` o `Cmd+Shift+P`).
 4. Escribe y selecciona: **Dev Containers: Reopen in Container**.
 5. VS Code construirá el entorno, levantará los servicios de Docker Compose.
+   5.1 En caso de que de error, pon el siguiente comando fuera del docker, en el WSL: `docker compose run --rm backend composer install --no-interaction` Esto se debe a que no se instala bien las dependencias y da error.
 6. **¡Listo!** El `postCreateCommand` comprobará e instalará dependencias del backend solo si faltan (`vendor`), además de preparar `.env` y generar la `APP_KEY` si no existe.
 7. El `docker-compose` levanta `db`, `backend` y `frontend` simultáneamente desde el DevContainer.
 8. Para iniciar el frontend, se debe hacer lo siguiente:
