@@ -1,19 +1,68 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import api from '../lib/axios'
 
 const authStore = useAuthStore()
-const router = useRouter()
+const router    = useRouter()
 const isLoading = ref(true)
+
+const achievements     = ref([])
+const achievementsByGame = computed(() => {
+  const map = {}
+  for (const a of achievements.value) {
+    if (a.game_id !== null) {
+      if (!map[a.game_id]) map[a.game_id] = []
+      map[a.game_id].push(a)
+    }
+  }
+  return map
+})
+
+const RARITY_BADGE = {
+  common:    'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200',
+  uncommon:  'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+  rare:      'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  epic:      'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  legendary: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+}
+
+// Reset de progreso
+const resetTarget   = ref(null)   // { slug, title }
+const isResetting   = ref(false)
+
+function confirmReset(stat) {
+  resetTarget.value = { slug: stat.game.slug, title: stat.game.title }
+}
+
+async function executeReset() {
+  if (!resetTarget.value) return
+  isResetting.value = true
+  try {
+    await api.delete(`/games/${resetTarget.value.slug}/reset`)
+    // Refrescar el usuario para actualizar stats
+    await authStore.fetchUser()
+    // Limpiar logros del juego reseteado de la lista local para reflejar el cambio
+    achievements.value = []
+    const { data } = await api.get('/achievements')
+    achievements.value = data.data ?? []
+  } catch { /* silencioso */ } finally {
+    isResetting.value = false
+    resetTarget.value = null
+  }
+}
 
 onMounted(async () => {
   if (!authStore.isLoggedIn) {
     router.push('/login')
     return
   }
-  
   await authStore.fetchUser()
+  try {
+    const { data } = await api.get('/achievements')
+    achievements.value = data.data ?? []
+  } catch { /* silencioso */ }
   isLoading.value = false
 })
 
@@ -58,9 +107,11 @@ function formatDate(isoDate) {
           <article 
             v-for="stat in authStore.user.global_stats" 
             :key="stat.game_id" 
-            class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-zinc-900 p-5 shrink-0 shadow-sm dark:shadow-none transition-colors"
+            class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-zinc-900 p-5 shrink-0 shadow-sm dark:shadow-none transition-colors flex flex-col gap-4"
           >
-            <h3 class="text-lg font-bold text-cyan-600 dark:text-cyan-300 mb-4 transition-colors">{{ stat.game.title }}</h3>
+            <h3 class="text-lg font-bold text-cyan-600 dark:text-cyan-300 transition-colors">{{ stat.game.title }}</h3>
+
+            <!-- Stats -->
             <div class="space-y-3">
               <div class="flex justify-between items-center bg-slate-50 dark:bg-zinc-950 px-3 py-2 rounded border-l-2 border-l-cyan-400 dark:border-l-cyan-500 border border-slate-100 dark:border-slate-800/50 transition-colors">
                 <span class="text-sm text-slate-500 dark:text-slate-400">Puntaje Máx</span>
@@ -75,9 +126,84 @@ function formatDate(isoDate) {
                 <span class="font-semibold text-slate-700 dark:text-slate-200">{{ formatDate(stat.last_played_at) }}</span>
               </div>
             </div>
+
+            <!-- Logros del juego -->
+            <div v-if="achievementsByGame[stat.game_id]?.length" class="border-t border-slate-100 dark:border-slate-800 pt-3">
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-2">
+                Logros
+                <span class="ml-1 text-slate-500 dark:text-slate-400">
+                  {{ achievementsByGame[stat.game_id].filter(a => a.unlocked).length }}/{{ achievementsByGame[stat.game_id].length }}
+                </span>
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <div
+                  v-for="a in achievementsByGame[stat.game_id]"
+                  :key="a.id"
+                  :title="a.title + (a.unlocked ? '\n✅ ' + (a.earned_at ? new Date(a.earned_at).toLocaleDateString() : 'Desbloqueado') : '\n🔒 Bloqueado') + '\n' + a.description"
+                  class="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all"
+                  :class="[
+                    RARITY_BADGE[a.rarity] ?? RARITY_BADGE.common,
+                    a.unlocked ? 'opacity-100' : 'opacity-35 grayscale'
+                  ]"
+                >
+                  <span>{{ a.unlocked ? '🏆' : '🔒' }}</span>
+                  <span class="max-w-28 truncate">{{ a.title }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón reset -->
+            <div class="border-t border-slate-100 dark:border-slate-800 pt-3 mt-auto">
+              <button
+                @click="confirmReset(stat)"
+                class="w-full rounded-lg border border-red-300 dark:border-red-800/60 bg-red-50 dark:bg-red-900/10 px-3 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/25 transition-colors"
+              >
+                🗑️ Reiniciar progreso
+              </button>
+            </div>
           </article>
         </div>
       </div>
     </template>
   </section>
+
+  <!-- Modal de confirmación de reset -->
+  <Teleport to="body">
+    <Transition name="fade">
+      <div
+        v-if="resetTarget"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        @click.self="resetTarget = null"
+      >
+        <div class="w-full max-w-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-2xl">
+          <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">¿Reiniciar progreso?</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+            Se borrará toda la partida guardada y las estadísticas de
+            <span class="font-semibold text-slate-700 dark:text-slate-200">{{ resetTarget.title }}</span>.
+            Esta acción no se puede deshacer.
+          </p>
+          <div class="flex gap-3">
+            <button
+              @click="resetTarget = null"
+              class="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="executeReset"
+              :disabled="isResetting"
+              class="flex-1 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 px-4 py-2 text-sm font-semibold text-white transition-colors"
+            >
+              {{ isResetting ? 'Borrando…' : 'Sí, reiniciar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to       { opacity: 0; }
+</style>

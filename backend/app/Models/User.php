@@ -66,4 +66,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Achievement::class)
             ->withPivot('earned_at');
     }
+
+    public function gameSessions(): HasMany
+    {
+        return $this->hasMany(GameSession::class);
+    }
 }

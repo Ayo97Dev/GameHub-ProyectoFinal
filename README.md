@@ -102,3 +102,41 @@ DB_USERNAME=gamehub_user
 DB_PASSWORD=gamehub_password
 ```
 *Importante: `DB_HOST` debe ser `db` (el nombre del servicio en Docker), no `localhost`.*
+
+---
+
+## Arquitectura del Proyecto
+
+### Backend (Laravel)
+- **Autenticación:** Laravel Sanctum (tokens Bearer stateless)
+- **Motor de juego:** Patrón `GameService` abstracto con subclases por juego (`ClickerGameService`, etc.)
+- **Servicios:** `AchievementService` para comprobar y desbloquear logros automáticamente
+- **Middleware:** `game.throttle` — rate limiting por usuario/juego (configurable en `games.config`)
+- **Directorio de servicios:** `backend/app/Services/`
+
+### Frontend (Vue 3)
+- **Stores por juego:** `src/stores/games/clicker.js`, expandible a más juegos
+- **Motor de API:** `src/lib/gameEngineService.js` — interfaz centralizada para todas las llamadas al game engine
+- **Vistas disponibles:** Home, Login, Register, Dashboard, Play (por slug), Leaderboard (por slug), Achievements
+- **Guard de rutas:** Las rutas `dashboard`, `play` y `achievements` requieren autenticación
+
+## API resumida
+
+| Método | Ruta | Auth | Descripción |
+|--------|------|------|-------------|
+| POST | `/api/register` | No | Registro |
+| POST | `/api/login` | No | Login |
+| POST | `/api/logout` | Sí | Logout |
+| GET | `/api/user` | Sí | Perfil del usuario |
+| GET | `/api/games` | No | Lista de juegos activos |
+| GET | `/api/games/{slug}` | No | Detalle de un juego |
+| POST | `/api/games/{slug}/play` | Sí | Iniciar sesión de juego |
+| POST | `/api/games/{slug}/action` | Sí | Ejecutar acción de juego |
+| GET | `/api/games/{slug}/load` | Sí | Cargar progreso |
+| POST | `/api/games/{slug}/complete` | Sí | Finalizar sesión |
+| GET | `/api/leaderboard/{slug}` | No | Top 10 del juego |
+| GET | `/api/achievements` | Sí | Todos los logros del usuario |
+| GET | `/api/achievements/{slug}` | Sí | Logros por juego |
+
+Ver documentación completa en [`backend/api.md`](backend/api.md).
+

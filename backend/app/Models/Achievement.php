@@ -12,10 +12,24 @@ class Achievement extends Model
     use HasFactory;
 
     protected $fillable = [
+        'slug',
         'title',
         'description',
         'game_id',
+        'icon_url',
+        'points_reward',
+        'rarity',
+        'condition',
+        'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'condition' => 'array',
+            'is_active' => 'boolean',
+        ];
+    }
 
     public function game(): BelongsTo
     {
