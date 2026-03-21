@@ -6,6 +6,7 @@ export const useClickerStore = defineStore('clicker', () => {
   const GAME_SLUG = 'clicker'
 
   const isLoading = ref(false)
+  const isPrestiging = ref(false)
   const error     = ref(null)
   const sessionId = ref(null)
   const lastSaved = ref(null)
@@ -19,6 +20,8 @@ export const useClickerStore = defineStore('clicker', () => {
     upgrades:       {},
     total_clicks:   0,
     prestige_level: 0,
+    prestige_click_bonus: 0,
+    prestige_dps_mul: 1,
   })
 
   const balance      = computed(() => gameState.value.balance)
@@ -28,7 +31,19 @@ export const useClickerStore = defineStore('clicker', () => {
   const prestigeLevel = computed(() => gameState.value.prestige_level)
   const totalClicks  = computed(() => gameState.value.total_clicks)
 
-  const PRESTIGE_MIN_BALANCE = 1_000_000
+  const PRESTIGE_BASE_MIN_BALANCE = 1_000_000
+  const prestigeRequiredBalance = computed(() => {
+    const level = Math.max(Number(prestigeLevel.value ?? 0), 0)
+    return Math.round(PRESTIGE_BASE_MIN_BALANCE * (2 ** level))
+  })
+  const nextPrestigeClickIncrement = computed(() => {
+    const level = Math.max(Number(prestigeLevel.value ?? 0), 0)
+    return Number((0.5 + (level * 0.25)).toFixed(4))
+  })
+  const nextPrestigeDpsFactor = computed(() => {
+    const level = Math.max(Number(prestigeLevel.value ?? 0), 0)
+    return Number((1.05 + (Math.min(level, 10) * 0.01)).toFixed(4))
+  })
 
   // Datos estáticos de mejoras (espejo del backend)
   const UPGRADE_BASE_COSTS = {
@@ -70,7 +85,8 @@ export const useClickerStore = defineStore('clicker', () => {
   // Recalcula DPS y click_power desde cero a partir del array de mejoras
   function _recalcStats() {
     let dps        = 0
-    let clickPower = 1 + (gameState.value.prestige_level ?? 0) * 0.5
+    const prestigeClickBonus = gameState.value.prestige_click_bonus ?? ((gameState.value.prestige_level ?? 0) * 0.5)
+    let clickPower = 1 + prestigeClickBonus
     const dpsMul   = gameState.value.prestige_dps_mul ?? 1
     for (const [id, count] of Object.entries(gameState.value.upgrades)) {
       const u = UPGRADE_BONUSES[id]
@@ -90,6 +106,15 @@ export const useClickerStore = defineStore('clicker', () => {
       const res = await gameEngine.play(GAME_SLUG, loadSave)
       sessionId.value = res.session_id
       Object.assign(gameState.value, res.game_state)
+
+      if (gameState.value.prestige_click_bonus == null) {
+        gameState.value.prestige_click_bonus = (gameState.value.prestige_level ?? 0) * 0.5
+      }
+      if (gameState.value.prestige_dps_mul == null) {
+        gameState.value.prestige_dps_mul = 1 + ((gameState.value.prestige_level ?? 0) * 0.05)
+      }
+
+      _recalcStats()
     } catch (e) {
       error.value = e.message
     } finally {
@@ -98,9 +123,11 @@ export const useClickerStore = defineStore('clicker', () => {
   }
 
   // Actualización local inmediata
-  function click() {
-    gameState.value.balance      += gameState.value.click_power
+  function click(multiplier = 1) {
+    const gain = gameState.value.click_power * Math.max(multiplier, 1)
+    gameState.value.balance      += gain
     gameState.value.total_clicks += 1
+    return gain
   }
 
   function buyUpgrade(upgradeId) {
@@ -125,22 +152,41 @@ export const useClickerStore = defineStore('clicker', () => {
   }
 
   async function prestige() {
-    if (gameState.value.balance < PRESTIGE_MIN_BALANCE) return
+    if (gameState.value.balance < prestigeRequiredBalance.value || isPrestiging.value) return false
+    isPrestiging.value = true
+    error.value = null
     try {
+      // El progreso de click/DPS es optimista en cliente: guardamos antes de prestigiar
+      // para que el backend evalúe el umbral con el estado más reciente.
+      await saveGame()
+
       const res = await gameEngine.action(GAME_SLUG, {
         action:  'prestige',
-        payload: {},
+        payload: {
+          expected_balance: gameState.value.balance,
+        },
       })
-      if (res.success) {
+
+      if (res?.success && res?.data?.success) {
         gameState.value.balance          = 0
         gameState.value.upgrades         = {}
         gameState.value.prestige_level   = res.data.prestige_level
-        gameState.value.click_power      = res.data.click_power
+        gameState.value.prestige_click_bonus = res.data.prestige_click_bonus ?? (res.data.prestige_level * 0.5)
+        gameState.value.click_power      = 1 + gameState.value.prestige_click_bonus
         gameState.value.dps              = 0
         gameState.value.prestige_dps_mul = res.data.prestige_dps_mul ?? 1
+        gameState.value.total_clicks     = 0
+        lastSaved.value = new Date()
+        return true
       }
+
+      error.value = res?.data?.error || 'No se pudo completar el prestigio.'
+      return false
     } catch (e) {
-      error.value = e.message
+      error.value = e?.response?.data?.error || e.message
+      return false
+    } finally {
+      isPrestiging.value = false
     }
   }
 
@@ -176,7 +222,16 @@ export const useClickerStore = defineStore('clicker', () => {
   }
 
   function $reset() {
-    gameState.value     = { balance: 0, click_power: 1, dps: 0, upgrades: {}, total_clicks: 0, prestige_level: 0, prestige_dps_mul: 1 }
+    gameState.value     = {
+      balance: 0,
+      click_power: 1,
+      dps: 0,
+      upgrades: {},
+      total_clicks: 0,
+      prestige_level: 0,
+      prestige_click_bonus: 0,
+      prestige_dps_mul: 1,
+    }
     sessionId.value     = null
     lastSaved.value     = null
     error.value         = null
@@ -185,11 +240,12 @@ export const useClickerStore = defineStore('clicker', () => {
 
   return {
     // state
-    gameState, isLoading, error, lastSaved, sessionId, newAchievements,
+    gameState, isLoading, isPrestiging, error, lastSaved, sessionId, newAchievements,
     // computed
     balance, clickPower, dps, upgrades, prestigeLevel, totalClicks,
+    prestigeRequiredBalance, nextPrestigeClickIncrement, nextPrestigeDpsFactor,
     // helpers
-    upgradeCost, PRESTIGE_MIN_BALANCE,
+    upgradeCost, PRESTIGE_BASE_MIN_BALANCE,
     // actions
     initializeGame, click, buyUpgrade, prestige, saveGame, completeGame,
     $reset,

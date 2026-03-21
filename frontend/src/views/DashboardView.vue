@@ -84,20 +84,21 @@ function formatDate(isoDate) {
     </div>
 
     <template v-else-if="authStore.user">
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 p-6 flex items-center gap-5 shadow-sm dark:shadow-none backdrop-blur-md overflow-hidden relative transition-colors">
+      <div class="gh-panel flex items-center gap-5 overflow-hidden p-6 relative">
         <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-cyan-300/20 dark:bg-cyan-500/10 blur-3xl" />
         <div class="pointer-events-none absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-violet-300/20 dark:bg-violet-500/10 blur-3xl" />
         <div class="relative z-10 h-16 w-16 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-violet-500/30 dark:shadow-cyan-500/20 shrink-0">
           {{ authStore.user.name.charAt(0).toUpperCase() }}
         </div>
         <div class="relative z-10">
-          <h1 class="text-3xl font-bold text-slate-800 dark:text-white transition-colors">{{ authStore.user.name }}</h1>
+          <p class="text-xs font-bold uppercase tracking-[0.24em] text-cyan-600 dark:text-cyan-400">Perfil</p>
+          <h1 class="text-3xl font-black text-slate-800 dark:text-white transition-colors">{{ authStore.user.name }}</h1>
           <p class="mt-1 text-slate-500 dark:text-slate-400 transition-colors">{{ authStore.user.email }}</p>
         </div>
       </div>
 
       <div class="mt-8">
-        <h2 class="text-2xl font-semibold text-slate-800 dark:text-white mb-4 transition-colors">Estadísticas por Juego</h2>
+        <h2 class="mb-4 text-2xl font-black text-slate-800 dark:text-white transition-colors">Estadísticas por Juego</h2>
         
         <div v-if="!authStore.user.global_stats || authStore.user.global_stats.length === 0" class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-zinc-900 p-6 text-center text-slate-500 dark:text-slate-400 transition-colors">
           Aún no tienes estadísticas. ¡Juega para empezar a registrar tu progreso!
@@ -107,7 +108,7 @@ function formatDate(isoDate) {
           <article 
             v-for="stat in authStore.user.global_stats" 
             :key="stat.game_id" 
-            class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-zinc-900 p-5 shrink-0 shadow-sm dark:shadow-none transition-colors flex flex-col gap-4"
+            class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-zinc-900 p-5 shrink-0 shadow-lg shadow-slate-200/50 dark:shadow-black/20 transition-colors flex flex-col gap-4"
           >
             <h3 class="text-lg font-bold text-cyan-600 dark:text-cyan-300 transition-colors">{{ stat.game.title }}</h3>
 

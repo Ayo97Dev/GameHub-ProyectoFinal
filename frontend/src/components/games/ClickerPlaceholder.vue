@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClickerStore } from '../../stores/games/clicker'
 
 const clicker = useClickerStore()
@@ -60,10 +60,17 @@ const TIER_STYLES = {
 
 const isClicking      = ref(false)
 const toastQueue      = ref([])   // { id, title, rarity }
-const clickParticles  = ref([])   // { id, x, y, value }
+const clickParticles  = ref([])   // { id, x, y, value, critical }
+const combatEvents    = ref([])   // { id, text, tone }
+const comboCount      = ref(0)
+const lastClickAt     = ref(0)
+const hitFlash        = ref(false)
+const critPulse       = ref(false)
 let particleId        = 0
+let combatEventId     = 0
 let saveInterval      = null
 let dpsInterval       = null
+let comboInterval     = null
 let toastTimers       = []
 
 const RARITY_STYLES = {
@@ -80,6 +87,86 @@ const RARITY_LABEL = {
   rare:      'Raro',
   epic:      'Épico',
   legendary: 'Legendario',
+}
+
+const COMBO_TIERS = [
+  { threshold: 50, label: 'Impulso', multiplier: 1.05, critBonus: 0.02 },
+  { threshold: 100, label: 'Ráfaga', multiplier: 1.12, critBonus: 0.04 },
+  { threshold: 200, label: 'Frenesí', multiplier: 1.22, critBonus: 0.06 },
+  { threshold: 500, label: 'Sobrecarga', multiplier: 1.4, critBonus: 0.1 },
+  { threshold: 1000, label: 'Omega', multiplier: 1.75, critBonus: 0.15 },
+]
+
+const currentComboTier = computed(() => {
+  let tier = null
+  for (const candidate of COMBO_TIERS) {
+    if (comboCount.value >= candidate.threshold) {
+      tier = candidate
+    } else {
+      break
+    }
+  }
+  return tier
+})
+
+const nextComboTier = computed(() => COMBO_TIERS.find(tier => comboCount.value < tier.threshold) ?? null)
+
+const comboProgress = computed(() => {
+  if (!nextComboTier.value) return 1
+  const currentThreshold = currentComboTier.value?.threshold ?? 0
+  const span = nextComboTier.value.threshold - currentThreshold
+  const progressInTier = comboCount.value - currentThreshold
+  return Math.max(0, Math.min(progressInTier / span, 1))
+})
+
+const comboMultiplier = computed(() => currentComboTier.value?.multiplier ?? 1)
+const critChance = computed(() => {
+  const baseChance = 0.06
+  const tierBonus = currentComboTier.value?.critBonus ?? 0
+  return Math.min(baseChance + tierBonus, 0.32)
+})
+const comboLabel = computed(() => currentComboTier.value?.label ?? 'Calma')
+
+const dpsEnergy = computed(() => Math.min(clicker.dps / 15_000, 1))
+const cadenceEnergy = computed(() => Math.min(comboCount.value / 1_000, 1))
+const dynamicEnergy = computed(() => Math.min(0.2 + (dpsEnergy.value * 0.55) + (cadenceEnergy.value * 0.45), 1))
+
+const impactStyleVars = computed(() => ({
+  '--impact-wave-duration': `${(2.8 - dynamicEnergy.value * 1.6).toFixed(2)}s`,
+  '--impact-wave-scale': `${(1.14 + dynamicEnergy.value * 0.28).toFixed(2)}`,
+  '--impact-glow-strength': `${(0.22 + dynamicEnergy.value * 0.45).toFixed(2)}`,
+  '--impact-grid-opacity': `${(0.25 + dynamicEnergy.value * 0.45).toFixed(2)}`,
+  '--impact-core-breathe': `${(3.6 - dynamicEnergy.value * 2).toFixed(2)}s`,
+  '--impact-side-pulse': `${(2.6 - dynamicEnergy.value * 1.6).toFixed(2)}s`,
+  '--impact-spin-speed': `${(14 - dynamicEnergy.value * 9).toFixed(2)}s`,
+}))
+
+const baseNodeAngles = [0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352]
+const ambientNodes = computed(() => {
+  const count = 4 + Math.round(dynamicEnergy.value * 8)
+  const radius = 92 + dynamicEnergy.value * 22
+
+  return baseNodeAngles.slice(0, count).map((angle, index) => {
+    const radians = (angle * Math.PI) / 180
+    return {
+      id: index,
+      style: {
+        left: `calc(50% + ${(Math.cos(radians) * radius).toFixed(1)}px)`,
+        top: `calc(50% + ${(Math.sin(radians) * radius).toFixed(1)}px)`,
+        animationDelay: `${(index * 0.12).toFixed(2)}s`,
+        animationDuration: `${(1.8 - dynamicEnergy.value * 0.9 + (index % 3) * 0.12).toFixed(2)}s`,
+      },
+    }
+  })
+})
+
+function pushCombatEvent(text, tone = 'neutral') {
+  const id = ++combatEventId
+  combatEvents.value.unshift({ id, text, tone })
+  combatEvents.value = combatEvents.value.slice(0, 4)
+  setTimeout(() => {
+    combatEvents.value = combatEvents.value.filter(e => e.id !== id)
+  }, 2800)
 }
 
 // Mostrar toast cuando llegan logros nuevos
@@ -117,6 +204,13 @@ onMounted(async () => {
     }
   }, 100)
 
+  comboInterval = setInterval(() => {
+    if (!lastClickAt.value || comboCount.value === 0) return
+    if (Date.now() - lastClickAt.value > 850) {
+      comboCount.value = Math.max(comboCount.value - 1, 0)
+    }
+  }, 160)
+
   // Guardar al ocultar la pestaña y al cerrar la ventana
   document.addEventListener('visibilitychange', saveOnHide)
   window.addEventListener('beforeunload', saveOnUnload)
@@ -125,6 +219,7 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(saveInterval)
   clearInterval(dpsInterval)
+  clearInterval(comboInterval)
   toastTimers.forEach(clearTimeout)
   document.removeEventListener('visibilitychange', saveOnHide)
   window.removeEventListener('beforeunload', saveOnUnload)
@@ -133,24 +228,53 @@ onUnmounted(() => {
 
 // Feedback visual inmediato — sin esperar respuesta de red
 function handleClick(event) {
+  const now = Date.now()
+  comboCount.value = now - lastClickAt.value <= 650 ? comboCount.value + 1 : 1
+  lastClickAt.value = now
+
   isClicking.value = true
-  clicker.click()
+  hitFlash.value = true
+  const isCritical = Math.random() < critChance.value
+  const totalMultiplier = comboMultiplier.value * (isCritical ? 2 : 1)
+  const gained = clicker.click(totalMultiplier)
+
+  if (isCritical) {
+    critPulse.value = true
+    pushCombatEvent(`Crítico x2 · +${Math.round(gained)}`, 'critical')
+    setTimeout(() => { critPulse.value = false }, 220)
+  }
+
+  if (nextComboTier.value && comboCount.value === nextComboTier.value.threshold) {
+    pushCombatEvent(
+      `${nextComboTier.value.label} desbloqueado · x${nextComboTier.value.multiplier.toFixed(2)}`,
+      'combo'
+    )
+  }
+
+  if (comboCount.value > 0 && comboCount.value % 50 === 0) {
+    pushCombatEvent(`Racha x${comboCount.value} · x${comboMultiplier.value.toFixed(2)}`, 'combo')
+  }
 
   // Partícula flotante "+N" en la posición del clic
   const rect = event.currentTarget.getBoundingClientRect()
   const id   = ++particleId
   const x    = rect.left + rect.width  / 2 + (Math.random() - 0.5) * 60
   const y    = rect.top  + rect.height / 3
-  clickParticles.value.push({ id, x, y, value: clicker.clickPower })
+  clickParticles.value.push({ id, x, y, value: Math.round(gained), critical: isCritical })
   setTimeout(() => {
     clickParticles.value = clickParticles.value.filter(p => p.id !== id)
   }, 900)
 
+  setTimeout(() => (hitFlash.value = false), 130)
   setTimeout(() => (isClicking.value = false), 80)
 }
 
 function canAfford(upgradeId) {
   return clicker.balance >= clicker.upgradeCost(upgradeId)
+}
+
+function missingForUpgrade(upgradeId) {
+  return Math.max(clicker.upgradeCost(upgradeId) - clicker.balance, 0)
 }
 
 function upgradeProgress(upgradeId) {
@@ -166,86 +290,172 @@ function formatNumber(n) {
 </script>
 
 <template>
-  <section class="relative flex flex-col gap-4 rounded-xl p-2 overflow-hidden">
-    <!-- Fondo degradado ambiental -->
-    <div class="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-amber-500/5 via-transparent to-violet-500/5 dark:from-amber-500/10 dark:to-violet-500/10" />
+  <section class="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-slate-300/70 dark:border-slate-700/70 bg-slate-100/85 dark:bg-slate-950/60 p-3 sm:p-4 transition-colors">
+    <div class="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_12%_8%,rgba(34,211,238,.14),transparent_38%),radial-gradient(circle_at_88%_20%,rgba(244,114,182,.12),transparent_36%),linear-gradient(to_bottom,rgba(255,255,255,.45),rgba(241,245,249,.15))] dark:bg-[radial-gradient(circle_at_12%_8%,rgba(34,211,238,.12),transparent_38%),radial-gradient(circle_at_88%_20%,rgba(167,139,250,.14),transparent_36%),linear-gradient(to_bottom,rgba(15,23,42,.55),rgba(2,6,23,.25))]" />
+    <div class="pointer-events-none absolute inset-0 rounded-2xl opacity-35 dark:opacity-45 hud-grid" />
 
     <!-- Cargando -->
-    <div v-if="clicker.isLoading" class="flex min-h-60 items-center justify-center">
+    <div v-if="clicker.isLoading" class="relative z-10 flex min-h-60 items-center justify-center">
       <div class="flex flex-col items-center gap-3">
-        <div class="size-8 rounded-full border-4 border-amber-400/30 border-t-amber-400 animate-spin" />
-        <p class="text-sm text-slate-500 dark:text-slate-400">Cargando partida…</p>
+        <div class="size-8 rounded-full border-4 border-cyan-400/30 dark:border-cyan-500/35 border-t-cyan-500 dark:border-t-cyan-300 animate-spin" />
+        <p class="text-sm font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Cargando partida…</p>
       </div>
     </div>
 
     <template v-else>
-      <!-- Header stats -->
-      <div class="grid grid-cols-3 gap-3 text-center">
-        <div class="relative overflow-hidden rounded-lg border border-amber-300/40 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-500/20 px-3 py-2">
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-300/15 to-transparent" />
-          <p class="text-[11px] uppercase tracking-wide text-amber-600 dark:text-amber-400">Balance</p>
-          <p class="text-xl font-bold tabular-nums text-amber-700 dark:text-amber-300">{{ formatNumber(clicker.balance) }}</p>
-        </div>
-        <div class="relative overflow-hidden rounded-lg border border-cyan-300/40 bg-cyan-50 dark:bg-cyan-950/30 dark:border-cyan-500/20 px-3 py-2">
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-cyan-300/15 to-transparent" />
-          <p class="text-[11px] uppercase tracking-wide text-cyan-600 dark:text-cyan-400">DPS</p>
-          <p class="text-xl font-bold tabular-nums text-cyan-700 dark:text-cyan-300">{{ clicker.dps.toFixed(1) }}</p>
-        </div>
-        <div class="relative overflow-hidden rounded-lg border border-violet-300/40 bg-violet-50 dark:bg-violet-950/30 dark:border-violet-500/20 px-3 py-2">
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-br from-violet-300/15 to-transparent" />
-          <p class="text-[11px] uppercase tracking-wide text-violet-600 dark:text-violet-400">Prestige</p>
-          <p class="text-xl font-bold tabular-nums text-violet-700 dark:text-violet-300">{{ clicker.prestigeLevel }}</p>
-        </div>
-      </div>
-
-      <!-- Botón principal -->
-      <div class="relative flex justify-center py-6">
-        <!-- Rings de pulso ambiental (activos cuando hay DPS) -->
-        <template v-if="clicker.dps > 0">
-          <div class="pulse-ring absolute size-52 rounded-full border border-amber-400/25" style="animation-delay: 0s" />
-          <div class="pulse-ring absolute size-60 rounded-full border border-amber-300/15" style="animation-delay: 0.8s" />
-          <div class="pulse-ring absolute size-64 rounded-full border border-amber-200/10" style="animation-delay: 1.6s" />
-        </template>
-
-        <!-- Wrapper animado con borde arcoíris giratorio (conic-gradient + @property) -->
-        <div class="spin-border w-fit h-fit rounded-full p-[3px] drop-shadow-[0_0_24px_rgba(251,191,36,0.55)]">
-          <button
-            @click="handleClick"
-            :disabled="clicker.isLoading"
-            :class="[
-              'relative size-36 rounded-full select-none transition-all duration-75',
-              'bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500',
-              'shadow-[0_0_30px_rgba(251,191,36,0.4)]',
-              'hover:shadow-[0_0_50px_rgba(251,191,36,0.7)] hover:scale-105',
-              isClicking ? 'scale-90 shadow-[0_0_15px_rgba(251,191,36,0.3)]' : 'scale-100',
-            ]"
-          >
-            <!-- Sheen interior -->
-            <div class="absolute inset-0 rounded-full bg-gradient-to-t from-orange-600/30 to-yellow-200/40 pointer-events-none" />
-            <!-- Destello especular -->
-            <div class="absolute top-2 left-5 h-5 w-8 rounded-full bg-white/30 blur-sm -rotate-12 pointer-events-none" />
-            <!-- Contenido -->
-            <div class="relative flex flex-col items-center justify-center gap-1">
-              <span class="text-4xl leading-none select-none" style="filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35))">🪙</span>
-              <span class="text-xs font-bold text-white drop-shadow">+{{ clicker.clickPower }}</span>
+      <div class="order-2 lg:order-1 relative z-10 grid gap-3 lg:grid-cols-[1.4fr_minmax(0,1fr)]">
+        <div class="rounded-2xl border border-slate-300/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/60 p-3 transition-colors">
+          <div class="grid grid-cols-1 gap-2 text-center sm:grid-cols-3">
+            <div class="rounded-xl border border-amber-300/50 dark:border-amber-700/40 bg-amber-50/90 dark:bg-amber-950/35 px-3 py-2 shadow-sm dark:shadow-[0_0_0_1px_rgba(245,158,11,.1)] transition-colors">
+              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-600 dark:text-amber-400">Balance</p>
+              <p class="text-xl font-black tabular-nums text-amber-700 dark:text-amber-300">{{ formatNumber(clicker.balance) }}</p>
             </div>
+            <div class="rounded-xl border border-cyan-300/50 dark:border-cyan-700/40 bg-cyan-50/90 dark:bg-cyan-950/35 px-3 py-2 shadow-sm dark:shadow-[0_0_0_1px_rgba(34,211,238,.1)] transition-colors">
+              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-600 dark:text-cyan-400">DPS</p>
+              <p class="text-xl font-black tabular-nums text-cyan-700 dark:text-cyan-300">{{ clicker.dps.toFixed(1) }}</p>
+            </div>
+            <div class="rounded-xl border border-violet-300/50 dark:border-violet-700/40 bg-violet-50/90 dark:bg-violet-950/35 px-3 py-2 shadow-sm dark:shadow-[0_0_0_1px_rgba(167,139,250,.1)] transition-colors">
+              <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-400">Prestigio</p>
+              <p class="text-xl font-black tabular-nums text-violet-700 dark:text-violet-300">{{ clicker.prestigeLevel }}</p>
+            </div>
+          </div>
+
+          <div class="mt-3 rounded-xl border border-cyan-300/50 dark:border-cyan-700/50 bg-cyan-50/80 dark:bg-cyan-950/25 p-2 transition-colors">
+            <div class="mb-1 flex items-center justify-between">
+              <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-700 dark:text-cyan-300">Cadencia</p>
+              <p class="text-xs font-black uppercase tracking-[0.12em] text-cyan-600 dark:text-cyan-300">{{ comboLabel }} · x{{ comboCount }}</p>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-cyan-200 dark:bg-cyan-900/60">
+              <div class="h-full rounded-full bg-gradient-to-r from-cyan-500 to-violet-500 transition-all duration-150" :style="{ width: (comboProgress * 100) + '%' }" />
+            </div>
+            <div class="mt-1 flex items-center justify-between text-[10px] font-semibold text-cyan-700 dark:text-cyan-300">
+              <span>Bonus combo: x{{ comboMultiplier.toFixed(2) }}</span>
+              <span>Crítico: {{ Math.round(critChance * 100) }}%</span>
+            </div>
+            <p class="mt-1 text-[10px] text-cyan-700 dark:text-cyan-300/90">
+              Siguiente bonus: {{ nextComboTier ? `${nextComboTier.threshold} clicks` : 'MAX alcanzado' }}
+            </p>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-300/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/60 p-3 transition-colors">
+          <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-violet-600 dark:text-violet-300">Motor de prestigio</p>
+          <div class="mt-2">
+            <div class="mb-0.5 flex justify-between text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500">
+              <span>Progreso</span>
+              <span>{{ formatNumber(clicker.balance) }} / {{ formatNumber(clicker.prestigeRequiredBalance) }}</span>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+              <div class="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-400 transition-all duration-500" :style="{ width: Math.min(clicker.balance / clicker.prestigeRequiredBalance * 100, 100) + '%' }" />
+            </div>
+          </div>
+
+          <button
+            @click="clicker.prestige()"
+            :disabled="clicker.balance < clicker.prestigeRequiredBalance || clicker.isPrestiging"
+            class="mt-3 w-full overflow-hidden rounded-lg border px-4 py-2.5 text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            :class="clicker.balance >= clicker.prestigeRequiredBalance
+              ? 'border-violet-400 bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-violet-500/10 text-violet-700 shadow-sm dark:border-violet-500/50 dark:bg-gradient-to-r dark:from-violet-500/15 dark:via-purple-500/15 dark:to-violet-500/15 dark:text-violet-300 dark:shadow-[0_0_0_1px_rgba(139,92,246,.15)] hover:from-violet-500/20 hover:to-violet-500/20 prestige-ready'
+              : 'border-violet-300/40 bg-violet-50 text-violet-600 dark:border-violet-700/30 dark:bg-violet-900/10 dark:text-violet-400'"
+          >
+            {{ clicker.isPrestiging ? 'Procesando prestigio…' : `✨ Prestigio · +${clicker.nextPrestigeClickIncrement.toFixed(2)} clic/click` }}
           </button>
+
+          <p class="mt-1 text-center text-[11px] font-semibold text-violet-600 dark:text-violet-300">
+            Siguiente bonificación DPS global: x{{ clicker.nextPrestigeDpsFactor.toFixed(2) }}
+          </p>
+
+          <p v-if="clicker.error" class="mt-2 text-center text-xs font-semibold text-rose-600 dark:text-rose-300">
+            {{ clicker.error }}
+          </p>
+
+          <p v-if="clicker.lastSaved" class="mt-2 text-center text-xs text-slate-400 dark:text-slate-500">
+            Guardado: {{ clicker.lastSaved.toLocaleTimeString() }}
+          </p>
         </div>
       </div>
 
-      <!-- Upgrades: 3 cards compactas por tier -->
-      <div class="space-y-2">
-        <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Mejoras</h3>
+      <div class="order-1 lg:order-2 relative z-10 grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div class="rounded-2xl border border-slate-300/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/60 p-4 transition-colors">
+          <p class="text-center text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Núcleo energético</p>
+          <div class="relative mt-3 flex justify-center py-4 sm:py-6">
+            <div
+              class="impact-stage relative flex items-center justify-center"
+              :class="[
+                critPulse ? 'impact-stage--crit' : '',
+                dynamicEnergy > 0.75 ? 'impact-stage--charged' : ''
+              ]"
+              :style="impactStyleVars"
+            >
+              <div class="impact-grid-bg absolute" />
+              <div class="impact-wave impact-wave--a" />
+              <div class="impact-wave impact-wave--b" />
+              <div
+                v-for="node in ambientNodes"
+                :key="node.id"
+                class="impact-node"
+                :style="node.style"
+              />
+              <div v-if="hitFlash" class="impact-flash absolute" />
+
+              <div class="impact-frame">
+                <button
+                  @click="handleClick"
+                  :disabled="clicker.isLoading"
+                  :class="[
+                    'impact-core select-none',
+                    isClicking ? 'scale-[0.96]' : 'scale-100',
+                  ]"
+                >
+                  <span class="impact-content">
+                    <span class="impact-mark">⬢</span>
+                    <span class="impact-label">Golpe +{{ clicker.clickPower }}</span>
+                  </span>
+                </button>
+              </div>
+
+              <div class="impact-side impact-side--left" />
+              <div class="impact-side impact-side--right" />
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-slate-300/70 dark:border-slate-700/60 bg-slate-50/85 dark:bg-slate-950/45 p-2 text-center transition-colors">
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pulsa rápido para mantener la racha y llenar la barra de cadencia.</p>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-300/70 dark:border-slate-700/60 bg-white/80 dark:bg-slate-900/60 p-3 transition-colors">
+          <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Registro de combate</p>
+          <div class="mt-2 flex min-h-20 flex-col gap-1.5">
+            <p v-if="combatEvents.length === 0" class="text-xs text-slate-400 dark:text-slate-500">Golpea el núcleo para iniciar la racha.</p>
+            <div
+              v-for="evt in combatEvents"
+              :key="evt.id"
+              class="rounded-md border px-2 py-1 text-xs font-bold uppercase tracking-[0.1em]"
+              :class="evt.tone === 'critical'
+                ? 'border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-700/60 dark:bg-rose-950/30 dark:text-rose-300'
+                : evt.tone === 'combo'
+                  ? 'border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-700/60 dark:bg-violet-950/30 dark:text-violet-300'
+                  : 'border-slate-300 bg-slate-50 text-slate-700 dark:border-slate-700/60 dark:bg-slate-900/70 dark:text-slate-300'"
+            >
+              {{ evt.text }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-3 relative z-10 space-y-2">
+        <h3 class="text-sm font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Tienda de mejoras</h3>
 
         <div
           v-for="tier in TIERS"
           :key="tier.id"
-          class="overflow-hidden rounded-xl border"
+          class="overflow-hidden rounded-xl border bg-white/85 dark:bg-slate-900/55"
           :class="TIER_STYLES[tier.color].card"
         >
           <!-- Cabecera del tier -->
           <div class="flex items-center justify-between px-3 py-1.5" :class="TIER_STYLES[tier.color].header">
-            <span class="text-[11px] font-bold uppercase tracking-widest">{{ tier.label }}</span>
+            <span class="text-[10px] font-black uppercase tracking-[0.2em]">{{ tier.label }}</span>
             <span class="text-[10px] opacity-60">
               {{ UPGRADES.filter(u => u.tier === tier.id && clicker.upgrades[u.id]).length }}/{{ UPGRADES.filter(u => u.tier === tier.id).length }} activas
             </span>
@@ -266,20 +476,29 @@ function formatNumber(n) {
                 class="group relative flex items-center gap-2 px-2.5 py-2 text-left transition-all"
                 :class="canAfford(upgrade.id)
                   ? TIER_STYLES[tier.color].affordable + ' hover:scale-[1.02] hover:shadow-sm cursor-pointer'
-                  : TIER_STYLES[tier.color].locked + ' opacity-50 cursor-not-allowed'"
+                  : TIER_STYLES[tier.color].locked + ' opacity-75 cursor-not-allowed'"
               >
                 <div v-if="canAfford(upgrade.id)" :class="TIER_STYLES[tier.color].shimmer" class="pointer-events-none absolute inset-0" />
                 <span class="text-base leading-none shrink-0">{{ upgrade.icon }}</span>
                 <div class="relative min-w-0 flex-1">
                   <div class="flex items-baseline justify-between gap-1">
-                    <p class="truncate text-[11px] font-semibold text-slate-800 dark:text-white">{{ upgrade.name }}</p>
+                    <p class="truncate text-[11px] font-bold text-slate-800 dark:text-white">{{ upgrade.name }}</p>
                     <span v-if="clicker.upgrades[upgrade.id]" class="shrink-0 rounded-full px-1 py-px text-[9px] font-bold" :class="TIER_STYLES[tier.color].badge">
                       ×{{ clicker.upgrades[upgrade.id] }}
                     </span>
                   </div>
-                  <p class="text-[9px] leading-tight text-slate-400 dark:text-slate-500">{{ upgrade.description }}</p>
-                  <p class="text-[10px]" :class="canAfford(upgrade.id) ? TIER_STYLES[tier.color].cost : 'text-slate-400 dark:text-slate-500'">
+                  <p class="text-[9px] leading-tight text-slate-500 dark:text-slate-300">{{ upgrade.description }}</p>
+                  <p class="text-[10px]" :class="canAfford(upgrade.id) ? TIER_STYLES[tier.color].cost : 'text-slate-500 dark:text-slate-300'">
                     {{ formatNumber(clicker.upgradeCost(upgrade.id)) }}
+                  </p>
+                  <p v-if="!canAfford(upgrade.id)" class="text-[9px] font-semibold text-slate-600 dark:text-slate-300 lg:hidden">
+                    Faltan {{ formatNumber(missingForUpgrade(upgrade.id)) }}
+                  </p>
+                  <p
+                    v-if="!canAfford(upgrade.id)"
+                    class="pointer-events-none absolute right-0 top-0 hidden rounded-md bg-slate-900/90 px-1.5 py-0.5 text-[9px] font-semibold text-slate-100 opacity-0 transition-opacity duration-200 lg:block group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-slate-100/90 dark:text-slate-900"
+                  >
+                    Faltan {{ formatNumber(missingForUpgrade(upgrade.id)) }}
                   </p>
                   <div class="mt-0.5 h-0.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                     <div class="h-full rounded-full transition-all duration-300" :class="tier.barColor" :style="{ width: (upgradeProgress(upgrade.id) * 100) + '%' }" />
@@ -301,20 +520,29 @@ function formatNumber(n) {
                 class="group relative flex items-center gap-2 px-2.5 py-2 text-left transition-all"
                 :class="canAfford(upgrade.id)
                   ? TIER_STYLES[tier.color].affordable + ' hover:scale-[1.02] hover:shadow-sm cursor-pointer'
-                  : TIER_STYLES[tier.color].locked + ' opacity-50 cursor-not-allowed'"
+                  : TIER_STYLES[tier.color].locked + ' opacity-75 cursor-not-allowed'"
               >
                 <div v-if="canAfford(upgrade.id)" :class="TIER_STYLES[tier.color].shimmer" class="pointer-events-none absolute inset-0" />
                 <span class="text-base leading-none shrink-0">{{ upgrade.icon }}</span>
                 <div class="relative min-w-0 flex-1">
                   <div class="flex items-baseline justify-between gap-1">
-                    <p class="truncate text-[11px] font-semibold text-slate-800 dark:text-white">{{ upgrade.name }}</p>
+                    <p class="truncate text-[11px] font-bold text-slate-800 dark:text-white">{{ upgrade.name }}</p>
                     <span v-if="clicker.upgrades[upgrade.id]" class="shrink-0 rounded-full px-1 py-px text-[9px] font-bold" :class="TIER_STYLES[tier.color].badge">
                       ×{{ clicker.upgrades[upgrade.id] }}
                     </span>
                   </div>
-                  <p class="text-[9px] leading-tight text-slate-400 dark:text-slate-500">{{ upgrade.description }}</p>
-                  <p class="text-[10px]" :class="canAfford(upgrade.id) ? TIER_STYLES[tier.color].cost : 'text-slate-400 dark:text-slate-500'">
+                  <p class="text-[9px] leading-tight text-slate-500 dark:text-slate-300">{{ upgrade.description }}</p>
+                  <p class="text-[10px]" :class="canAfford(upgrade.id) ? TIER_STYLES[tier.color].cost : 'text-slate-500 dark:text-slate-300'">
                     {{ formatNumber(clicker.upgradeCost(upgrade.id)) }}
+                  </p>
+                  <p v-if="!canAfford(upgrade.id)" class="text-[9px] font-semibold text-slate-600 dark:text-slate-300 lg:hidden">
+                    Faltan {{ formatNumber(missingForUpgrade(upgrade.id)) }}
+                  </p>
+                  <p
+                    v-if="!canAfford(upgrade.id)"
+                    class="pointer-events-none absolute right-0 top-0 hidden rounded-md bg-slate-900/90 px-1.5 py-0.5 text-[9px] font-semibold text-slate-100 opacity-0 transition-opacity duration-200 lg:block group-hover:opacity-100 group-focus-within:opacity-100 dark:bg-slate-100/90 dark:text-slate-900"
+                  >
+                    Faltan {{ formatNumber(missingForUpgrade(upgrade.id)) }}
                   </p>
                   <div class="mt-0.5 h-0.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                     <div class="h-full rounded-full transition-all duration-300" :class="tier.barColor" :style="{ width: (upgradeProgress(upgrade.id) * 100) + '%' }" />
@@ -325,37 +553,6 @@ function formatNumber(n) {
           </div>
         </div>
       </div>
-
-      <!-- Prestige -->
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-3">
-        <!-- Barra de progreso hacia prestige -->
-        <div class="mb-2">
-          <div class="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 mb-0.5">
-            <span>Progreso al Prestige</span>
-            <span>{{ formatNumber(clicker.balance) }} / 1.000.000</span>
-          </div>
-          <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-            <div
-              class="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-400 transition-all duration-500"
-              :style="{ width: Math.min(clicker.balance / 1_000_000 * 100, 100) + '%' }"
-            />
-          </div>
-        </div>
-        <button
-          @click="clicker.prestige()"
-          :disabled="clicker.balance < clicker.PRESTIGE_MIN_BALANCE"
-          class="w-full overflow-hidden rounded-lg border px-4 py-2.5 text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-          :class="clicker.balance >= clicker.PRESTIGE_MIN_BALANCE
-            ? 'border-violet-400 bg-gradient-to-r from-violet-500/10 via-purple-500/10 to-violet-500/10 text-violet-700 hover:from-violet-500/20 hover:to-violet-500/20 dark:border-violet-500/50 dark:text-violet-300 prestige-ready'
-            : 'border-violet-300/40 bg-violet-50 text-violet-600 dark:border-violet-700/30 dark:bg-violet-900/10 dark:text-violet-400'"
-        >
-          ✨ Prestige · +0.5 clic/click permanente
-          <span v-if="clicker.prestigeLevel > 0" class="ml-1 text-xs opacity-70">(Nivel {{ clicker.prestigeLevel + 1 }} → +{{ ((clicker.prestigeLevel + 1) * 5).toFixed(0) }}% DPS)</span>
-        </button>
-        <p v-if="clicker.lastSaved" class="mt-2 text-center text-xs text-slate-400 dark:text-slate-500">
-          Guardado: {{ clicker.lastSaved.toLocaleTimeString() }}
-        </p>
-      </div>
     </template>
   </section>
 
@@ -365,9 +562,10 @@ function formatNumber(n) {
       <div
         v-for="p in clickParticles"
         :key="p.id"
-        class="float-particle absolute whitespace-nowrap text-sm font-bold text-amber-400 dark:text-yellow-300"
+        class="float-particle absolute whitespace-nowrap text-sm font-bold"
+        :class="p.critical ? 'text-rose-500 dark:text-rose-300' : 'text-amber-500 dark:text-yellow-300'"
         :style="{ left: p.x + 'px', top: p.y + 'px' }"
-      >+{{ p.value }}</div>
+      >{{ p.critical ? `CRIT +${p.value}` : `+${p.value}` }}</div>
     </div>
   </Teleport>
 
@@ -401,41 +599,226 @@ function formatNumber(n) {
 </template>
 
 <style scoped>
+.hud-grid {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px),
+    linear-gradient(to right, rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.impact-stage {
+  width: 17rem;
+  height: 17rem;
+}
+
+.impact-stage--crit {
+  animation: impact-crit 0.24s ease-out;
+}
+
+.impact-grid-bg {
+  inset: 14%;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.15) 1px, transparent 1px),
+    linear-gradient(to right, rgba(34, 211, 238, 0.15) 1px, transparent 1px);
+  background-size: 14px 14px;
+  opacity: var(--impact-grid-opacity, 0.5);
+  transition: opacity 180ms ease;
+}
+
+.impact-wave {
+  position: absolute;
+  inset: 18%;
+  border-radius: 9999px;
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  pointer-events: none;
+}
+
+.impact-wave--a {
+  animation: impact-wave var(--impact-wave-duration, 2.2s) ease-out infinite;
+}
+
+.impact-wave--b {
+  animation: impact-wave var(--impact-wave-duration, 2.2s) ease-out infinite;
+  animation-delay: 1.1s;
+}
+
+.impact-frame {
+  position: relative;
+  z-index: 20;
+  pointer-events: none;
+  padding: 4px;
+  clip-path: polygon(25% 4%, 75% 4%, 96% 50%, 75% 96%, 25% 96%, 4% 50%);
+  background: linear-gradient(145deg, rgba(34, 211, 238, 0.9), rgba(139, 92, 246, 0.9));
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.28),
+    0 18px 34px rgba(14, 165, 233, 0.24);
+  animation: impact-frame-spin var(--impact-spin-speed, 14s) linear infinite;
+}
+
+.impact-core {
+  width: 9.4rem;
+  height: 9.4rem;
+  clip-path: polygon(25% 4%, 75% 4%, 96% 50%, 75% 96%, 25% 96%, 4% 50%);
+  border: 1px solid rgba(224, 242, 254, 0.85);
+  position: relative;
+  color: rgb(255 255 255);
+  background:
+    radial-gradient(circle at 28% 25%, rgba(255,255,255,0.34), transparent 45%),
+    linear-gradient(155deg, rgba(8, 145, 178, 0.95), rgba(91, 33, 182, 0.95));
+  text-shadow: 0 1px 5px rgba(15, 23, 42, 0.65);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 28px rgba(34, 211, 238, var(--impact-glow-strength, 0.25));
+  transition: transform 120ms ease, filter 150ms ease;
+  animation: impact-core-breathe var(--impact-core-breathe, 3s) ease-in-out infinite;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  pointer-events: auto;
+}
+
+.impact-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 0.35rem;
+  gap: 0.25rem;
+  animation: impact-counter-spin var(--impact-spin-speed, 14s) linear infinite;
+  pointer-events: none;
+}
+
+.impact-core:hover {
+  filter: brightness(1.08);
+}
+
+.impact-mark {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.55));
+  pointer-events: none;
+}
+
+.impact-label {
+  max-width: 7.8rem;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.impact-side {
+  position: absolute;
+  z-index: 10;
+  width: 34px;
+  height: 6px;
+  top: 50%;
+  margin-top: -3px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, rgba(34, 211, 238, 0.15), rgba(34, 211, 238, 0.8), rgba(34, 211, 238, 0.15));
+  animation: impact-side-pulse var(--impact-side-pulse, 2.2s) ease-in-out infinite;
+}
+
+.impact-side--left {
+  left: 14px;
+}
+
+.impact-side--right {
+  right: 14px;
+}
+
+.impact-flash {
+  z-index: 25;
+  width: 9.6rem;
+  height: 9.6rem;
+  clip-path: polygon(25% 4%, 75% 4%, 96% 50%, 75% 96%, 25% 96%, 4% 50%);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.38), rgba(34, 211, 238, 0));
+  animation: impact-flash 0.16s ease-out forwards;
+  pointer-events: none;
+}
+
+.impact-node {
+  position: absolute;
+  z-index: 12;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.95), rgba(34, 211, 238, 0.15));
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation-name: impact-node-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.impact-stage--charged .impact-grid-bg {
+  box-shadow: inset 0 0 24px rgba(34, 211, 238, 0.2);
+}
+
+html.dark .impact-frame {
+  box-shadow:
+    0 0 0 1px rgba(167, 139, 250, 0.3),
+    0 22px 40px rgba(76, 29, 149, 0.35);
+}
+
+@keyframes impact-wave {
+  0% { transform: scale(0.84); opacity: 0.55; }
+  100% { transform: scale(var(--impact-wave-scale, 1.18)); opacity: 0; }
+}
+
+@keyframes impact-frame-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes impact-counter-spin {
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes impact-core-breathe {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.12) saturate(1.18); }
+}
+
+@keyframes impact-side-pulse {
+  0%, 100% { opacity: 0.45; transform: scaleX(0.9); }
+  50% { opacity: 0.9; transform: scaleX(1.08); }
+}
+
+@keyframes impact-node-float {
+  0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.8); }
+  50% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+@keyframes impact-crit {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+  100% { transform: scale(1); }
+}
+
+@keyframes impact-flash {
+  0% { opacity: 0.9; transform: scale(0.85); }
+  100% { opacity: 0; transform: scale(1.16); }
+}
+
 /* ── Partículas flotantes "+N" ── */
 .float-particle {
-  animation: float-up 0.9s ease-out forwards;
-  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.9));
+  animation: float-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  filter: drop-shadow(0 0 5px rgba(14, 165, 233, 0.45));
 }
 @keyframes float-up {
-  0%   { opacity: 1;   transform: translateY(0)     scale(1.4); }
-  20%  { opacity: 1;   transform: translateY(-18px)  scale(1); }
-  100% { opacity: 0;   transform: translateY(-75px)  scale(0.7); }
-}
-
-/* ── Anillo arcoíris giratorio (conic-gradient animado via @property) ── */
-@property --spin-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-.spin-border {
-  background: conic-gradient(
-    from var(--spin-angle),
-    #fbbf24, #f97316, #ef4444, #a855f7, #22d3ee, #a3e635, #fbbf24
-  );
-  animation: spin-hue 3s linear infinite;
-}
-@keyframes spin-hue {
-  to { --spin-angle: 360deg; }
-}
-
-/* ── Rings de pulso ambiental (DPS) ── */
-.pulse-ring {
-  animation: pulse-radiate 2.4s ease-out infinite;
-}
-@keyframes pulse-radiate {
-  0%   { transform: scale(0.85); opacity: 0.7; }
-  100% { transform: scale(1.25); opacity: 0; }
+  0%   { opacity: 0.95; transform: translateY(0) scale(1.08); }
+  100% { opacity: 0; transform: translateY(-62px) scale(0.86); }
 }
 
 /* ── Barrido shimmer en upgrades asequibles ── */
@@ -443,31 +826,31 @@ function formatNumber(n) {
   background: linear-gradient(
     105deg,
     transparent 40%,
-    rgba(251, 191, 36, 0.2) 50%,
+    rgba(251, 191, 36, 0.14) 50%,
     transparent 60%
   );
   background-size: 200% 100%;
-  animation: shimmer-sweep 2s ease-in-out infinite;
+  animation: shimmer-sweep 2.8s ease-in-out infinite;
 }
 .shimmer-cyan {
   background: linear-gradient(
     105deg,
     transparent 40%,
-    rgba(34, 211, 238, 0.2) 50%,
+    rgba(34, 211, 238, 0.14) 50%,
     transparent 60%
   );
   background-size: 200% 100%;
-  animation: shimmer-sweep 2s ease-in-out infinite;
+  animation: shimmer-sweep 2.8s ease-in-out infinite;
 }
 .shimmer-violet {
   background: linear-gradient(
     105deg,
     transparent 40%,
-    rgba(167, 139, 250, 0.25) 50%,
+    rgba(167, 139, 250, 0.18) 50%,
     transparent 60%
   );
   background-size: 200% 100%;
-  animation: shimmer-sweep 2s ease-in-out infinite;
+  animation: shimmer-sweep 2.8s ease-in-out infinite;
 }
 @keyframes shimmer-sweep {
   0%   { background-position: 200% center; }
@@ -476,11 +859,11 @@ function formatNumber(n) {
 
 /* ── Pulso del botón prestige cuando está disponible ── */
 .prestige-ready {
-  animation: prestige-glow 1.8s ease-in-out infinite;
+  animation: prestige-glow 2.4s ease-in-out infinite;
 }
 @keyframes prestige-glow {
-  0%, 100% { box-shadow: 0 0 0 0   rgba(139, 92, 246, 0);    }
-  50%       { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0.25); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+  50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.15); }
 }
 
 /* ── Transiciones de toasts ── */

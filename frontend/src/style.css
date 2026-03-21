@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Syne:wght@600;700;800&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
@@ -14,6 +14,7 @@
 
   body {
     @apply font-sans antialiased text-slate-800 bg-slate-50 transition-colors duration-300;
+    font-family: 'Rajdhani', sans-serif;
     background-image:
       radial-gradient(80rem 30rem at 10% -10%, rgba(34, 211, 238, 0.15), transparent 45%),
       radial-gradient(70rem 30rem at 90% -20%, rgba(139, 92, 246, 0.15), transparent 45%),
@@ -30,7 +31,12 @@
   }
 
   h1, h2, h3 {
-    font-family: 'Rajdhani', 'Inter', sans-serif;
+    font-family: 'Syne', 'Rajdhani', sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  ::selection {
+    @apply bg-violet-500/30 text-slate-900 dark:bg-cyan-400/35 dark:text-white;
   }
 }
 
@@ -68,5 +74,13 @@
     background-image:
       linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
       linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  }
+
+  .gh-panel {
+    @apply rounded-2xl border border-slate-200/90 bg-white/90 shadow-xl shadow-slate-200/60 backdrop-blur-md transition-colors duration-300 dark:border-slate-800/80 dark:bg-slate-900/80 dark:shadow-black/20;
+  }
+
+  .gh-title-gradient {
+    @apply bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent dark:from-violet-300 dark:via-fuchsia-300 dark:to-cyan-300;
   }
 }

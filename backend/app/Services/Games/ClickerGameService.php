@@ -8,7 +8,7 @@ use App\Services\GameService;
 
 class ClickerGameService extends GameService
 {
-    private const PRESTIGE_MIN_BALANCE = 1_000_000;
+    private const PRESTIGE_BASE_MIN_BALANCE = 1_000_000;
 
     private const UPGRADES = [
         // ── Tier 1: Básico ──────────────────────────────────────────────
@@ -42,6 +42,8 @@ class ClickerGameService extends GameService
             'upgrades'       => [],
             'total_clicks'   => 0,
             'prestige_level' => 0,
+            'prestige_click_bonus' => 0,
+            'prestige_dps_mul' => 1.0,
         ];
     }
 
@@ -54,7 +56,7 @@ class ClickerGameService extends GameService
         return match ($action) {
             'click'       => $this->handleClick($payload),
             'buy_upgrade' => $this->handleBuyUpgrade($payload),
-            'prestige'    => $this->handlePrestige(),
+            'prestige'    => $this->handlePrestige($payload),
             default       => ['error' => 'Unknown action', 'code' => 'UNKNOWN_ACTION'],
         };
     }
@@ -64,7 +66,7 @@ class ClickerGameService extends GameService
         return match ($action) {
             'click'       => isset($payload['timestamp']),
             'buy_upgrade' => isset($payload['upgrade_id']),
-            'prestige'    => true,
+            'prestige'    => !isset($payload['expected_balance']) || is_numeric($payload['expected_balance']),
             default       => false,
         };
     }
@@ -138,8 +140,9 @@ class ClickerGameService extends GameService
     private function recalcStats(array $state): array
     {
         $dps        = 0.0;
-        $clickPower = 1.0 + (($state['prestige_level'] ?? 0) * 0.5);
-        $dpsMul     = $state['prestige_dps_mul'] ?? 1.0;
+        $prestigeClickBonus = $state['prestige_click_bonus'] ?? (($state['prestige_level'] ?? 0) * 0.5);
+        $clickPower = 1.0 + $prestigeClickBonus;
+        $dpsMul     = $state['prestige_dps_mul'] ?? (1.0 + (($state['prestige_level'] ?? 0) * 0.05));
         foreach ($state['upgrades'] as $upId => $count) {
             $u = self::UPGRADES[(int) $upId] ?? null;
             if ($u) {
@@ -150,26 +153,44 @@ class ClickerGameService extends GameService
         return [$dps * $dpsMul, $clickPower];
     }
 
-    private function handlePrestige(): array
+    private function handlePrestige(array $payload = []): array
     {
         $progress = $this->loadProgress();
         $state    = $progress ? $progress->payload : $this->getInitialState();
 
-        if (($state['balance'] ?? 0) < self::PRESTIGE_MIN_BALANCE) {
-            return ['error' => 'Insufficient balance for prestige', 'code' => 'PRESTIGE_INSUFFICIENT_BALANCE'];
+        $currentPrestigeLevel = (int) ($state['prestige_level'] ?? 0);
+        $requiredBalance = $this->getPrestigeRequiredBalance($currentPrestigeLevel);
+        $savedBalance  = (float) ($state['balance'] ?? 0);
+        $clientBalance = (float) ($payload['expected_balance'] ?? 0);
+        $effectiveBalance = max($savedBalance, $clientBalance);
+
+        if ($effectiveBalance < $requiredBalance) {
+            return [
+                'error' => 'Insufficient balance for prestige',
+                'code' => 'PRESTIGE_INSUFFICIENT_BALANCE',
+                'required_balance' => $requiredBalance,
+                'current_balance' => $effectiveBalance,
+            ];
         }
 
-        $prestigeLevel = ($state['prestige_level'] ?? 0) + 1;
+        $prestigeLevel = $currentPrestigeLevel + 1;
+        $currentClickBonus = (float) ($state['prestige_click_bonus'] ?? ($currentPrestigeLevel * 0.5));
+        $currentDpsMul     = (float) ($state['prestige_dps_mul'] ?? (1.0 + ($currentPrestigeLevel * 0.05)));
+        $clickIncrement    = $this->getPrestigeClickIncrement($currentPrestigeLevel);
+        $dpsFactor         = $this->getPrestigeDpsFactor($currentPrestigeLevel);
+        $newClickBonus     = round($currentClickBonus + $clickIncrement, 4);
+        $newDpsMul         = round($currentDpsMul * $dpsFactor, 4);
 
-        // Cada nivel de prestige: +0.5 click_power base + 5% de bonificación al DPS
+        // Prestige: reinicia progreso y acumula bonus permanentes
         $newState = [
             'balance'          => 0,
-            'click_power'      => 1.0 + ($prestigeLevel * 0.5),
+            'click_power'      => 1.0 + $newClickBonus,
             'dps'              => 0,
             'upgrades'         => [],
-            'total_clicks'     => $state['total_clicks'] ?? 0,
+            'total_clicks'     => 0,
             'prestige_level'   => $prestigeLevel,
-            'prestige_dps_mul' => 1.0 + ($prestigeLevel * 0.05),
+            'prestige_click_bonus' => $newClickBonus,
+            'prestige_dps_mul' => $newDpsMul,
         ];
 
         $this->saveProgress($newState, 0);
@@ -178,8 +199,27 @@ class ClickerGameService extends GameService
             'success'          => true,
             'prestige_level'   => $prestigeLevel,
             'click_power'      => $newState['click_power'],
+            'prestige_click_bonus' => $newClickBonus,
             'prestige_dps_mul' => $newState['prestige_dps_mul'],
+            'applied_click_increment' => $clickIncrement,
+            'applied_dps_factor' => $dpsFactor,
+            'next_required_balance' => $this->getPrestigeRequiredBalance($prestigeLevel),
         ];
+    }
+
+    private function getPrestigeRequiredBalance(int $prestigeLevel): int
+    {
+        return (int) round(self::PRESTIGE_BASE_MIN_BALANCE * (2 ** max($prestigeLevel, 0)));
+    }
+
+    private function getPrestigeClickIncrement(int $prestigeLevel): float
+    {
+        return round(0.5 + ($prestigeLevel * 0.25), 4);
+    }
+
+    private function getPrestigeDpsFactor(int $prestigeLevel): float
+    {
+        return round(1.05 + (min($prestigeLevel, 10) * 0.01), 4);
     }
 
     public function getAvailableUpgrades(): array

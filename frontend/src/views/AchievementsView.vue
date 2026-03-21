@@ -28,7 +28,8 @@ onMounted(async () => {
 <template>
   <section class="mx-auto w-full max-w-5xl px-4 py-10">
     <header class="mb-6">
-      <h1 class="text-3xl font-bold text-slate-800 dark:text-white transition-colors">🎖️ Logros</h1>
+      <p class="text-xs font-bold uppercase tracking-[0.24em] text-violet-600 dark:text-violet-300">Colección</p>
+      <h1 class="mt-2 text-3xl font-black text-slate-800 dark:text-white transition-colors">🎖️ Logros</h1>
       <p class="mt-1 text-slate-500 dark:text-slate-400">
         {{ achievements.filter(a => a.unlocked).length }} / {{ achievements.length }} desbloqueados
       </p>
@@ -47,7 +48,7 @@ onMounted(async () => {
       >
         <!-- Icono o emoji -->
         <div class="mb-3 flex items-start gap-3">
-          <div class="size-10 shrink-0 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl transition-colors">
+          <div class="size-10 shrink-0 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shadow-sm shadow-slate-200/60 dark:shadow-black/20 transition-colors">
             {{ a.icon_url ?? '🏅' }}
           </div>
           <div class="flex-1 min-w-0">

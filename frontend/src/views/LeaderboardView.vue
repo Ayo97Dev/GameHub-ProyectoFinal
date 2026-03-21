@@ -29,7 +29,8 @@ onMounted(async () => {
 <template>
   <section class="mx-auto w-full max-w-3xl px-4 py-10">
     <header class="mb-6">
-      <h1 class="text-3xl font-bold text-slate-800 dark:text-white transition-colors">
+      <p class="text-xs font-bold uppercase tracking-[0.24em] text-cyan-600 dark:text-cyan-400">Competitivo</p>
+      <h1 class="mt-2 text-3xl font-black text-slate-800 dark:text-white transition-colors">
         🏆 Leaderboard — {{ gameName }}
       </h1>
       <p class="mt-1 text-slate-500 dark:text-slate-400">Top jugadores de todos los tiempos.</p>
@@ -48,9 +49,9 @@ onMounted(async () => {
         v-for="(entry, i) in entries"
         :key="entry.user_id"
         class="flex items-center gap-4 rounded-xl border px-5 py-3 transition-all"
-        :class="i === 0 ? 'border-yellow-400/50 bg-yellow-50 dark:bg-yellow-900/20'
-               : i === 1 ? 'border-slate-300/50 bg-slate-50 dark:bg-slate-800/40'
-               : i === 2 ? 'border-amber-600/30 bg-orange-50 dark:bg-orange-900/10'
+        :class="i === 0 ? 'border-yellow-400/50 bg-yellow-50 shadow-lg shadow-yellow-200/60 dark:bg-yellow-900/20 dark:shadow-yellow-900/20'
+               : i === 1 ? 'border-slate-300/50 bg-slate-50 shadow-md shadow-slate-200/50 dark:bg-slate-800/40 dark:shadow-black/20'
+               : i === 2 ? 'border-amber-600/30 bg-orange-50 shadow-md shadow-orange-200/50 dark:bg-orange-900/10 dark:shadow-black/20'
                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'"
       >
         <span class="w-10 text-center text-2xl font-black">
