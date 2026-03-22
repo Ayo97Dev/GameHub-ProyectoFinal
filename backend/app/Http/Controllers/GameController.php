@@ -99,8 +99,9 @@ class GameController extends Controller
         $service   = $this->resolveService($request->user(), $game);
         $gameState = $request->input('game_state', []);
         $score     = (int) $request->input('score', 0);
+        $playtime  = max((int) $request->input('playtime', 0), 0);
 
-        $service->saveProgress($gameState, $score);
+        $service->saveProgress($gameState, $score, $playtime);
 
         // Construir datos de disparo para los logros
         $upgrades              = $gameState['upgrades'] ?? [];

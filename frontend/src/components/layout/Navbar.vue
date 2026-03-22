@@ -58,7 +58,7 @@ async function handleLogout() {
 
           <template v-if="authStore.isLoggedIn">
             <RouterLink
-              to="/dashboard"
+              to="/profile"
               class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 hover:text-cyan-600 dark:text-slate-300 transition-colors dark:hover:bg-slate-800/80 dark:hover:text-cyan-300"
               active-class="bg-slate-100 text-cyan-600 shadow-sm dark:bg-slate-800 dark:text-cyan-300 dark:shadow-[0_0_18px_rgba(34,211,238,.2)]"
             >

@@ -32,7 +32,7 @@ onMounted(() => {
         <RouterLink to="/play/rpg">
           <BaseButton>Comenzar partida</BaseButton>
         </RouterLink>
-        <RouterLink to="/dashboard">
+        <RouterLink to="/profile">
           <BaseButton variant="ghost">Ver perfil</BaseButton>
         </RouterLink>
       </div>

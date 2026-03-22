@@ -19,7 +19,7 @@ async function submitLogin() {
   isLoading.value = true
   try {
     await authStore.login(form)
-    router.push('/dashboard')
+    router.push('/profile')
   } catch (error) {
     if (error.response?.data?.message) {
       errorMsg.value = error.response.data.message

@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        $arcade = Game::firstOrCreate(['slug' => 'quiz'], [
+        $quiz = Game::firstOrCreate(['slug' => 'quiz'], [
             'title'       => 'Quiz',
             'description' => 'Preguntas y respuestas.',
             'is_active'   => true,

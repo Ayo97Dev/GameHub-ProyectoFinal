@@ -10,6 +10,8 @@ export const useClickerStore = defineStore('clicker', () => {
   const error     = ref(null)
   const sessionId = ref(null)
   const lastSaved = ref(null)
+  const sessionStartedAt = ref(null)
+  const reportedPlaytimeSeconds = ref(0)
   // Cola de logros recién desbloqueados para notificar al usuario
   const newAchievements = ref([])
 
@@ -99,6 +101,11 @@ export const useClickerStore = defineStore('clicker', () => {
     gameState.value.click_power = clickPower
   }
 
+  function getSessionDurationSeconds() {
+    if (!sessionStartedAt.value) return 0
+    return Math.max(Math.floor((Date.now() - sessionStartedAt.value) / 1000), 0)
+  }
+
   async function initializeGame(loadSave = true) {
     isLoading.value = true
     error.value     = null
@@ -115,6 +122,8 @@ export const useClickerStore = defineStore('clicker', () => {
       }
 
       _recalcStats()
+      sessionStartedAt.value = Date.now()
+      reportedPlaytimeSeconds.value = 0
     } catch (e) {
       error.value = e.message
     } finally {
@@ -192,11 +201,16 @@ export const useClickerStore = defineStore('clicker', () => {
 
   async function saveGame() {
     try {
+      const elapsedSeconds = getSessionDurationSeconds()
+      const pendingPlaytime = Math.max(elapsedSeconds - reportedPlaytimeSeconds.value, 0)
+
       const res = await gameEngine.save(GAME_SLUG, {
         game_state: gameState.value,
         score:      gameState.value.balance,
-        playtime:   0,
+        playtime:   pendingPlaytime,
       })
+
+      reportedPlaytimeSeconds.value += pendingPlaytime
       lastSaved.value = new Date()
       if (res.achievements_unlocked?.length) {
         newAchievements.value.push(...res.achievements_unlocked)
@@ -234,6 +248,8 @@ export const useClickerStore = defineStore('clicker', () => {
     }
     sessionId.value     = null
     lastSaved.value     = null
+    sessionStartedAt.value = null
+    reportedPlaytimeSeconds.value = 0
     error.value         = null
     newAchievements.value = []
   }
@@ -245,7 +261,7 @@ export const useClickerStore = defineStore('clicker', () => {
     balance, clickPower, dps, upgrades, prestigeLevel, totalClicks,
     prestigeRequiredBalance, nextPrestigeClickIncrement, nextPrestigeDpsFactor,
     // helpers
-    upgradeCost, PRESTIGE_BASE_MIN_BALANCE,
+    upgradeCost, PRESTIGE_BASE_MIN_BALANCE, getSessionDurationSeconds,
     // actions
     initializeGame, click, buyUpgrade, prestige, saveGame, completeGame,
     $reset,

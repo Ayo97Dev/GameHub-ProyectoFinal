@@ -58,6 +58,7 @@ const TIER_STYLES = {
   },
 }
 
+// Estados y lógica de juego (clicks, DPS, mejoras, combos, logros, etc.)
 const isClicking      = ref(false)
 const toastQueue      = ref([])   // { id, title, rarity }
 const clickParticles  = ref([])   // { id, x, y, value, critical }
@@ -66,12 +67,15 @@ const comboCount      = ref(0)
 const lastClickAt     = ref(0)
 const hitFlash        = ref(false)
 const critPulse       = ref(false)
+const sessionElapsedSeconds = ref(0)
 let particleId        = 0
 let combatEventId     = 0
 let saveInterval      = null
 let dpsInterval       = null
 let comboInterval     = null
+let sessionClockInterval = null
 let toastTimers       = []
+
 
 const RARITY_STYLES = {
   common:    'border-slate-400  bg-slate-800   text-slate-100',
@@ -89,6 +93,7 @@ const RARITY_LABEL = {
   legendary: 'Legendario',
 }
 
+// Definición de los niveles de combo, sus multiplicadores y bonificaciones
 const COMBO_TIERS = [
   { threshold: 50, label: 'Impulso', multiplier: 1.05, critBonus: 0.02 },
   { threshold: 100, label: 'Ráfaga', multiplier: 1.12, critBonus: 0.04 },
@@ -127,6 +132,7 @@ const critChance = computed(() => {
 })
 const comboLabel = computed(() => currentComboTier.value?.label ?? 'Calma')
 
+// Cálculo de energía dinámica para efectos visuales basados en DPS y racha de combos
 const dpsEnergy = computed(() => Math.min(clicker.dps / 15_000, 1))
 const cadenceEnergy = computed(() => Math.min(comboCount.value / 1_000, 1))
 const dynamicEnergy = computed(() => Math.min(0.2 + (dpsEnergy.value * 0.55) + (cadenceEnergy.value * 0.45), 1))
@@ -160,6 +166,7 @@ const ambientNodes = computed(() => {
   })
 })
 
+// Función para crear un log del combate
 function pushCombatEvent(text, tone = 'neutral') {
   const id = ++combatEventId
   combatEvents.value.unshift({ id, text, tone })
@@ -191,8 +198,15 @@ function saveOnUnload() {
   clicker.saveGame()
 }
 
+
 onMounted(async () => {
+  // Guarda el tiempo de juego
   await clicker.initializeGame(true)
+  sessionElapsedSeconds.value = clicker.getSessionDurationSeconds()
+
+  sessionClockInterval = setInterval(() => {
+    sessionElapsedSeconds.value = clicker.getSessionDurationSeconds()
+  }, 1000)
 
   // Auto-guardado cada 30 s
   saveInterval = setInterval(() => clicker.saveGame(), 30_000)
@@ -220,6 +234,7 @@ onUnmounted(() => {
   clearInterval(saveInterval)
   clearInterval(dpsInterval)
   clearInterval(comboInterval)
+  clearInterval(sessionClockInterval)
   toastTimers.forEach(clearTimeout)
   document.removeEventListener('visibilitychange', saveOnHide)
   window.removeEventListener('beforeunload', saveOnUnload)
@@ -287,6 +302,19 @@ function formatNumber(n) {
   if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K'
   return Math.floor(n).toString()
 }
+
+function formatSessionDuration(seconds) {
+  const total = Math.max(Math.floor(seconds), 0)
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  const secs = total % 60
+
+  if (hours > 0) {
+    return `${hours}h ${minutes.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`
+  }
+
+  return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
 </script>
 
 <template>
@@ -320,9 +348,14 @@ function formatNumber(n) {
             </div>
           </div>
 
+          <div class="mt-2 rounded-xl border border-slate-300/50 dark:border-slate-700/50 bg-slate-50/80 dark:bg-slate-900/40 px-3 py-2 text-center transition-colors">
+            <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Tiempo de sesión</p>
+            <p class="text-lg font-black tabular-nums text-slate-700 dark:text-slate-200">{{ formatSessionDuration(sessionElapsedSeconds) }}</p>
+          </div>
+
           <div class="mt-3 rounded-xl border border-cyan-300/50 dark:border-cyan-700/50 bg-cyan-50/80 dark:bg-cyan-950/25 p-2 transition-colors">
             <div class="mb-1 flex items-center justify-between">
-              <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-700 dark:text-cyan-300">Cadencia</p>
+              <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-700 dark:text-cyan-300">Combo</p>
               <p class="text-xs font-black uppercase tracking-[0.12em] text-cyan-600 dark:text-cyan-300">{{ comboLabel }} · x{{ comboCount }}</p>
             </div>
             <div class="h-1.5 w-full overflow-hidden rounded-full bg-cyan-200 dark:bg-cyan-900/60">
@@ -420,7 +453,7 @@ function formatNumber(n) {
           </div>
 
           <div class="rounded-xl border border-slate-300/70 dark:border-slate-700/60 bg-slate-50/85 dark:bg-slate-950/45 p-2 text-center transition-colors">
-            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pulsa rápido para mantener la racha y llenar la barra de cadencia.</p>
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pulsa rápido para mantener la racha y llenar la barra de combo.</p>
           </div>
         </div>
 

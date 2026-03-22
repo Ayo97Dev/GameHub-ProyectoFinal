@@ -21,7 +21,7 @@ async function submitRegister() {
   isLoading.value = true
   try {
     await authStore.register(form)
-    router.push('/dashboard')
+    router.push('/profile')
   } catch (error) {
     if (error.response?.data?.message) {
       errorMsg.value = error.response.data.message

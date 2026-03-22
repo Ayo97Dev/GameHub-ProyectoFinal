@@ -11,7 +11,7 @@ export const useGameStore = defineStore('game', () => {
     'cookie-clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
     'rpg': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
     'clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
-    'arcade': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80'
+    'quiz': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80'
   }
 
   async function fetchGames() {
@@ -20,7 +20,7 @@ export const useGameStore = defineStore('game', () => {
       const { data } = await api.get('/games')
       games.value = data.data.map(game => ({
         ...game,
-        cover: DEFAULT_COVERS[game.slug] || DEFAULT_COVERS['arcade'],
+        cover: DEFAULT_COVERS[game.slug] || DEFAULT_COVERS['quiz'],
         route: `/play/${game.slug}`
       }))
     } catch (error) {
@@ -30,7 +30,7 @@ export const useGameStore = defineStore('game', () => {
         games.value = [
           { slug: 'rpg', title: 'Dungeon Realms RPG', description: 'Explora mazmorras oscuras y sube de nivel a tu héroe.', cover: DEFAULT_COVERS['rpg'], route: '/play/rpg' },
           { slug: 'clicker', title: 'Neon Clicker Rush', description: 'Haz clic, mejora tu producción y domina el ranking.', cover: DEFAULT_COVERS['clicker'], route: '/play/clicker' },
-          { slug: 'arcade', title: 'Cyber Arcade Blaster', description: 'Acción arcade retro con reflejos al límite.', cover: DEFAULT_COVERS['arcade'], route: '/play/arcade' }
+          { slug: 'quiz', title: 'Quiz Master', description: 'Preguntas rápidas y ranking en tiempo real.', cover: DEFAULT_COVERS['quiz'], route: '/play/quiz' }
         ]
       }
     } finally {
