@@ -11,7 +11,9 @@ use App\Http\Resources\GameSessionResource;
 use App\Models\Game;
 use App\Models\GameSession;
 use App\Services\AchievementService;
+use App\Services\Games\Connect4GameService;
 use App\Services\Games\ClickerGameService;
+use App\Services\Games\TowerDefenseGameService;
 use App\Services\GameService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -100,6 +102,13 @@ class GameController extends Controller
         $gameState = $request->input('game_state', []);
         $score     = (int) $request->input('score', 0);
         $playtime  = max((int) $request->input('playtime', 0), 0);
+        $wins      = max((int) ($gameState['wins'] ?? 0), 0);
+        $losses    = max((int) ($gameState['losses'] ?? 0), 0);
+
+        if ($game->slug === 'connect4') {
+            // En Connect4 el leaderboard usa victorias acumuladas.
+            $score = $wins;
+        }
 
         $service->saveProgress($gameState, $score, $playtime);
 
@@ -120,6 +129,8 @@ class GameController extends Controller
                 'prestige_level'        => (int) ($gameState['prestige_level'] ?? 0),
                 'total_upgrades_bought' => $totalUpgradesBought,
                 'max_upgrade_count'     => $maxUpgradeCount,
+                'wins'                  => $wins,
+                'losses'                => $losses,
             ]
         );
 
@@ -175,7 +186,9 @@ class GameController extends Controller
     private function resolveService($user, Game $game): GameService
     {
         return match ($game->slug) {
+            'connect4' => new Connect4GameService($user, $game),
             'clicker' => new ClickerGameService($user, $game),
+            'towerdefense' => new TowerDefenseGameService($user, $game),
             default   => new ClickerGameService($user, $game), // fallback genérico
         };
     }

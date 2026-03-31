@@ -52,6 +52,10 @@ class AchievementService
             'score'                 => $data['score'] ?? 0,
             // Duración de sesión en segundos
             'duration'              => $data['duration'] ?? PHP_INT_MAX,
+            // Victorias acumuladas
+            'wins'                  => $data['wins'] ?? 0,
+            // Derrotas acumuladas
+            'losses'                => $data['losses'] ?? 0,
             // Clics totales
             'total_clicks'          => $data['total_clicks'] ?? 0,
             // Nivel de prestige

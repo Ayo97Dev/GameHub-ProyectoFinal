@@ -3,15 +3,19 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGameStore } from '../stores/game'
 import { useClickerStore } from '../stores/games/clicker'
+import { useConnect4Store } from '../stores/games/connect4'
 import api from '../lib/axios'
 import Rpg from '../components/games/Rpg.vue'
 import Clicker from '../components/games/Clicker.vue'
 import Quiz from '../components/games/Quiz.vue'
+import Connect4 from '../components/games/Connect4.vue'
+import Towerdefense from '../components/games/Towerdefense.vue'
 import MockAd from '../components/ads/MockAd.vue'
 
 const route      = useRoute()
 const gameStore  = useGameStore()
 const clicker    = useClickerStore()
+const connect4   = useConnect4Store()
 
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
 
@@ -19,6 +23,8 @@ const FALLBACK_TITLE_BY_SLUG = {
   clicker: 'Reactor de Clics',
   rpg: 'Modo RPG',
   quiz: 'Modo Quiz',
+  connect4: 'Conecta 4',
+  towerdefense: 'Tower Defense',
 }
 
 const pageTitle = computed(() => {
@@ -27,18 +33,40 @@ const pageTitle = computed(() => {
 })
 
 const leaderboard = ref([])
+const towerDefenseScore = ref(0)
 
 const gameComponent = computed(() => {
   if (route.params.slug === 'rpg')     return Rpg
   if (route.params.slug === 'clicker') return Clicker
   if (route.params.slug === 'quiz')    return Quiz
+  if (route.params.slug === 'connect4') return Connect4
+  if (route.params.slug === 'towerdefense') return Towerdefense
   return null
 })
 
 const liveScore = computed(() => {
   if (route.params.slug === 'clicker') return Math.floor(clicker.balance)
+  if (route.params.slug === 'connect4') return connect4.wins
+  if (route.params.slug === 'towerdefense') return towerDefenseScore.value
   return 0
 })
+
+const liveScoreLabel = computed(() => {
+  if (route.params.slug === 'connect4') return 'Victorias'
+  if (route.params.slug === 'towerdefense') return 'Rondas superadas'
+  return 'Puntos'
+})
+
+const leaderboardLabel = computed(() => {
+  if (route.params.slug === 'connect4') return 'Top 3 — Victorias'
+  if (route.params.slug === 'towerdefense') return 'Top 3 — Rondas'
+  return 'Top 3 — Clasificación'
+})
+
+function handleLiveScore(value) {
+  const parsed = Number(value)
+  towerDefenseScore.value = Number.isFinite(parsed) ? Math.max(Math.floor(parsed), 0) : 0
+}
 
 onMounted(async () => {
   try {
@@ -71,7 +99,7 @@ onMounted(async () => {
       </aside>
 
       <div class="order-2 lg:order-1 xl:order-2 gh-panel p-4 sm:p-5">
-        <component :is="gameComponent" v-if="gameComponent" />
+        <component :is="gameComponent" v-if="gameComponent" @live-score="handleLiveScore" />
         <div v-else class="min-h-[320px] rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-zinc-900 p-6 text-slate-600 dark:text-slate-300 transition-colors">
           El slug del juego no es válido.
         </div>
@@ -83,7 +111,7 @@ onMounted(async () => {
           <h2 class="text-base sm:text-lg font-black text-violet-600 dark:text-cyan-300 transition-colors">Estadísticas en vivo</h2>
           <div class="mt-2 space-y-2">
             <div class="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors">
-              <p class="text-[11px] uppercase tracking-wide text-slate-600 dark:text-slate-300">Puntos</p>
+              <p class="text-[11px] uppercase tracking-wide text-slate-600 dark:text-slate-300">{{ liveScoreLabel }}</p>
               <p class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">{{ liveScore.toLocaleString() }}</p>
             </div>
           </div>
@@ -91,7 +119,7 @@ onMounted(async () => {
 
         <!-- Top 3 de clasificación -->
         <div>
-          <h2 class="text-base font-semibold text-slate-700 dark:text-slate-200 transition-colors">Top 3 — Clasificación</h2>
+          <h2 class="text-base font-semibold text-slate-700 dark:text-slate-200 transition-colors">{{ leaderboardLabel }}</h2>
           <div class="mt-2 space-y-2">
             <div
               v-for="(entry, i) in leaderboard"
@@ -104,7 +132,9 @@ onMounted(async () => {
               <div class="flex-1 min-w-0">
                 <p class="truncate text-sm font-medium text-slate-800 dark:text-white">{{ entry.username }}</p>
               </div>
-              <span class="text-sm font-bold text-violet-600 dark:text-cyan-400">{{ Number(entry.high_score).toLocaleString() }}</span>
+              <span class="text-sm font-bold text-violet-600 dark:text-cyan-400">
+                {{ Number(entry.high_score).toLocaleString() }}
+              </span>
             </div>
             <p v-if="leaderboard.length === 0" class="text-xs text-slate-400 dark:text-slate-500">Aún no hay puntuaciones.</p>
           </div>

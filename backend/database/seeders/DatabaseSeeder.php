@@ -52,6 +52,26 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        $connect4 = Game::firstOrCreate(['slug' => 'connect4'], [
+            'title'       => 'Connect 4',
+            'description' => 'Conecta cuatro fichas contra la IA.',
+            'is_active'   => true,
+            'config'      => [
+                'allowed_actions'       => [],
+                'rate_limit_per_minute' => 60,
+            ],
+        ]);
+
+        Game::firstOrCreate(['slug' => 'towerdefense'], [
+            'title'       => 'Tower Defense',
+            'description' => 'Defiende tu base con torretas y oleadas crecientes.',
+            'is_active'   => true,
+            'config'      => [
+                'allowed_actions'       => [],
+                'rate_limit_per_minute' => 60,
+            ],
+        ]);
+
         // Achievements globales
         $achievementsData = [
             // ── Puntuación ──────────────────────────────────────────────────────
@@ -88,6 +108,13 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'prestige-3',         'title' => 'Triple Renacimiento',      'description' => 'Realiza 3 Prestiges.',                       'game_id' => $clicker->id, 'points_reward' => 100, 'rarity' => 'rare',      'condition' => ['field' => 'prestige_level', 'operator' => 'greater_than_or_equal', 'value' => 3]],
             ['slug' => 'prestige-master',    'title' => 'Maestro del Renacimiento', 'description' => 'Realiza 5 Prestiges.',                       'game_id' => $clicker->id, 'points_reward' => 200, 'rarity' => 'epic',      'condition' => ['field' => 'prestige_level', 'operator' => 'greater_than_or_equal', 'value' => 5]],
             ['slug' => 'prestige-legend',    'title' => 'Eterno',                   'description' => 'Realiza 10 Prestiges.',                      'game_id' => $clicker->id, 'points_reward' => 500, 'rarity' => 'legendary', 'condition' => ['field' => 'prestige_level', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+
+            // ── Connect4: Victorias ───────────────────────────────────────────
+            ['slug' => 'connect4-wins-1',    'title' => 'Primera Victoria',        'description' => 'Gana 1 partida de Connect4.',                'game_id' => $connect4->id, 'points_reward' => 20,  'rarity' => 'common',    'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 1]],
+            ['slug' => 'connect4-wins-10',   'title' => 'Racha Inicial',           'description' => 'Gana 10 partidas de Connect4.',              'game_id' => $connect4->id, 'points_reward' => 60,  'rarity' => 'uncommon',  'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+            ['slug' => 'connect4-wins-20',   'title' => 'Competidor Serio',        'description' => 'Gana 20 partidas de Connect4.',              'game_id' => $connect4->id, 'points_reward' => 120, 'rarity' => 'rare',      'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 20]],
+            ['slug' => 'connect4-wins-50',   'title' => 'Maestro de la Cuadricula', 'description' => 'Gana 50 partidas de Connect4.',             'game_id' => $connect4->id, 'points_reward' => 260, 'rarity' => 'epic',      'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 50]],
+            ['slug' => 'connect4-wins-100',  'title' => 'Leyenda de Connect4',     'description' => 'Gana 100 partidas de Connect4.',             'game_id' => $connect4->id, 'points_reward' => 500, 'rarity' => 'legendary', 'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 100]],
 
             // ── Global ───────────────────────────────────────────────────────
             ['slug' => 'speed-runner',       'title' => 'Speed Runner',             'description' => 'Completa una sesión en menos de 60 segundos.', 'game_id' => null,       'points_reward' => 75,  'rarity' => 'epic',      'condition' => ['field' => 'duration', 'operator' => 'less_than_or_equal', 'value' => 60]],

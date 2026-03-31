@@ -13,7 +13,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/games', [GameController::class, 'index']);
 Route::get('/games/{slug}', [GameController::class, 'show']);
-Route::get('/leaderboard/{slug}', [StatsController::class, 'leaderboard']);
+Route::get('/leaderboard/{slug}', [StatsController::class, 'leaderboard'])->middleware('connect4.leaderboard.auth');
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {

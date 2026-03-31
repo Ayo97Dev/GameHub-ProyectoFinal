@@ -23,6 +23,11 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const auth = useAuthStore()
+
+  if (to.name === 'leaderboard' && to.params.slug === 'connect4' && !auth.isLoggedIn) {
+    return { name: 'login' }
+  }
+
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return { name: 'login' }
   }

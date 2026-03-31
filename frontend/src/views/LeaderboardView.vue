@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../lib/axios'
 
@@ -9,6 +9,15 @@ const slug  = route.params.slug
 const entries  = ref([])
 const gameName = ref('')
 const isLoading = ref(true)
+const isConnect4 = computed(() => slug === 'connect4')
+const leaderboardSubtitle = computed(() => {
+  if (isConnect4.value) return 'Top jugadores por victorias acumuladas.'
+  return 'Top jugadores de todos los tiempos.'
+})
+const scoreLabel = computed(() => {
+  if (isConnect4.value) return 'victorias'
+  return 'puntos'
+})
 
 onMounted(async () => {
   try {
@@ -33,7 +42,7 @@ onMounted(async () => {
       <h1 class="mt-2 text-3xl font-black text-slate-800 dark:text-white transition-colors">
         🏆 Leaderboard — {{ gameName }}
       </h1>
-      <p class="mt-1 text-slate-500 dark:text-slate-400">Top jugadores de todos los tiempos.</p>
+      <p class="mt-1 text-slate-500 dark:text-slate-400">{{ leaderboardSubtitle }}</p>
     </header>
 
     <div v-if="isLoading" class="flex justify-center py-16 text-slate-500 dark:text-slate-400">
@@ -68,6 +77,7 @@ onMounted(async () => {
         </div>
         <div class="text-right shrink-0">
           <p class="text-lg font-bold text-violet-600 dark:text-cyan-300">{{ Number(entry.high_score).toLocaleString() }}</p>
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ scoreLabel }}</p>
           <p v-if="entry.time_played" class="text-xs text-slate-400 dark:text-slate-500">
             {{ Math.floor(entry.time_played / 60) }}m jugadas
           </p>
