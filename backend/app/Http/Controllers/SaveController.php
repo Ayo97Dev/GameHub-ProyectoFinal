@@ -30,7 +30,7 @@ class SaveController extends Controller
             ->where('game_id', $gameId)
             ->first();
 
-        if (!$save) {
+        if (! $save) {
             return response()->json(['message' => 'No save found'], 404);
         }
 

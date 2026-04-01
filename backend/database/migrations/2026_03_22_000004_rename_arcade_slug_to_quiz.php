@@ -10,7 +10,7 @@ return new class extends Migration
         $arcade = DB::table('games')->where('slug', 'arcade')->first();
         $quiz = DB::table('games')->where('slug', 'quiz')->first();
 
-        if ($arcade && !$quiz) {
+        if ($arcade && ! $quiz) {
             DB::table('games')
                 ->where('id', $arcade->id)
                 ->update([
@@ -27,7 +27,7 @@ return new class extends Migration
         $arcade = DB::table('games')->where('slug', 'arcade')->first();
         $quiz = DB::table('games')->where('slug', 'quiz')->first();
 
-        if ($quiz && !$arcade) {
+        if ($quiz && ! $arcade) {
             DB::table('games')
                 ->where('id', $quiz->id)
                 ->update([

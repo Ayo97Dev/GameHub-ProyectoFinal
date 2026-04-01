@@ -38,9 +38,9 @@ class AchievementService
 
     private function conditionMet(array $condition, array $data): bool
     {
-        $field    = $condition['field']    ?? null;
+        $field = $condition['field'] ?? null;
         $operator = $condition['operator'] ?? null;
-        $target   = $condition['value']    ?? null;
+        $target = $condition['value'] ?? null;
 
         if ($field === null) {
             return false;
@@ -48,25 +48,30 @@ class AchievementService
 
         // Valor a comparar según el campo
         $value = match ($field) {
-            // Puntuación/balance actual
-            'score'                 => $data['score'] ?? 0,
+            // Puntuación/balance actual / oleada máxima (Tower Defense)
+            'score' => $data['score'] ?? 0,
+            'max_wave' => $data['max_wave_reached'] ?? 0,
             // Duración de sesión en segundos
-            'duration'              => $data['duration'] ?? PHP_INT_MAX,
+            'duration' => $data['duration'] ?? PHP_INT_MAX,
             // Victorias acumuladas
-            'wins'                  => $data['wins'] ?? 0,
+            'wins' => $data['wins'] ?? 0,
             // Derrotas acumuladas
-            'losses'                => $data['losses'] ?? 0,
+            'losses' => $data['losses'] ?? 0,
             // Clics totales
-            'total_clicks'          => $data['total_clicks'] ?? 0,
+            'total_clicks' => $data['total_clicks'] ?? 0,
             // Nivel de prestige
-            'prestige_level'        => $data['prestige_level'] ?? 0,
+            'prestige_level' => $data['prestige_level'] ?? 0,
             // Total de mejoras compradas (suma de todas)
             'total_upgrades_bought' => $data['total_upgrades_bought'] ?? 0,
             // Máximo de veces que se ha comprado UNA MISMA mejora
-            'max_upgrade_count'     => $data['max_upgrade_count'] ?? 0,
+            'max_upgrade_count' => $data['max_upgrade_count'] ?? 0,
             // Número de veces que se ha comprado una mejora específica
-            'upgrade_count'         => $data['upgrades'][$condition['upgrade_id'] ?? 0] ?? 0,
-            default                 => null,
+            'upgrade_count' => $data['upgrades'][$condition['upgrade_id'] ?? 0] ?? 0,
+            // Tower Defense: Torres construidas
+            'total_towers_built' => $data['total_towers_built'] ?? 0,
+            // Tower Defense: Oro gastado
+            'total_gold_spent' => $data['total_gold_spent'] ?? 0,
+            default => null,
         };
 
         if ($value === null) {
@@ -74,12 +79,12 @@ class AchievementService
         }
 
         return match ($operator) {
-            'greater_than'          => $value > $target,
+            'greater_than' => $value > $target,
             'greater_than_or_equal' => $value >= $target,
-            'equal'                 => $value == $target,
-            'less_than'             => $value < $target,
-            'less_than_or_equal'    => $value <= $target,
-            default                 => false,
+            'equal' => $value == $target,
+            'less_than' => $value < $target,
+            'less_than_or_equal' => $value <= $target,
+            default => false,
         };
     }
 

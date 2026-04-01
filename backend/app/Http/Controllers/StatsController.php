@@ -7,7 +7,6 @@ use App\Http\Resources\GameStatResource;
 use App\Http\Resources\LeaderboardResource;
 use App\Models\Game;
 use App\Models\GameStat;
-use Illuminate\Http\Request;
 
 class StatsController extends Controller
 {

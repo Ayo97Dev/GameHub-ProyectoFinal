@@ -1,12 +1,54 @@
 <template>
   <div class="tower-defense gh-neon-ring">
+    <!-- ───────────────────────────────────────────────────────────────
+         Pantalla de elección: Continuar vs Nueva Partida
+         ─────────────────────────────────────────────────────────────── -->
+    <div v-if="gameMode === 'choice'" class="screen-choice">
+      <div class="choice-container">
+        <h1 class="choice-title">Tower Defense</h1>
+        <p class="choice-subtitle">Defiende el reactor y escala la dificultad por oleadas.</p>
+        
+        <div v-if="store.isLoading" class="choice-loading">
+          <p>Cargando...</p>
+        </div>
+        <div v-else class="choice-buttons">
+          <button
+            v-if="store.savedGame"
+            @click="startGame(true)"
+            class="btn-choice btn-continue"
+          >
+            <span class="btn-icon">▶</span>
+            <span>Continuar Partida</span>
+            <span class="btn-detail">Onda {{ store.savedGame.wave }}</span>
+          </button>
+          
+          <button
+            @click="startGame(false)"
+            class="btn-choice btn-new"
+          >
+            <span class="btn-icon">✨</span>
+            <span>Nueva Partida</span>
+            <span class="btn-detail">Empieza desde cero</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────────────────────────────────
+         Pantalla principal del juego
+         ─────────────────────────────────────────────────────────────── -->
+    <template v-else-if="gameMode === 'playing'">
     <header class="hud">
-      <div class="hud-intro">
-        <p class="kicker">Modo Estrategia</p>
-        <p class="subtitle">Defiende el reactor y escala la dificultad por oleadas.</p>
+      <div class="hud-left">
+        <div class="game-title">
+          <p class="kicker">Modo Estrategia</p>
+          <h2 class="game-name">Tower Defense</h2>
+          <p class="subtitle small">Defiende el reactor y escala la dificultad por oleadas.</p>
+        </div>
       </div>
 
-      <div class="stats">
+      <div class="hud-right">
+        <div class="stats">
         <article class="stat-card lives">
           <p class="stat-label">Vidas</p>
           <p class="stat-value">{{ gameState.lives }}</p>
@@ -19,26 +61,27 @@
           <p class="stat-label">Ronda</p>
           <p class="stat-value">{{ gameState.wave }}</p>
         </article>
-      </div>
+        </div>
 
-      <div class="wave-panel" :class="{ danger: gameState.gameOver }">
-        <template v-if="gameState.gameOver">
-          <p class="wave-title">Base caída</p>
-          <p class="wave-text">Sobreviviste {{ gameState.wave - 1 }} rondas.</p>
-          <button @click="resetGame" class="btn-start">Reiniciar</button>
-        </template>
-        <template v-else-if="!gameState.waveActive">
-          <p class="wave-title">Fase de Preparación</p>
-          <p class="wave-text">Coloca y mejora torres.</p>
-          <button @click="startWave" class="btn-start">Lanzar Ronda {{ gameState.wave }}</button>
-        </template>
-        <template v-else>
-          <p class="wave-title">Ronda Activa</p>
-          <div class="wave-track">
-            <div class="wave-fill" :style="{ width: `${waveProgressPercent}%` }"></div>
+        <div class="wave-panel" :class="{ danger: gameState.gameOver }">
+          <div v-if="gameState.gameOver">
+            <p class="wave-title">Base caída</p>
+            <p class="wave-text">Sobreviviste {{ gameState.wave - 1 }} rondas.</p>
+            <button @click="resetGameLocal" class="btn-start">Volver</button>
           </div>
-          <p class="wave-text">Enemigos restantes: {{ remainingEnemies }}</p>
-        </template>
+          <div v-else-if="!gameState.waveActive">
+            <p class="wave-title">Fase de Preparación</p>
+            <p class="wave-text">Coloca y mejora torres.</p>
+            <button @click="startWave" class="btn-start">Lanzar Ronda {{ gameState.wave }}</button>
+          </div>
+          <div v-else>
+            <p class="wave-title">Ronda Activa</p>
+            <div class="wave-track">
+              <div class="wave-fill" :style="{ width: `${waveProgressPercent}%` }"></div>
+            </div>
+            <p class="wave-text">Enemigos restantes: {{ remainingEnemies }}</p>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -103,13 +146,16 @@
         </div>
       </div>
 
-      <aside class="sidebar">
-        <h3 class="sidebar-title">{{ selectedCell ? `Celda (${selectedCell.x}, ${selectedCell.y})` : 'Selecciona una celda' }}</h3>
-        <div v-if="!selectedCell" class="empty-sidebar">
-          <p>Haz clic en cualquier casilla para comenzar.</p>
-          <p class="empty-hint">Las casillas de camino no pueden ser seleccionadas.</p>
+    </div>
+
+    <teleport to="body">
+      <div v-if="selectedCell" class="tooltip-panel" :style="tooltipPosition">
+        <div class="tooltip-header">
+          <h3 class="sidebar-title">Celda ({{ selectedCell.x }}, {{ selectedCell.y }})</h3>
+          <button class="tooltip-close" @click="closeTooltip" aria-label="Cerrar">✕</button>
         </div>
-        <template v-else>
+
+        <div class="tooltip-content">
           <div v-if="!selectedTower">
             <p class="section-title">Construir Torre</p>
             <div v-for="(type, key) in towerTypes" :key="key" class="shop-item" :class="{ disabled: gameState.gold < type.cost }" @click="buildTower(key)">
@@ -117,7 +163,6 @@
               <div class="item-info">
                 <div class="item-head">
                   <strong>{{ type.name }}</strong>
-                  <span class="effect-chip">{{ towerEffectLabel(type.effect) }}</span>
                 </div>
                 <small>Daño: {{ type.damage }} | Rango: {{ type.range }}</small>
                 <div class="effect-desc">{{ type.desc }}</div>
@@ -125,6 +170,7 @@
               <div class="item-cost">{{ type.cost }}</div>
             </div>
           </div>
+
           <div v-else class="upgrade-panel">
             <h4>{{ selectedTower.name }} (Nvl {{ selectedTower.level }})</h4>
             <div class="stats-grid">
@@ -137,20 +183,28 @@
             <button class="btn-upgrade" :disabled="gameState.gold < upgradeCost" @click="upgradeTower">Mejorar ({{ upgradeCost }})</button>
             <button class="btn-sell" @click="sellTower">Vender ({{ selectedTowerSellValue }})</button>
           </div>
-        </template>
-      </aside>
-    </div>
+        </div>
+      </div>
+    </teleport>
+    </template>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useTowerDefenseStore } from '../../stores/games/towerdefense'
+import gameEngineService from '../../lib/gameEngineService'
 
 const emit = defineEmits(['live-score'])
+
+const store = useTowerDefenseStore()
 
 const mapWidth = 12
 const mapHeight = 10
 const cellSize = 50
+
+const viewportVersion = ref(0)
+const gameMode = ref('choice') // 'choice' | 'continue' | 'new' | 'playing'
 
 const path = [
   { x: 0, y: 2 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 3, y: 2 }, { x: 4, y: 2 },
@@ -174,6 +228,7 @@ const towers = ref([])
 const enemies = ref([])
 const projectiles = ref([])
 const selectedCell = ref(null)
+const clickPosition = ref(null) // { x, y } en pixels
 
 const towerTypes = {
   basic: { name: 'Básica', cost: 30, range: 2.5, damage: 15, cooldownMax: 20, color: '#38bdf8', desc: 'Equilibrada', effect: 'none' },
@@ -399,13 +454,76 @@ const applyProjectileImpact = (projectile, target) => {
   }
 }
 
+const tooltipPosition = computed(() => {
+  // Acceder a viewportVersion para que el computed se recalcule en resize
+  viewportVersion.value
+
+  if (!selectedCell.value || !clickPosition.value) return {}
+
+  const { x: clickX, y: clickY } = clickPosition.value
+  const tooltipWidth = 320
+  const tooltipHeight = 300 // estimado
+  const padding = 12
+  const cellCenterX = clickX + cellSize / 2
+  const cellCenterY = clickY + cellSize / 2
+
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+
+  let left, top
+
+  // Intentar posicionar a la derecha de la celda
+  if (cellCenterX + padding + tooltipWidth < viewportWidth) {
+    left = cellCenterX + padding
+  } else if (cellCenterX - padding - tooltipWidth > 0) {
+    // Si no hay lugar a la derecha, intentar a la izquierda
+    left = cellCenterX - padding - tooltipWidth
+  } else {
+    // Si no hay lugar en ninguno de los lados, centrar en X
+    left = Math.max(padding, Math.min(viewportWidth - tooltipWidth - padding, viewportWidth / 2 - tooltipWidth / 2))
+  }
+
+  // Posicionar verticalmente cerca del clic, pero asegurado dentro del viewport
+  let preferredTop = cellCenterY - tooltipHeight / 2
+  top = Math.max(padding, Math.min(viewportHeight - tooltipHeight - padding, preferredTop))
+
+  return {
+    left: `${left}px`,
+    top: `${top}px`,
+    position: 'fixed'
+  }
+})
+
 const handleMapClick = (event) => {
+  // evitar que el handler global de "click fuera" cierre inmediatamente
+  if (event && event.stopPropagation) event.stopPropagation()
+
   const cell = event.target.closest('.cell')
   if (!cell) return
 
   const x = parseInt(cell.dataset.x, 10)
   const y = parseInt(cell.dataset.y, 10)
+
+  // No abrir tooltip en casillas de camino (no construibles)
+  if (isPath(x, y) && !getTowerAt(x, y)) {
+    selectedCell.value = null
+    clickPosition.value = null
+    return
+  }
+
+  // Guardar la posición del clic en pixels
+  const rect = cell.getBoundingClientRect()
+  clickPosition.value = {
+    x: rect.left,
+    y: rect.top
+  }
+
   selectedCell.value = { x, y }
+}
+
+const closeTooltip = () => {
+  selectedCell.value = null
+  clickPosition.value = null
 }
 
 let towerIdCounter = 0
@@ -413,6 +531,8 @@ let enemyIdCounter = 0
 let projectileIdCounter = 0
 let spawnInterval = null
 let gameLoopId = null
+let resizeListener = null
+let outsideClickHandler = null
 
 const buildTower = (typeKey) => {
   const type = towerTypes[typeKey]
@@ -595,10 +715,74 @@ const gameTick = () => {
     totalWaveEnemies.value = 0
     clearSpawnLoop()
     gameState.wave++
+    
+    // Autosave al terminar onda
+    saveWaveProgress()
+  }
+  
+  // Si vidas llegan a 0, game over
+  if (gameState.lives <= 0 && !gameState.gameOver) {
+    handleGameOver()
   }
 }
 
-const resetGame = () => {
+/**
+ * Guarda el progreso (autosave al terminar onda)
+ */
+async function saveWaveProgress() {
+  try {
+    const response = await store.saveProgress(gameState.wave)
+    if (response?.achievements_unlocked && response.achievements_unlocked.length > 0) {
+      console.log('Achievements unlocked:', response.achievements_unlocked)
+    }
+  } catch (error) {
+    console.error('Error saving wave progress:', error)
+  }
+}
+
+/**
+ * Maneja el game over y guarda la partida
+ */
+async function handleGameOver() {
+  gameState.gameOver = true
+  gameState.waveActive = false
+  
+  try {
+    // Guardar estado final
+    const response = await store.saveProgress(gameState.wave)
+    if (response?.achievements_unlocked) {
+      console.log('Final achievements:', response.achievements_unlocked)
+    }
+    
+    // Completar sesión
+    await store.completeSession(gameState.wave, 0)
+    
+    // Borrar guardado
+    await store.resetGame()
+  } catch (error) {
+    console.error('Error handling game over:', error)
+  }
+}
+
+/**
+ * Inicia el juego con las opciones del usuario
+ */
+async function startGame(continueGame = false) {
+  await store.initializeTowerDefense(continueGame)
+  
+  // Copiar estado del store al componente
+  Object.assign(gameState, store.gameState)
+  towers.value = store.gameState.towers || []
+  
+  gameMode.value = 'playing'
+  
+  // Iniciar el game loop cuando el juego comienza
+  if (!gameLoopId) {
+    gameLoopId = setInterval(gameTick, 30)
+  }
+}
+
+const resetGameLocal = () => {
   Object.assign(gameState, {
     lives: 20,
     gold: 150,
@@ -616,8 +800,10 @@ const resetGame = () => {
   enemies.value = []
   projectiles.value = []
   selectedCell.value = null
+  clickPosition.value = null
   clearSpawnLoop()
   emit('live-score', 0)
+  gameMode.value = 'choice'
 }
 
 watch(
@@ -628,13 +814,39 @@ watch(
   { immediate: true }
 )
 
-onMounted(() => {
-  gameLoopId = setInterval(gameTick, 30)
+onMounted(async () => {
+  // Cargar si hay partida guardada (esto solo marca si existe, no inicia el juego)
+  await store.loadGame()
+  
+  // El game loop solo debería iniciarse cuando el juego empieza
+  // Por ahora es null; se iniciará en startGame()
+  
+  // Reposicionar tooltip cuando se redimensiona la ventana
+  resizeListener = () => {
+    viewportVersion.value++
+  }
+  window.addEventListener('resize', resizeListener)
+  
+  // Cerrar tooltip al hacer click fuera de él
+  outsideClickHandler = (e) => {
+    // si no hay tooltip abierto, nada que hacer
+    const tooltip = document.querySelector('.tooltip-panel')
+    if (!tooltip) return
+
+    // si el click ocurrió dentro del tooltip, no cerramos
+    if (e.target.closest && e.target.closest('.tooltip-panel')) return
+
+    selectedCell.value = null
+    clickPosition.value = null
+  }
+  document.addEventListener('click', outsideClickHandler)
 })
 
 onUnmounted(() => {
   if (gameLoopId) clearInterval(gameLoopId)
   clearSpawnLoop()
+  if (resizeListener) window.removeEventListener('resize', resizeListener)
+  if (outsideClickHandler) document.removeEventListener('click', outsideClickHandler)
 })
 </script>
 
@@ -677,11 +889,14 @@ onUnmounted(() => {
 .hud {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: 1.15fr 1.8fr 1.45fr;
-  gap: 12px;
-  align-items: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 8px 10px;
   margin-bottom: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-radius: 0.85rem;
 }
 
 .hud-intro,
@@ -717,16 +932,56 @@ onUnmounted(() => {
 }
 
 .stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
   gap: 10px;
+  align-items: center;
+}
+/* Layout del header: zonas izquierda/derecha y tipografía */
+.hud-left .game-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hud-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(34, 211, 238, 0.95);
+  font-weight: 800;
+}
+
+.game-name {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+.subtitle.small {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(203, 213, 225, 0.86);
 }
 
 .stat-card {
   border-radius: 0.9rem;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(15, 23, 42, 0.62);
-  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(2,6,23,0.55));
+  padding: 10px 14px;
+  min-width: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .stat-label {
@@ -738,9 +993,10 @@ onUnmounted(() => {
 }
 
 .stat-value {
-  margin: 4px 0 0;
-  font-size: 1.2rem;
-  font-weight: 700;
+  margin: 6px 0 0;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #e2e8f0;
 }
 
 .stat-card.lives .stat-value {
@@ -760,6 +1016,11 @@ onUnmounted(() => {
   flex-direction: column;
   justify-content: center;
   gap: 8px;
+  min-width: 180px;
+  padding: 10px 12px;
+  border-radius: 0.9rem;
+  background: linear-gradient(125deg, rgba(34,211,238,0.08), rgba(139,92,246,0.06));
+  border: 1px solid rgba(148,163,184,0.12);
 }
 
 .wave-panel.danger {
@@ -845,7 +1106,7 @@ onUnmounted(() => {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 310px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -860,6 +1121,8 @@ onUnmounted(() => {
   background: rgba(15, 23, 42, 0.55);
   padding: 10px;
   overflow-x: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .map {
@@ -875,6 +1138,7 @@ onUnmounted(() => {
     linear-gradient(180deg, rgba(51, 65, 85, 0.75), rgba(30, 41, 59, 0.9));
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 }
 
 .map-row {
@@ -1126,12 +1390,19 @@ onUnmounted(() => {
   background: #94a3b8;
 }
 
-.sidebar {
+.tooltip-panel {
+  position: fixed;
   border-radius: 1rem;
   border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.98);
+  backdrop-filter: blur(12px);
   padding: 14px;
+  width: 320px;
+  max-height: 55vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.85);
+  z-index: 9999;
+  pointer-events: auto;
 }
 
 .sidebar-title {
@@ -1225,8 +1496,42 @@ onUnmounted(() => {
 .item-cost {
   color: #facc15;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   white-space: nowrap;
+}
+
+/* Header inside tooltip so the close button scrolls with content */
+.tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tooltip-close {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.12);
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 1.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+}
+
+.tooltip-close:hover {
+  background: rgba(244, 63, 94, 0.28);
+  color: #fb7185;
+}
+
+.tooltip-panel .item-cost {
+  font-size: 1.2rem;
 }
 
 .upgrade-panel h4 {
@@ -1270,25 +1575,24 @@ onUnmounted(() => {
   font-weight: 700;
 }
 
-.empty-sidebar {
-  text-align: center;
-  color: rgba(203, 213, 225, 0.88);
-  padding: 18px 10px;
-}
+/* close button positioned inside header so it scrolls with content (keep earlier .tooltip-close rules) */
 
-.empty-sidebar p {
-  margin: 0;
-}
-
-.empty-hint {
-  margin-top: 8px !important;
-  font-size: 0.78rem;
-  color: rgba(148, 163, 184, 0.92);
-}
-
-@media (max-width: 1280px) {
+@media (max-width: 1024px) {
   .hud {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 8px;
+  }
+
+  .hud-right {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stats {
+    justify-content: center;
+    flex-wrap: wrap;
   }
 }
 
@@ -1296,10 +1600,104 @@ onUnmounted(() => {
   .game-area {
     grid-template-columns: 1fr;
   }
+}
 
-  .sidebar {
-    width: 100%;
-  }
+/* ─────────────────────────────────────────────────────────────────────── */
+/* Pantalla de elección */
+/* ─────────────────────────────────────────────────────────────────────── */
+
+.screen-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.choice-container {
+  text-align: center;
+  max-width: 500px;
+}
+
+.choice-title {
+  margin: 0 0 8px;
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.choice-subtitle {
+  margin: 0 0 32px;
+  font-size: 1rem;
+  color: rgba(203, 213, 225, 0.9);
+}
+
+.choice-loading {
+  margin: 30px 0;
+  font-size: 1.1rem;
+  color: rgba(226, 232, 240, 0.8);
+}
+
+.choice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.btn-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 24px;
+  border-radius: 1rem;
+  border: 2px solid;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.btn-choice .btn-icon {
+  font-size: 1.8rem;
+}
+
+.btn-choice .btn-detail {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.btn-continue {
+  color: #e2e8f0;
+  border-color: rgba(34, 211, 238, 0.7);
+  background: linear-gradient(125deg, rgba(34, 211, 238, 0.15), rgba(139, 92, 246, 0.15));
+}
+
+.btn-continue:hover {
+  border-color: rgba(34, 211, 238, 1);
+  background: linear-gradient(125deg, rgba(34, 211, 238, 0.25), rgba(139, 92, 246, 0.25));
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(34, 211, 238, 0.2);
+}
+
+.btn-new {
+  color: #0f172a;
+  border-color: rgba(34, 211, 238, 0.9);
+  background: linear-gradient(125deg, #22d3ee, #67e8f9);
+}
+
+.btn-new:hover {
+  border-color: rgba(34, 211, 238, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(34, 211, 238, 0.4);
 }
 
 @media (max-width: 640px) {
@@ -1313,6 +1711,14 @@ onUnmounted(() => {
 
   .title {
     font-size: 1.2rem;
+  }
+
+  .choice-title {
+    font-size: 2rem;
+  }
+
+  .choice-subtitle {
+    font-size: 0.9rem;
   }
 }
 </style>

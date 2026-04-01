@@ -39,4 +39,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/achievements', [AchievementController::class, 'index']);
     Route::get('/achievements/{slug}', [AchievementController::class, 'byGame']);
 });
-

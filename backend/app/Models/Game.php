@@ -22,7 +22,7 @@ class Game extends Model
     protected function casts(): array
     {
         return [
-            'config'    => 'array',
+            'config' => 'array',
             'is_active' => 'boolean',
         ];
     }

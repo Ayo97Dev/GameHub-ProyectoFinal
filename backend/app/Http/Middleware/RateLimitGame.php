@@ -13,14 +13,14 @@ class RateLimitGame
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
 
         $game = \App\Models\Game::where('slug', $request->route('slug'))->first();
 
         $limit = $game?->config['rate_limit_per_minute'] ?? 120;
-        $key   = "game_rl:{$user->id}:" . ($game?->id ?? 0);
+        $key = "game_rl:{$user->id}:".($game?->id ?? 0);
 
         $count = (int) Cache::get($key, 0);
 

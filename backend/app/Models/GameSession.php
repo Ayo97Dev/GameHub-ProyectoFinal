@@ -25,8 +25,8 @@ class GameSession extends Model
     {
         return [
             'session_data' => 'array',
-            'started_at'   => 'datetime',
-            'ended_at'     => 'datetime',
+            'started_at' => 'datetime',
+            'ended_at' => 'datetime',
         ];
     }
 

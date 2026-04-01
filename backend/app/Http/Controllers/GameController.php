@@ -7,12 +7,11 @@ use App\Http\Requests\GameActionRequest;
 use App\Http\Requests\PlayGameRequest;
 use App\Http\Resources\AchievementResource;
 use App\Http\Resources\GameResource;
-use App\Http\Resources\GameSessionResource;
 use App\Models\Game;
 use App\Models\GameSession;
 use App\Services\AchievementService;
-use App\Services\Games\Connect4GameService;
 use App\Services\Games\ClickerGameService;
+use App\Services\Games\Connect4GameService;
 use App\Services\Games\TowerDefenseGameService;
 use App\Services\GameService;
 use Illuminate\Http\JsonResponse;
@@ -28,30 +27,31 @@ class GameController extends Controller
     public function show($slug)
     {
         $game = Game::active()->where('slug', $slug)->firstOrFail();
+
         return new GameResource($game);
     }
 
     public function play(PlayGameRequest $request, string $slug): JsonResponse
     {
-        $game    = Game::active()->where('slug', $slug)->firstOrFail();
+        $game = Game::active()->where('slug', $slug)->firstOrFail();
         $service = $this->resolveService($request->user(), $game);
 
         $loadSave = $request->boolean('load_save', true);
         $progress = $loadSave ? $service->loadProgress() : null;
-        $state    = $progress ? $progress->payload : $service->getInitialState();
+        $state = $progress ? $progress->payload : $service->getInitialState();
 
         $session = $service->createSession($state);
 
         return response()->json([
             'session_id' => $session->id,
             'game_state' => $state,
-            'game'       => new GameResource($game),
+            'game' => new GameResource($game),
         ]);
     }
 
     public function action(GameActionRequest $request, string $slug): JsonResponse
     {
-        $game    = Game::active()->where('slug', $slug)->firstOrFail();
+        $game = Game::active()->where('slug', $slug)->firstOrFail();
         $service = $this->resolveService($request->user(), $game);
 
         $result = $service->executeAction(
@@ -64,23 +64,23 @@ class GameController extends Controller
         }
 
         return response()->json([
-            'success'   => true,
-            'data'      => $result,
+            'success' => true,
+            'data' => $result,
             'timestamp' => now()->getTimestampMs(),
         ]);
     }
 
     public function load(Request $request, string $slug): JsonResponse
     {
-        $game     = Game::active()->where('slug', $slug)->firstOrFail();
-        $service  = $this->resolveService($request->user(), $game);
+        $game = Game::active()->where('slug', $slug)->firstOrFail();
+        $service = $this->resolveService($request->user(), $game);
         $progress = $service->loadProgress();
 
-        if (!$progress) {
+        if (! $progress) {
             return response()->json([
-                'game_state'  => $service->getInitialState(),
-                'score'       => 0,
-                'playtime'    => 0,
+                'game_state' => $service->getInitialState(),
+                'score' => 0,
+                'playtime' => 0,
                 'last_played' => null,
             ]);
         }
@@ -88,22 +88,22 @@ class GameController extends Controller
         $stat = $request->user()->gameStats()->where('game_id', $game->id)->first();
 
         return response()->json([
-            'game_state'  => $progress->payload,
-            'score'       => $stat?->high_score ?? 0,
-            'playtime'    => $stat?->time_played ?? 0,
+            'game_state' => $progress->payload,
+            'score' => $stat?->high_score ?? 0,
+            'playtime' => $stat?->time_played ?? 0,
             'last_played' => $stat?->last_played_at,
         ]);
     }
 
     public function save(Request $request, string $slug): JsonResponse
     {
-        $game      = Game::active()->where('slug', $slug)->firstOrFail();
-        $service   = $this->resolveService($request->user(), $game);
+        $game = Game::active()->where('slug', $slug)->firstOrFail();
+        $service = $this->resolveService($request->user(), $game);
         $gameState = $request->input('game_state', []);
-        $score     = (int) $request->input('score', 0);
-        $playtime  = max((int) $request->input('playtime', 0), 0);
-        $wins      = max((int) ($gameState['wins'] ?? 0), 0);
-        $losses    = max((int) ($gameState['losses'] ?? 0), 0);
+        $score = (int) $request->input('score', 0);
+        $playtime = max((int) $request->input('playtime', 0), 0);
+        $wins = max((int) ($gameState['wins'] ?? 0), 0);
+        $losses = max((int) ($gameState['losses'] ?? 0), 0);
 
         if ($game->slug === 'connect4') {
             // En Connect4 el leaderboard usa victorias acumuladas.
@@ -112,30 +112,25 @@ class GameController extends Controller
 
         $service->saveProgress($gameState, $score, $playtime);
 
-        // Construir datos de disparo para los logros
-        $upgrades              = $gameState['upgrades'] ?? [];
-        $upgradeValues         = array_values(array_map('intval', $upgrades));
-        $totalUpgradesBought   = array_sum($upgradeValues);
-        $maxUpgradeCount       = $upgradeValues ? max($upgradeValues) : 0;
+        // Construir datos de disparo para los logros combinando genéricos + específicos del juego
+        $triggerData = array_merge(
+            [
+                'score' => $score,
+                'wins' => $wins,
+                'losses' => $losses,
+            ],
+            $service->getGameMetadata($gameState)
+        );
 
-        $achievementService  = new AchievementService();
-        $newAchievements     = $achievementService->checkAndUnlock(
+        $achievementService = new AchievementService;
+        $newAchievements = $achievementService->checkAndUnlock(
             $request->user(),
             $game->id,
-            [
-                'score'                 => $score,
-                'upgrades'              => array_map('intval', $upgrades),
-                'total_clicks'          => (int) ($gameState['total_clicks'] ?? 0),
-                'prestige_level'        => (int) ($gameState['prestige_level'] ?? 0),
-                'total_upgrades_bought' => $totalUpgradesBought,
-                'max_upgrade_count'     => $maxUpgradeCount,
-                'wins'                  => $wins,
-                'losses'                => $losses,
-            ]
+            $triggerData
         );
 
         return response()->json([
-            'saved'                 => true,
+            'saved' => true,
             'achievements_unlocked' => AchievementResource::collection(collect($newAchievements)),
         ]);
     }
@@ -166,7 +161,7 @@ class GameController extends Controller
 
     public function complete(CompleteGameRequest $request, string $slug): JsonResponse
     {
-        $game    = Game::active()->where('slug', $slug)->firstOrFail();
+        $game = Game::active()->where('slug', $slug)->firstOrFail();
         $session = GameSession::findOrFail($request->input('session_id'));
 
         if ($session->user_id !== $request->user()->id || $session->game_id !== $game->id) {
@@ -174,7 +169,7 @@ class GameController extends Controller
         }
 
         $service = $this->resolveService($request->user(), $game);
-        $result  = $service->completeSession(
+        $result = $service->completeSession(
             $session,
             $request->input('final_score'),
             $request->input('duration')
@@ -188,9 +183,8 @@ class GameController extends Controller
         return match ($game->slug) {
             'connect4' => new Connect4GameService($user, $game),
             'clicker' => new ClickerGameService($user, $game),
-            'towerdefense' => new TowerDefenseGameService($user, $game),
-            default   => new ClickerGameService($user, $game), // fallback genérico
+            'tower-defense' => new TowerDefenseGameService($user, $game),
+            default => new ClickerGameService($user, $game), // fallback genérico
         };
     }
 }
-

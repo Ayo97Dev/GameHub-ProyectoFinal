@@ -14,7 +14,7 @@ class RequireConnect4LeaderboardAuth
             return $next($request);
         }
 
-        if (!auth('sanctum')->check()) {
+        if (! auth('sanctum')->check()) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 

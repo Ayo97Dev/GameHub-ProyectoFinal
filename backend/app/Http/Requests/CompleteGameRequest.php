@@ -14,9 +14,9 @@ class CompleteGameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'session_id'  => 'required|exists:game_sessions,id',
+            'session_id' => 'required|exists:game_sessions,id',
             'final_score' => 'required|integer|min:0',
-            'duration'    => 'required|integer|min:0',
+            'duration' => 'required|integer|min:0',
         ];
     }
 }

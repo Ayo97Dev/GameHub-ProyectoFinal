@@ -1,9 +1,10 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGameStore } from '../stores/game'
 import { useClickerStore } from '../stores/games/clicker'
 import { useConnect4Store } from '../stores/games/connect4'
+import { useTowerDefenseStore } from '../stores/games/towerdefense'
 import api from '../lib/axios'
 import Rpg from '../components/games/Rpg.vue'
 import Clicker from '../components/games/Clicker.vue'
@@ -16,6 +17,7 @@ const route      = useRoute()
 const gameStore  = useGameStore()
 const clicker    = useClickerStore()
 const connect4   = useConnect4Store()
+const towerDefense = useTowerDefenseStore()
 
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
 
@@ -24,7 +26,7 @@ const FALLBACK_TITLE_BY_SLUG = {
   rpg: 'Modo RPG',
   quiz: 'Modo Quiz',
   connect4: 'Conecta 4',
-  towerdefense: 'Tower Defense',
+  'tower-defense': 'Tower Defense',
 }
 
 const pageTitle = computed(() => {
@@ -40,26 +42,26 @@ const gameComponent = computed(() => {
   if (route.params.slug === 'clicker') return Clicker
   if (route.params.slug === 'quiz')    return Quiz
   if (route.params.slug === 'connect4') return Connect4
-  if (route.params.slug === 'towerdefense') return Towerdefense
+  if (route.params.slug === 'tower-defense') return Towerdefense
   return null
 })
 
 const liveScore = computed(() => {
   if (route.params.slug === 'clicker') return Math.floor(clicker.balance)
   if (route.params.slug === 'connect4') return connect4.wins
-  if (route.params.slug === 'towerdefense') return towerDefenseScore.value
+  if (route.params.slug === 'tower-defense') return Math.floor(towerDefense.gameState?.wave ?? 0)
   return 0
 })
 
 const liveScoreLabel = computed(() => {
   if (route.params.slug === 'connect4') return 'Victorias'
-  if (route.params.slug === 'towerdefense') return 'Rondas superadas'
+  if (route.params.slug === 'tower-defense') return 'Rondas superadas'
   return 'Puntos'
 })
 
 const leaderboardLabel = computed(() => {
   if (route.params.slug === 'connect4') return 'Top 3 — Victorias'
-  if (route.params.slug === 'towerdefense') return 'Top 3 — Rondas'
+  if (route.params.slug === 'tower-defense') return 'Top 3 — Rondas'
   return 'Top 3 — Clasificación'
 })
 
@@ -68,13 +70,22 @@ function handleLiveScore(value) {
   towerDefenseScore.value = Number.isFinite(parsed) ? Math.max(Math.floor(parsed), 0) : 0
 }
 
-onMounted(async () => {
+async function fetchLeaderboard() {
   try {
     const { data } = await api.get(`/leaderboard/${route.params.slug}`)
     leaderboard.value = data.data?.slice(0, 3) ?? []
   } catch {
     leaderboard.value = []
   }
+}
+
+onMounted(() => {
+  fetchLeaderboard()
+})
+
+watch(() => route.params.slug, () => {
+  towerDefenseScore.value = 0 // Reset score when changing game
+  fetchLeaderboard()
 })
 </script>
 

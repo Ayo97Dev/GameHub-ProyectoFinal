@@ -23,51 +23,51 @@ class DatabaseSeeder extends Seeder
 
         // Juegos
         $clicker = Game::firstOrCreate(['slug' => 'clicker'], [
-            'title'       => 'ClickMaster',
+            'title' => 'ClickMaster',
             'description' => 'Haz clic, mejora tu producción y domina el ranking.',
-            'is_active'   => true,
-            'config'      => [
-                'allowed_actions'       => ['click', 'buy_upgrade', 'prestige'],
+            'is_active' => true,
+            'config' => [
+                'allowed_actions' => ['click', 'buy_upgrade', 'prestige'],
                 'rate_limit_per_minute' => 120,
             ],
         ]);
 
         $rpg = Game::firstOrCreate(['slug' => 'rpg'], [
-            'title'       => 'Dungeon RPG',
+            'title' => 'Dungeon RPG',
             'description' => 'Explora mazmorras y sube de nivel a tu héroe.',
-            'is_active'   => true,
-            'config'      => [
-                'allowed_actions'       => ['move', 'attack', 'heal'],
+            'is_active' => true,
+            'config' => [
+                'allowed_actions' => ['move', 'attack', 'heal'],
                 'rate_limit_per_minute' => 60,
             ],
         ]);
 
         $quiz = Game::firstOrCreate(['slug' => 'quiz'], [
-            'title'       => 'Quiz',
+            'title' => 'Quiz',
             'description' => 'Preguntas y respuestas.',
-            'is_active'   => true,
-            'config'      => [
-                'allowed_actions'       => ['answer_question', 'skip_question'],
+            'is_active' => true,
+            'config' => [
+                'allowed_actions' => ['answer_question', 'skip_question'],
                 'rate_limit_per_minute' => 120,
             ],
         ]);
 
         $connect4 = Game::firstOrCreate(['slug' => 'connect4'], [
-            'title'       => 'Connect 4',
+            'title' => 'Connect 4',
             'description' => 'Conecta cuatro fichas contra la IA.',
-            'is_active'   => true,
-            'config'      => [
-                'allowed_actions'       => [],
+            'is_active' => true,
+            'config' => [
+                'allowed_actions' => [],
                 'rate_limit_per_minute' => 60,
             ],
         ]);
 
-        Game::firstOrCreate(['slug' => 'towerdefense'], [
-            'title'       => 'Tower Defense',
+        Game::firstOrCreate(['slug' => 'tower-defense'], [
+            'title' => 'Tower Defense',
             'description' => 'Defiende tu base con torretas y oleadas crecientes.',
-            'is_active'   => true,
-            'config'      => [
-                'allowed_actions'       => [],
+            'is_active' => true,
+            'config' => [
+                'allowed_actions' => [],
                 'rate_limit_per_minute' => 60,
             ],
         ]);
@@ -128,4 +128,3 @@ class DatabaseSeeder extends Seeder
         }
     }
 }
-

@@ -9,10 +9,10 @@ export const useGameStore = defineStore('game', () => {
 
   const DEFAULT_GAMES = [
     { slug: 'rpg', title: 'Dungeon Realms RPG', description: 'Explora mazmorras oscuras y sube de nivel a tu héroe.' },
-    { slug: 'clicker', title: 'Neon Clicker Rush', description: 'Haz clic, mejora tu producción y domina el ranking.' },
-    { slug: 'quiz', title: 'Quiz Master', description: 'Preguntas rápidas y ranking en tiempo real.' },
+    { slug: 'clicker', title: 'ClickMaster', description: 'Haz clic, mejora tu producción y domina el ranking.' },
+    { slug: 'quiz', title: 'Quiz', description: 'Preguntas rápidas.' },
     { slug: 'connect4', title: 'Conecta 4', description: 'Clásico Conecta 4 contra la IA' },
-    { slug: 'towerdefense', title: 'Tower Defense', description: 'Defiende tu base con torretas, mejoras y oleadas crecientes.' },
+    { slug: 'tower-defense', title: 'Tower Defense', description: 'Defiende tu base con torretas, mejoralas y defiende tu base.' },
   ]
 
   const DEFAULT_COVERS = {
@@ -22,7 +22,7 @@ export const useGameStore = defineStore('game', () => {
     'clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
     'quiz': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
     'connect4': 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200&q=80',
-    'towerdefense': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?auto=format&fit=crop&w=1200&q=80'
+    'tower-defense': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?auto=format&fit=crop&w=1200&q=80'
   }
 
   function withPresentation(game) {

@@ -14,8 +14,8 @@ class GameActionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'action'    => 'required|string|max:50',
-            'payload'   => 'required|array',
+            'action' => 'required|string|max:50',
+            'payload' => 'required|array',
             'timestamp' => 'required|integer',
         ];
     }

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Achievement;
 use App\Models\Game;
 use App\Models\GameSave;
 use App\Models\GameSession;
@@ -35,8 +34,8 @@ abstract class GameService
             $stat->high_score = $score;
         }
 
-        $stat->time_played    += $playtime;
-        $stat->last_played_at  = now();
+        $stat->time_played += $playtime;
+        $stat->last_played_at = now();
         $stat->save();
 
         return $save;
@@ -64,12 +63,21 @@ abstract class GameService
             ->update(['status' => 'abandoned', 'ended_at' => now()]);
 
         return GameSession::create([
-            'user_id'      => $this->user->id,
-            'game_id'      => $this->game->id,
+            'user_id' => $this->user->id,
+            'game_id' => $this->game->id,
             'session_data' => $initialState,
-            'status'       => 'in_progress',
-            'started_at'   => now(),
+            'status' => 'in_progress',
+            'started_at' => now(),
         ]);
+    }
+
+    /**
+     * Retorna metadatos sobre la partida para verificaciones de logros.
+     * Debe ser sobrescrito por cada servicio de juego.
+     */
+    public function getGameMetadata(array $state): array
+    {
+        return [];
     }
 
     /**
@@ -78,23 +86,28 @@ abstract class GameService
     public function completeSession(GameSession $session, int $finalScore, int $duration): array
     {
         $session->update([
-            'score'            => $finalScore,
+            'score' => $finalScore,
             'duration_seconds' => $duration,
-            'status'           => 'completed',
-            'ended_at'         => now(),
+            'status' => 'completed',
+            'ended_at' => now(),
         ]);
 
         $this->saveProgress($session->session_data ?? [], $finalScore, $duration);
 
-        $achievementService  = new AchievementService();
-        $newAchievements     = $achievementService->checkAndUnlock(
+        $achievementService = new AchievementService;
+        $triggerData = array_merge(
+            ['score' => $finalScore, 'duration' => $duration],
+            $this->getGameMetadata($session->session_data ?? [])
+        );
+
+        $newAchievements = $achievementService->checkAndUnlock(
             $this->user,
             $this->game->id,
-            ['score' => $finalScore, 'duration' => $duration]
+            $triggerData
         );
 
         return [
-            'score'                 => $finalScore,
+            'score' => $finalScore,
             'achievements_unlocked' => $newAchievements,
         ];
     }

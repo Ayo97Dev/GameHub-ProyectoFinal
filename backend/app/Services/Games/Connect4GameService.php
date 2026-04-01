@@ -26,4 +26,15 @@ class Connect4GameService extends GameService
     {
         return false;
     }
+
+    /**
+     * Retorna metadatos sobre la partida para verificaciones de logros.
+     */
+    public function getGameMetadata(array $state): array
+    {
+        return [
+            'wins' => (int) ($state['wins'] ?? 0),
+            'losses' => (int) ($state['losses'] ?? 0),
+        ];
+    }
 }

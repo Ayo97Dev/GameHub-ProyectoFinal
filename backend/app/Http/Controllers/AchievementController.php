@@ -12,8 +12,8 @@ class AchievementController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $user         = $request->user();
-        $unlockedIds  = $user->achievements()->pluck('achievement_id')->toArray();
+        $user = $request->user();
+        $unlockedIds = $user->achievements()->pluck('achievement_id')->toArray();
 
         $achievements = Achievement::where('is_active', true)
             ->get()
@@ -26,9 +26,9 @@ class AchievementController extends Controller
 
     public function byGame(Request $request, string $slug): JsonResponse
     {
-        $game         = Game::active()->where('slug', $slug)->firstOrFail();
-        $user         = $request->user();
-        $unlockedIds  = $user->achievements()->pluck('achievement_id')->toArray();
+        $game = Game::active()->where('slug', $slug)->firstOrFail();
+        $user = $request->user();
+        $unlockedIds = $user->achievements()->pluck('achievement_id')->toArray();
 
         $achievements = Achievement::where('is_active', true)
             ->where('game_id', $game->id)
