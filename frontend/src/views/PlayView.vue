@@ -65,13 +65,13 @@ const liveScore = computed(() => {
 
 const liveScoreLabel = computed(() => {
   if (route.params.slug === 'connect4') return 'Victorias'
-  if (route.params.slug === 'tower-defense') return 'Rondas superadas'
+  if (route.params.slug === 'tower-defense') return 'Oleadas superadas'
   return 'Puntos'
 })
 
 const leaderboardLabel = computed(() => {
   if (route.params.slug === 'connect4') return 'Top 3 — Victorias'
-  if (route.params.slug === 'tower-defense') return 'Top 3 — Rondas'
+  if (route.params.slug === 'tower-defense') return 'Top 3 — Oleadas'
   return 'Top 3 — Clasificación'
 })
 

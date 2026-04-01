@@ -1106,3 +1106,80 @@ function isDraw(b) {
   .meta-bar { font-size: 0.5rem; }
 }
 </style>
+
+<!-- Light Mode Styles (Global, not scoped) -->
+<style>
+html:not(.dark) .c4-wrapper {
+  background:
+    radial-gradient(75rem 30rem at -10% -25%, rgba(34, 211, 238, 0.08), transparent 55%),
+    radial-gradient(65rem 26rem at 110% -15%, rgba(139, 92, 246, 0.08), transparent 55%),
+    linear-gradient(180deg, #f8fafc, #e2e8f0 65%) !important;
+  color: #1e293b !important;
+  border-color: rgba(51, 65, 85, 0.2) !important;
+}
+
+html:not(.dark) .status-bar {
+  background: linear-gradient(120deg, rgba(226, 232, 240, 0.6), rgba(248, 250, 252, 0.8)) !important;
+  border-color: rgba(51, 65, 85, 0.2) !important;
+}
+
+html:not(.dark) .meta-bar {
+  color: #475569 !important;
+}
+
+html:not(.dark) .turn-text {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .logo-c,
+html:not(.dark) .logo-4 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .score-label {
+  color: #475569 !important;
+}
+
+html:not(.dark) .score-value {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .board-frame {
+  background: linear-gradient(145deg, rgba(240, 249, 255, 0.9), rgba(226, 232, 240, 0.85)) !important;
+  border-color: rgba(100, 116, 139, 0.3) !important;
+}
+
+html:not(.dark) .hole {
+  background: #e2e8f0 !important;
+  box-shadow:
+    inset 0 2px 6px rgba(0,0,0,0.15),
+    inset 0 -2px 6px rgba(0,0,0,0.1),
+    0 0 12px rgba(2, 6, 23, 0.2) !important;
+}
+
+html:not(.dark) .win-overlay {
+  background: rgba(248, 250, 252, 0.9) !important;
+}
+
+html:not(.dark) .win-sub {
+  color: rgba(15, 23, 42, 0.7) !important;
+}
+
+html:not(.dark) .achievement-toast {
+  background: rgba(248, 250, 252, 0.95) !important;
+  border-color: rgba(34, 211, 238, 0.3) !important;
+  color: #1e293b !important;
+}
+
+html:not(.dark) .achievement-title {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .achievement-kicker {
+  color: #475569 !important;
+}
+
+html:not(.dark) .achievement-desc {
+  color: #334155 !important;
+}
+</style>

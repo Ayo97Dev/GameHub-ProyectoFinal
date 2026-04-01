@@ -19,7 +19,7 @@
           >
             <span class="btn-icon">▶</span>
             <span>Continuar Partida</span>
-            <span class="btn-detail">Onda {{ store.savedGame.wave }}</span>
+            <span class="btn-detail">Oleada {{ store.savedGame.wave }}</span>
           </button>
           
           <button
@@ -58,7 +58,7 @@
           <p class="stat-value">{{ gameState.gold }}</p>
         </article>
         <article class="stat-card wave">
-          <p class="stat-label">Ronda</p>
+          <p class="stat-label">Oleada</p>
           <p class="stat-value">{{ gameState.wave }}</p>
         </article>
         </div>
@@ -66,16 +66,16 @@
         <div class="wave-panel" :class="{ danger: gameState.gameOver }">
           <div v-if="gameState.gameOver">
             <p class="wave-title">Base caída</p>
-            <p class="wave-text">Sobreviviste {{ gameState.wave - 1 }} rondas.</p>
-            <button @click="resetGameLocal" class="btn-start">Volver</button>
+            <p class="wave-text">Sobreviviste {{ gameState.wave - 1 }} oleadas.</p>
+            <button @click="resetGameLocal" class="btn-start" aria-label="Reiniciar juego">Volver</button>
           </div>
           <div v-else-if="!gameState.waveActive">
             <p class="wave-title">Fase de Preparación</p>
             <p class="wave-text">Coloca y mejora torres.</p>
-            <button @click="startWave" class="btn-start">Lanzar Ronda {{ gameState.wave }}</button>
+            <button @click="startWave" class="btn-start" aria-label="Iniciar oleada">Lanzar Oleada {{ gameState.wave }}</button>
           </div>
           <div v-else>
-            <p class="wave-title">Ronda Activa</p>
+            <p class="wave-title">Oleada Activa ▶</p>
             <div class="wave-track">
               <div class="wave-fill" :style="{ width: `${waveProgressPercent}%` }"></div>
             </div>
@@ -180,8 +180,8 @@
               <div>Siguiente<span>{{ nextTowerRange }}</span></div>
             </div>
             <p class="effect-line">Efecto activo: <span class="effect-text">{{ towerEffectLabel(selectedTower.effect) }}</span></p>
-            <button class="btn-upgrade" :disabled="gameState.gold < upgradeCost" @click="upgradeTower">Mejorar ({{ upgradeCost }})</button>
-            <button class="btn-sell" @click="sellTower">Vender ({{ selectedTowerSellValue }})</button>
+            <button class="btn-upgrade" :disabled="gameState.gold < upgradeCost" @click="upgradeTower" aria-label="Mejorar torre">Mejorar ({{ upgradeCost }})</button>
+            <button class="btn-sell" @click="confirmSellTower" aria-label="Vender torre">Vender ({{ selectedTowerSellValue }})</button>
           </div>
         </div>
       </div>
@@ -576,6 +576,13 @@ const sellTower = () => {
   }
 }
 
+const confirmSellTower = () => {
+  const confirmed = window.confirm(`¿Vender por ${selectedTowerSellValue.value} oro?`)
+  if (confirmed) {
+    sellTower()
+  }
+}
+
 const clearSpawnLoop = () => {
   if (spawnInterval) {
     clearInterval(spawnInterval)
@@ -782,7 +789,7 @@ async function startGame(continueGame = false) {
   
   // Iniciar el game loop cuando el juego comienza
   if (!gameLoopId) {
-    gameLoopId = setInterval(gameTick, 30)
+    gameLoopId = setInterval(gameTick, 30)  // GameLoop a 30ms
   }
 }
 
@@ -1004,14 +1011,15 @@ onUnmounted(() => {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  opacity: 0.78;
+  opacity: 0.9;
+  color: #e2e8f0;
 }
 
 .stat-value {
   margin: 6px 0 0;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 900;
-  color: #e2e8f0;
+  color: #f8fafc;
 }
 
 .stat-card.lives .stat-value {
@@ -1060,18 +1068,21 @@ onUnmounted(() => {
 
 .wave-track {
   position: relative;
-  height: 8px;
+  height: 10px;
   border-radius: 999px;
-  background: rgba(2, 6, 23, 0.65);
+  background: rgba(2, 6, 23, 0.85);
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  border: 1.5px solid rgba(34, 211, 238, 0.35);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 8px 0;
 }
 
 .wave-fill {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--td-cyan), var(--td-violet));
-  transition: width 0.25s ease;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
 }
 
 .btn-start,
@@ -1083,7 +1094,7 @@ onUnmounted(() => {
   font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-start {
@@ -1092,10 +1103,29 @@ onUnmounted(() => {
   box-shadow: 0 8px 24px rgba(14, 116, 144, 0.32);
 }
 
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(14, 116, 144, 0.5);
+}
+
+.btn-start:active {
+  transform: translateY(0);
+}
+
 .btn-upgrade {
   width: 100%;
   color: #0f172a;
   background: linear-gradient(125deg, #22d3ee, #67e8f9);
+  box-shadow: 0 4px 12px rgba(34, 211, 238, 0.25);
+}
+
+.btn-upgrade:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(34, 211, 238, 0.4);
+}
+
+.btn-upgrade:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn-upgrade:disabled {
@@ -1108,8 +1138,20 @@ onUnmounted(() => {
   width: 100%;
   color: #fff;
   background: linear-gradient(125deg, #fb7185, #f43f5e);
+  box-shadow: 0 4px 12px rgba(249, 115, 115, 0.25);
   margin-top: 8px;
 }
+
+.btn-sell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(249, 115, 115, 0.4);
+}
+
+.btn-sell:active {
+  transform: translateY(0);
+}
+
+
 
 .btn-start:hover,
 .btn-upgrade:hover,
@@ -1142,8 +1184,8 @@ onUnmounted(() => {
 
 .map {
   position: relative;
-  width: 600px;
-  min-width: 600px;
+  width: 90vw;
+  max-width: 600px;
   height: 500px;
   border-radius: 0.65rem;
   border: 1px solid rgba(148, 163, 184, 0.22);
@@ -1226,14 +1268,15 @@ onUnmounted(() => {
   position: absolute;
   bottom: -4px;
   right: -4px;
-  min-width: 22px;
+  min-width: 24px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(34, 211, 238, 0.65);
+  border: 2px solid #22d3ee;
   color: #e0f2fe;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-align: center;
-  padding: 1px 4px;
+  padding: 2px 5px;
 }
 
 .range-ring {
@@ -1345,26 +1388,26 @@ onUnmounted(() => {
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .legend-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
+  gap: 7px;
+  font-size: 0.81rem;
   letter-spacing: 0.02em;
-  color: rgba(226, 232, 240, 0.86);
-  padding: 4px 8px;
+  color: #cbd5e1;
+  padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.26);
-  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .legend-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
 }
 
@@ -1408,16 +1451,31 @@ onUnmounted(() => {
 .tooltip-panel {
   position: fixed;
   border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: rgba(15, 23, 42, 0.98);
+  border: 2px solid rgba(34, 211, 238, 0.45);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95));
   backdrop-filter: blur(12px);
   padding: 14px;
   width: 320px;
   max-height: 55vh;
   overflow-y: auto;
-  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.85);
+  box-shadow: 
+    0 20px 60px rgba(15, 23, 42, 0.95),
+    0 0 40px rgba(34, 211, 238, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   z-index: 9999;
   pointer-events: auto;
+  animation: tooltipSlideIn 0.15s ease-out;
+}
+
+@keyframes tooltipSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .sidebar-title {
@@ -1439,24 +1497,26 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 10px;
   border-radius: 0.7rem;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(30, 41, 59, 0.75);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  background: linear-gradient(125deg, rgba(15, 23, 42, 0.7), rgba(30, 41, 59, 0.8));
   cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.shop-item:hover {
-  transform: translateY(-1px);
-  border-color: rgba(34, 211, 238, 0.62);
-  background: rgba(30, 41, 59, 0.96);
+.shop-item:hover:not(.disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(34, 211, 238, 0.65);
+  background: linear-gradient(125deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.9));
+  box-shadow: 0 4px 16px rgba(34, 211, 238, 0.2);
 }
 
 .shop-item.disabled {
   opacity: 0.48;
-  filter: grayscale(0.25);
+  filter: grayscale(0.5);
   cursor: not-allowed;
 }
 
@@ -1526,23 +1586,29 @@ onUnmounted(() => {
 
 .tooltip-close {
   position: relative;
-  width: 34px;
-  height: 34px;
-  border: none;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(244, 63, 94, 0.35);
   border-radius: 50%;
-  background: rgba(148, 163, 184, 0.12);
-  color: #e2e8f0;
+  background: rgba(244, 63, 94, 0.12);
+  color: #fb7185;
   cursor: pointer;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: all 0.18s ease;
+  flex: 0 0 auto;
 }
 
 .tooltip-close:hover {
   background: rgba(244, 63, 94, 0.28);
-  color: #fb7185;
+  border-color: rgba(244, 63, 94, 0.65);
+  transform: rotate(90deg);
+}
+
+.tooltip-close:active {
+  transform: rotate(90deg) scale(0.95);
 }
 
 .tooltip-panel .item-cost {
@@ -1735,5 +1801,101 @@ onUnmounted(() => {
   .choice-subtitle {
     font-size: 0.9rem;
   }
+}
+</style>
+
+<!-- Light Mode Styles (Global, not scoped) -->
+<style>
+html:not(.dark) .tower-defense {
+  background:
+    radial-gradient(75rem 30rem at -10% -25%, rgba(34, 211, 238, 0.08), transparent 55%),
+    radial-gradient(65rem 26rem at 110% -15%, rgba(139, 92, 246, 0.08), transparent 55%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(240, 249, 255, 0.98)) !important;
+  color: #1e293b !important;
+  border-color: rgba(51, 65, 85, 0.3) !important;
+}
+
+html:not(.dark) .hud-intro,
+html:not(.dark) .wave-panel {
+  background: rgba(248, 250, 252, 0.8) !important;
+  border-color: rgba(51, 65, 85, 0.3) !important;
+  color: #1f2937 !important;
+}
+
+html:not(.dark) .stat-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(240, 249, 255, 0.9)) !important;
+  border-color: rgba(51, 65, 85, 0.25) !important;
+}
+
+html:not(.dark) .stat-label {
+  color: #1f2937 !important;
+}
+
+html:not(.dark) .stat-value {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .btn-start,
+html:not(.dark) .btn-upgrade,
+html:not(.dark) .btn-sell {
+  color: #fff !important;
+}
+
+html:not(.dark) .map-shell {
+  background: rgba(240, 249, 255, 0.7) !important;
+  border-color: rgba(100, 116, 139, 0.3) !important;
+}
+
+html:not(.dark) .map {
+  background:
+    radial-gradient(circle at 30% 12%, rgba(34, 211, 238, 0.1), transparent 55%),
+    linear-gradient(180deg, rgba(226, 232, 240, 0.8), rgba(203, 213, 225, 0.9)) !important;
+}
+
+html:not(.dark) .tooltip-panel {
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.98), rgba(240, 249, 255, 0.95)) !important;
+  border-color: rgba(34, 211, 238, 0.4) !important;
+  color: #1e293b !important;
+}
+
+html:not(.dark) .kicker {
+  color: #0369a1 !important;
+}
+
+html:not(.dark) .game-name,
+html:not(.dark) .subtitle,
+html:not(.dark) .wave-title,
+html:not(.dark) .wave-text {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .section-title {
+  color: #0369a1 !important;
+}
+
+html:not(.dark) .sidebar-title {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .choice-subtitle,
+html:not(.dark) .choice-loading {
+  color: #334155 !important;
+}
+
+html:not(.dark) .btn-new {
+  color: #000 !important;
+  border-color: #0891b2 !important;
+  background: linear-gradient(125deg, #06b6d4, #0891b2) !important;
+}
+
+html:not(.dark) .btn-new:hover {
+  border-color: #0891b2 !important;
+  box-shadow: 0 12px 30px rgba(6, 182, 212, 0.4) !important;
+}
+
+html:not(.dark) .btn-continue {
+  color: #0f172a !important;
+  border-color: #0891b2 !important;
+  background: linear-gradient(125deg, rgba(6, 182, 212, 0.3), rgba(139, 92, 246, 0.2)) !important;
 }
 </style>
