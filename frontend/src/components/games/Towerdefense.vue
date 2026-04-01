@@ -230,6 +230,10 @@ const projectiles = ref([])
 const selectedCell = ref(null)
 const clickPosition = ref(null) // { x, y } en pixels
 
+// Lifecycle guards para evitar saves innecesarios
+let componentMountedAt = 0
+let lastPlayerAction = 0
+
 const towerTypes = {
   basic: { name: 'Básica', cost: 30, range: 2.5, damage: 15, cooldownMax: 20, color: '#38bdf8', desc: 'Equilibrada', effect: 'none' },
   rapid: { name: 'Ametralladora', cost: 60, range: 2, damage: 4, cooldownMax: 4, color: '#f59e0b', desc: 'Ataque rápido', effect: 'fast' },
@@ -815,6 +819,8 @@ watch(
 )
 
 onMounted(async () => {
+  componentMountedAt = Date.now()
+  
   // Cargar si hay partida guardada (esto solo marca si existe, no inicia el juego)
   await store.loadGame()
   
@@ -847,6 +853,15 @@ onUnmounted(() => {
   clearSpawnLoop()
   if (resizeListener) window.removeEventListener('resize', resizeListener)
   if (outsideClickHandler) document.removeEventListener('click', outsideClickHandler)
+  
+  // Solo guardar si el usuario estuvo jugando al menos 5 segundos
+  const timeSinceMount = Date.now() - componentMountedAt
+  if (timeSinceMount >= 5_000 || lastPlayerAction > 0) {
+    console.log(`[TowerDefense] onUnmounted save (${timeSinceMount}ms in game)`)
+    store.saveProgress(gameState.wave)
+  } else {
+    console.log(`[TowerDefense] onUnmounted skipped save (${timeSinceMount}ms < 5s threshold)`)
+  }
 })
 </script>
 

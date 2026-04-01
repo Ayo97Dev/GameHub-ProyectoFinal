@@ -3,6 +3,8 @@ import { ref, reactive } from 'vue'
 import gameEngineService from '../../lib/gameEngineService'
 
 export const useTowerDefenseStore = defineStore('tower-defense', () => {
+  const SAVE_COOLDOWN_MS = 5_000 // Mínimo 5 segundos entre saves
+  
   const gameState = reactive({
     lives: 20,
     gold: 150,
@@ -13,6 +15,8 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
   })
 
   const isLoading = ref(false)
+  const isSaving = ref(false)
+  const lastSaveRequestAt = ref(0)
   const hasLoadedGame = ref(false)
   const savedGame = ref(null)
   const sessionId = ref(null)
@@ -41,6 +45,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
    */
   async function initializeTowerDefense(continueGame = false) {
     isLoading.value = true
+    lastSaveRequestAt.value = 0
     try {
       const response = await gameEngineService.play('tower-defense', continueGame && !!savedGame.value)
       sessionId.value = response.session_id
@@ -58,7 +63,17 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
    * Guarda el progreso (autosave al terminar onda)
    */
   async function saveProgress(score = gameState.wave) {
+    if (isSaving.value) return
+    
+    const now = Date.now()
+    if (now - lastSaveRequestAt.value < SAVE_COOLDOWN_MS) {
+      return
+    }
+    
+    lastSaveRequestAt.value = now
+    
     try {
+      isSaving.value = true
       const response = await gameEngineService.save('tower-defense', {
         game_state: gameState,
         score,
@@ -72,6 +87,8 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
       return response
     } catch (error) {
       console.error('Error saving progress:', error)
+    } finally {
+      isSaving.value = false
     }
   }
 
@@ -118,6 +135,8 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
   return {
     gameState,
     isLoading,
+    isSaving,
+    lastSaveRequestAt,
     hasLoadedGame,
     savedGame,
     sessionId,

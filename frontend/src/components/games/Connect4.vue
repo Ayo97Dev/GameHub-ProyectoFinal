@@ -140,6 +140,8 @@
 import { ref, computed, reactive, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useConnect4Store } from '../../stores/games/connect4'
 
+const emit = defineEmits(['live-score'])
+
 const ROWS = 6
 const COLS = 7
 const AI_DEPTH = 5
@@ -161,6 +163,8 @@ const scores = computed(() => ({ player: connect4.wins, ai: connect4.losses }))
 let saveInterval = null
 let sessionClockInterval = null
 let toastTimers = []
+let componentMountedAt = 0
+let lastPlayerAction = 0
 
 watch(() => connect4.newAchievements.length, () => {
   while (connect4.newAchievements.length) {
@@ -172,18 +176,35 @@ watch(() => connect4.newAchievements.length, () => {
   }
 })
 
+// Callback helpers
+let lastSaveTime = 0
+const SAVE_MIN_INTERVAL_MS = 5_000
+
+function throttledSaveStats() {
+  const now = Date.now()
+  if (now - lastSaveTime < SAVE_MIN_INTERVAL_MS) {
+    console.log(`[Connect4] save throttled: ${now - lastSaveTime}ms since last save`)
+    return
+  }
+  lastSaveTime = now
+  console.log(`[Connect4] save executed`)
+  connect4.saveStats()
+}
+
 function dismissToast(id) {
   toastQueue.value = toastQueue.value.filter(toast => toast.id !== id)
 }
 
 function saveOnHide() {
   if (document.visibilityState === 'hidden') {
-    connect4.saveStats()
+    console.log('[Connect4] visibilitychange: hidden ->', 'throttledSaveStats()')
+    throttledSaveStats()
   }
 }
 
 function saveOnUnload() {
-  connect4.saveStats()
+  console.log('[Connect4] beforeunload ->', 'throttledSaveStats()')
+  throttledSaveStats()
 }
 
 function formatSessionDuration(seconds) {
@@ -200,6 +221,7 @@ function formatSessionDuration(seconds) {
 }
 
 onMounted(async () => {
+  componentMountedAt = Date.now()
   await connect4.initializeGame(true)
   sessionElapsedSeconds.value = connect4.getSessionDurationSeconds()
 
@@ -207,8 +229,10 @@ onMounted(async () => {
     sessionElapsedSeconds.value = connect4.getSessionDurationSeconds()
   }, 1000)
 
+  // Auto-guardado cada 30 s usando throttledSaveStats
   saveInterval = setInterval(() => {
-    connect4.saveStats()
+    console.log('[Connect4] autosave interval triggered')
+    throttledSaveStats()
   }, 30_000)
 
   document.addEventListener('visibilitychange', saveOnHide)
@@ -221,7 +245,15 @@ onUnmounted(() => {
   toastTimers.forEach(clearTimeout)
   document.removeEventListener('visibilitychange', saveOnHide)
   window.removeEventListener('beforeunload', saveOnUnload)
-  connect4.saveStats()
+  
+  // Solo guardar si el usuario estuvo jugando al menos 5 segundos
+  const timeSinceMount = Date.now() - componentMountedAt
+  if (timeSinceMount >= 5_000 || lastPlayerAction > 0) {
+    console.log(`[Connect4] onUnmounted save (${timeSinceMount}ms in game)`)
+    throttledSaveStats()
+  } else {
+    console.log(`[Connect4] onUnmounted skipped save (${timeSinceMount}ms < 5s threshold)`)
+  }
 })
 
 function createEmptyBoard() {

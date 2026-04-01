@@ -24,7 +24,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User registered successfully',
-            'user' => new UserResource($user->load('gameStats.game')),
+            'user' => new UserResource($user),
             'access_token' => $token,
             'token_type' => 'Bearer',
         ], 201);
@@ -43,7 +43,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged in successfully',
-            'user' => new UserResource($user->load('gameStats.game')),
+            'user' => new UserResource($user),
             'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
@@ -60,6 +60,6 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return new UserResource($request->user()->load('gameStats.game'));
+        return new UserResource($request->user());
     }
 }

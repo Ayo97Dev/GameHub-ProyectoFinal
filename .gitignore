@@ -1,2 +1,6 @@
 .github
+.agents
+.vscode
 TODO.md
+.playwright-mcp
+skills-lock.json

@@ -4,12 +4,14 @@ import gameEngine from '../../lib/gameEngineService'
 
 export const useConnect4Store = defineStore('connect4', () => {
   const GAME_SLUG = 'connect4'
+  const SAVE_COOLDOWN_MS = 5_000 // Mínimo 5 segundos entre saves
 
   const isLoading = ref(false)
   const isSaving = ref(false)
   const error = ref(null)
   const sessionId = ref(null)
   const lastSaved = ref(null)
+  const lastSaveRequestAt = ref(0)
   const sessionStartedAt = ref(null)
   const reportedPlaytimeSeconds = ref(0)
   const newAchievements = ref([])
@@ -51,11 +53,17 @@ export const useConnect4Store = defineStore('connect4', () => {
 
   async function saveStats() {
     if (isSaving.value) return
-
-    isSaving.value = true
+    
+    const now = Date.now()
+    if (now - lastSaveRequestAt.value < SAVE_COOLDOWN_MS) {
+      return
+    }
+    
+    lastSaveRequestAt.value = now
     error.value = null
 
     try {
+      isSaving.value = true
       const elapsedSeconds = getSessionDurationSeconds()
       const pendingPlaytime = Math.max(elapsedSeconds - reportedPlaytimeSeconds.value, 0)
 
@@ -99,6 +107,7 @@ export const useConnect4Store = defineStore('connect4', () => {
     error.value = null
     sessionId.value = null
     lastSaved.value = null
+    lastSaveRequestAt.value = 0
     sessionStartedAt.value = null
     reportedPlaytimeSeconds.value = 0
     newAchievements.value = []
@@ -110,6 +119,7 @@ export const useConnect4Store = defineStore('connect4', () => {
     error,
     sessionId,
     lastSaved,
+    lastSaveRequestAt,
     newAchievements,
     wins,
     losses,

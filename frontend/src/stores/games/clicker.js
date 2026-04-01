@@ -4,12 +4,15 @@ import gameEngine from '../../lib/gameEngineService'
 
 export const useClickerStore = defineStore('clicker', () => {
   const GAME_SLUG = 'clicker'
+  const SAVE_COOLDOWN_MS = 5_000 // Mínimo 5 segundos entre saves
 
   const isLoading = ref(false)
   const isPrestiging = ref(false)
+  const isSaving = ref(false)
   const error     = ref(null)
   const sessionId = ref(null)
   const lastSaved = ref(null)
+  const lastSaveRequestAt = ref(0)
   const sessionStartedAt = ref(null)
   const reportedPlaytimeSeconds = ref(0)
   // Cola de logros recién desbloqueados para notificar al usuario
@@ -151,13 +154,27 @@ export const useClickerStore = defineStore('clicker', () => {
     }
     _recalcStats()
 
-    // Sincronización con el backend en segundo plano (sin await)
-    gameEngine.action(GAME_SLUG, {
-      action:  'buy_upgrade',
-      payload: { upgrade_id: upgradeId },
-    }).catch(() => {
-      // El estado completo se reconciliará en el próximo saveGame()
-    })
+    // Sincronización con el backend con reintentos
+    let retries = 0
+    const maxRetries = 2
+    const attemptSync = async () => {
+      try {
+        await gameEngine.action(GAME_SLUG, {
+          action:  'buy_upgrade',
+          payload: { upgrade_id: upgradeId },
+        })
+      } catch (err) {
+        if (retries < maxRetries) {
+          retries++
+          // Reintentar después de 500ms
+          setTimeout(attemptSync, 500)
+        } else {
+          // El estado completo se reconciliará en el próximo saveGame()
+          console.error(`Buy upgrade ${upgradeId} failed after retries:`, err)
+        }
+      }
+    }
+    attemptSync()
   }
 
   async function prestige() {
@@ -200,7 +217,25 @@ export const useClickerStore = defineStore('clicker', () => {
   }
 
   async function saveGame() {
+    // Evitar múltiples saves concurrentes y demasiado frecuentes  
+    if (isSaving.value) {
+      console.log('[saveGame] bloqueado: ya hay un save en progreso')
+      return
+    }
+    
+    const now = Date.now()
+    const timeSinceLastSave = now - lastSaveRequestAt.value
+    
+    if (timeSinceLastSave < SAVE_COOLDOWN_MS) {
+      console.log(`[saveGame] bloqueado: solo ${timeSinceLastSave}ms desde último save (requiere ${SAVE_COOLDOWN_MS}ms)`)
+      return
+    }
+    
+    console.log(`[saveGame] ejecutando save (${timeSinceLastSave}ms desde último)`)
+    lastSaveRequestAt.value = now
+    
     try {
+      isSaving.value = true
       const elapsedSeconds = getSessionDurationSeconds()
       const pendingPlaytime = Math.max(elapsedSeconds - reportedPlaytimeSeconds.value, 0)
 
@@ -217,6 +252,8 @@ export const useClickerStore = defineStore('clicker', () => {
       }
     } catch (e) {
       error.value = e.message
+    } finally {
+      isSaving.value = false
     }
   }
 
@@ -248,15 +285,17 @@ export const useClickerStore = defineStore('clicker', () => {
     }
     sessionId.value     = null
     lastSaved.value     = null
+    lastSaveRequestAt.value = 0
     sessionStartedAt.value = null
     reportedPlaytimeSeconds.value = 0
+    isSaving.value      = false
     error.value         = null
     newAchievements.value = []
   }
 
   return {
     // state
-    gameState, isLoading, isPrestiging, error, lastSaved, sessionId, newAchievements,
+    gameState, isLoading, isPrestiging, isSaving, error, lastSaved, lastSaveRequestAt, sessionId, newAchievements,
     // computed
     balance, clickPower, dps, upgrades, prestigeLevel, totalClicks,
     prestigeRequiredBalance, nextPrestigeClickIncrement, nextPrestigeDpsFactor,

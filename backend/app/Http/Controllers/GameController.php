@@ -108,6 +108,8 @@ class GameController extends Controller
         if ($game->slug === 'connect4') {
             // En Connect4 el leaderboard usa victorias acumuladas.
             $score = $wins;
+            // Connect4 NO necesita guardar estado completo, solo estadísticas
+            $gameState = ['wins' => $wins, 'losses' => $losses];
         }
 
         $service->saveProgress($gameState, $score, $playtime);

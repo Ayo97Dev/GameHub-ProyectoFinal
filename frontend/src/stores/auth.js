@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = ref(!!localStorage.getItem('token'))
   const user = ref(null)
   const token = ref(localStorage.getItem('token') || null)
+  const isLoggingOut = ref(false)
 
   async function login(credentials) {
     const { data } = await api.post('/login', credentials)
@@ -31,15 +32,27 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function logout() {
-    if (token.value) {
-      try {
-        await api.post('/logout')
-      } catch (error) {
-        // Ignorar posibles errores al desloguear
-      }
+    // Evitar múltiples logout concurrentes
+    if (isLoggingOut.value) {
+      console.warn('[auth] logout bloqueado: ya hay un logout en progreso')
+      return
     }
-    setToken(null)
-    user.value = null
+    
+    isLoggingOut.value = true
+    try {
+      if (token.value) {
+        try {
+          await api.post('/logout')
+        } catch (error) {
+          // Ignorar posibles errores al desloguear
+          console.warn('[auth] error al llamar /logout:', error?.message)
+        }
+      }
+      setToken(null)
+      user.value = null
+    } finally {
+      isLoggingOut.value = false
+    }
   }
 
   function setToken(newToken) {
@@ -54,6 +67,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     isLoggedIn,
+    isLoggingOut,
     user,
     token,
     login,

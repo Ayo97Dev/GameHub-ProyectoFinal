@@ -13,6 +13,15 @@ import Connect4 from '../components/games/Connect4.vue'
 import Towerdefense from '../components/games/Towerdefense.vue'
 import MockAd from '../components/ads/MockAd.vue'
 
+// Helper para debounce
+function useDebouncedFunction(fn, delay = 300) {
+  let timeoutId = null
+  return function(...args) {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
+
 const route      = useRoute()
 const gameStore  = useGameStore()
 const clicker    = useClickerStore()
@@ -36,6 +45,7 @@ const pageTitle = computed(() => {
 
 const leaderboard = ref([])
 const towerDefenseScore = ref(0)
+const debouncedFetchLeaderboard = useDebouncedFunction(fetchLeaderboard, 300)
 
 const gameComponent = computed(() => {
   if (route.params.slug === 'rpg')     return Rpg
@@ -85,7 +95,7 @@ onMounted(() => {
 
 watch(() => route.params.slug, () => {
   towerDefenseScore.value = 0 // Reset score when changing game
-  fetchLeaderboard()
+  debouncedFetchLeaderboard()
 })
 </script>
 

@@ -2,6 +2,8 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClickerStore } from '../../stores/games/clicker'
 
+const emit = defineEmits(['live-score'])
+
 const clicker = useClickerStore()
 
 const UPGRADES = [
@@ -75,6 +77,8 @@ let dpsInterval       = null
 let comboInterval     = null
 let sessionClockInterval = null
 let toastTimers       = []
+let componentMountedAt = 0
+let lastPlayerAction  = 0
 
 
 const RARITY_STYLES = {
@@ -187,20 +191,40 @@ watch(() => clicker.newAchievements.length, () => {
   }
 })
 
+// Callback helpers
+let lastSaveTime = 0
+const SAVE_MIN_INTERVAL_MS = 5_000
+
+function throttledSaveGame() {
+  const now = Date.now()
+  if (now - lastSaveTime < SAVE_MIN_INTERVAL_MS) {
+    console.log(`[Clicker] save throttled: ${now - lastSaveTime}ms since last save`)
+    return
+  }
+  lastSaveTime = now
+  console.log(`[Clicker] save executed: ${now - lastSaveTime}ms since last save`)
+  clicker.saveGame()
+}
+
 function dismissToast(id) {
   toastQueue.value = toastQueue.value.filter(a => a.id !== id)
 }
 
 function saveOnHide() {
-  if (document.visibilityState === 'hidden') clicker.saveGame()
+  if (document.visibilityState === 'hidden') {
+    console.log('[Clicker] visibilitychange: hidden ->', 'throttledSaveGame()')
+    throttledSaveGame()
+  }
 }
 function saveOnUnload() {
-  clicker.saveGame()
+  console.log('[Clicker] beforeunload ->', 'throttledSaveGame()')
+  throttledSaveGame()
 }
 
 
 onMounted(async () => {
   // Guarda el tiempo de juego
+  componentMountedAt = Date.now()
   await clicker.initializeGame(true)
   sessionElapsedSeconds.value = clicker.getSessionDurationSeconds()
 
@@ -209,7 +233,10 @@ onMounted(async () => {
   }, 1000)
 
   // Auto-guardado cada 30 s
-  saveInterval = setInterval(() => clicker.saveGame(), 30_000)
+  saveInterval = setInterval(() => {
+    console.log('[Clicker] autosave interval triggered')
+    clicker.saveGame()
+  }, 30_000)
 
   // DPS cada 100 ms con 1/10 del valor → contador sube de forma continua y fluida
   dpsInterval = setInterval(() => {
@@ -238,7 +265,15 @@ onUnmounted(() => {
   toastTimers.forEach(clearTimeout)
   document.removeEventListener('visibilitychange', saveOnHide)
   window.removeEventListener('beforeunload', saveOnUnload)
-  clicker.saveGame()
+  
+  // Solo guardar si el usuario estuvo jugando al menos 5 segundos
+  const timeSinceMount = Date.now() - componentMountedAt
+  if (timeSinceMount >= 5_000 || lastPlayerAction > 0) {
+    console.log(`[Clicker] onUnmounted save (${timeSinceMount}ms in game)`)
+    clicker.saveGame()
+  } else {
+    console.log(`[Clicker] onUnmounted skipped save (${timeSinceMount}ms < 5s threshold)`)
+  }
 })
 
 // Feedback visual inmediato — sin esperar respuesta de red

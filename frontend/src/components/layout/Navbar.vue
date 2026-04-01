@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useGameStore } from '../../stores/game'
@@ -11,6 +11,7 @@ const gameStore = useGameStore()
 const router = useRouter()
 const { isDark, toggleTheme } = useTheme()
 const navGames = computed(() => gameStore.games)
+const isLoggingOut = ref(false)
 
 onMounted(() => {
   if (!gameStore.hasFetched || gameStore.games.length === 0) {
@@ -19,8 +20,19 @@ onMounted(() => {
 })
 
 async function handleLogout() {
-  await authStore.logout()
-  router.push('/')
+  if (isLoggingOut.value) return // Prevenir múltiples clics
+  
+  isLoggingOut.value = true
+  try {
+    await authStore.logout()
+    router.push('/')
+  } catch (error) {
+    console.error('Error during logout:', error)
+    // El logout ya se ejecutó, redirigir de todas formas
+    router.push('/')
+  } finally {
+    isLoggingOut.value = false
+  }
 }
 </script>
 
@@ -71,8 +83,8 @@ async function handleLogout() {
             >
               Perfil
             </RouterLink>
-            <BaseButton size="sm" @click="handleLogout">
-              Cerrar sesión
+            <BaseButton size="sm" @click="handleLogout" :disabled="isLoggingOut">
+              {{ isLoggingOut ? '⏳ Cerrando...' : 'Cerrar sesión' }}
             </BaseButton>
           </template>
           <template v-else>
