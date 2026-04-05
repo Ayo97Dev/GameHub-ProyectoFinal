@@ -1,0 +1,54 @@
+{
+  "scaling": {
+    "maxLevel": 50,
+    "growth": {
+      "maxHp": 0.06,
+      "attack": 0.05,
+      "defense": 0.04,
+      "critPerLevels": 5,
+      "critIncrement": 1
+    }
+  },
+  "classes": {
+    "CRUZADO": {
+      "name": "Paladin",
+      "role": "tank",
+      "baseStats": {
+        "maxHp": 900,
+        "attack": 95,
+        "defense": 50,
+        "crit": 10
+      }
+    },
+    "PICARO": {
+      "name": "Rogue",
+      "role": "dps",
+      "baseStats": {
+        "maxHp": 550,
+        "attack": 140,
+        "defense": 20,
+        "crit": 30
+      }
+    },
+    "MAGO": {
+      "name": "Wizard",
+      "role": "dps",
+      "baseStats": {
+        "maxHp": 500,
+        "attack": 155,
+        "defense": 15,
+        "crit": 30
+      }
+    },
+    "DRUIDA": {
+      "name": "Druid",
+      "role": "healer",
+      "baseStats": {
+        "maxHp": 700,
+        "attack": 100,
+        "defense": 30,
+        "crit": 20
+      }
+    }
+  }
+}

@@ -175,8 +175,8 @@ function makeHero() {
   return {
     name: 'Cruzado',
     level: 1,
-    hp: 28,
-    maxHp: 28,
+    hp: 1000,
+    maxHp: 1000,
     stress: 0,
     maxStress: 100,
     atkMin: 4,
