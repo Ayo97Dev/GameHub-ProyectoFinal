@@ -1,54 +1,196 @@
 {
-  "scaling": {
-    "maxLevel": 50,
-    "growth": {
-      "maxHp": 0.06,
-      "attack": 0.05,
-      "defense": 0.04,
-      "critPerLevels": 5,
-      "critIncrement": 1
-    }
-  },
-  "classes": {
-    "CRUZADO": {
-      "name": "Paladin",
+  "classes": [
+    {
+      "id": "warrior",
+      "name": "Guerrero",
+      "description": "Fuerte y resistente, especializado en daño físico y tanqueo.",
       "role": "tank",
-      "baseStats": {
-        "maxHp": 900,
-        "attack": 95,
-        "defense": 50,
-        "crit": 10
+      "avatar": "assets/warrior.png",
+      "stats": {
+        "hp": 170,
+        "mp": 15,
+        "attack": 17,
+        "defense": 17,
+        "magicAttack": 4,
+        "magicDefense": 10,
+        "speed": 7,
+        "critRate": 4,
+        "evasion": 2
+      },
+      "skills": [
+        "slash",
+        "shield_Block",
+        "second_Wind"
+      ],
+      "levelUp": {
+        "hp": 16,
+        "mp": 3,
+        "attack": 2,
+        "defense": 3,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 1
       }
     },
-    "PICARO": {
-      "name": "Rogue",
+    {
+      "id": "paladin",
+      "name": "Paladín",
+      "description": "Guerrero sagrado, combina resistencia física con magia de apoyo.",
+      "role": "tank",
+      "avatar": "assets/paladin.png",
+      "stats": {
+        "hp": 140,
+        "mp": 60,
+        "attack": 15,
+        "defense": 14,
+        "magicAttack": 12,
+        "magicDefense": 14,
+        "speed": 8,
+        "critRate": 4,
+        "evasion": 3
+      },
+      "skills": [
+        "divine_Shield",
+        "holy_Light",
+        "judgment"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 6,
+        "attack": 2,
+        "defense": 2,
+        "magicAttack": 2,
+        "magicDefense": 2,
+        "speed": 1
+      }
+    },
+    {
+      "id": "rogue",
+      "name": "Pícaro",
+      "description": "Ágil y sigiloso, experto en ataques rápidos y críticos.",
       "role": "dps",
-      "baseStats": {
-        "maxHp": 550,
-        "attack": 140,
-        "defense": 20,
-        "crit": 30
+      "avatar": "assets/rogue.png",
+      "stats": {
+        "hp": 95,
+        "mp": 25,
+        "attack": 21,
+        "defense": 7,
+        "magicAttack": 6,
+        "magicDefense": 6,
+        "speed": 20,
+        "critRate": 18,
+        "evasion": 12
+      },
+      "skills": [
+        "backstab",
+        "dagger_Throw",
+        "vanish"
+      ],
+      "levelUp": {
+        "hp": 9,
+        "mp": 2,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 3
       }
     },
-    "MAGO": {
-      "name": "Wizard",
+    {
+      "id": "mage",
+      "name": "Mago",
+      "description": "Experto en magia ofensiva, frágil físicamente pero devastador con hechizos.",
       "role": "dps",
-      "baseStats": {
-        "maxHp": 500,
-        "attack": 155,
-        "defense": 15,
-        "crit": 30
+      "avatar": "assets/mage.png",
+      "stats": {
+        "hp": 75,
+        "mp": 110,
+        "attack": 4,
+        "defense": 5,
+        "magicAttack": 22,
+        "magicDefense": 12,
+        "speed": 9,
+        "critRate": 5,
+        "evasion": 4
+      },
+      "skills": [
+        "fireball",
+        "lightning_Bolt",
+        "ice_Shards"
+      ],
+      "levelUp": {
+        "hp": 7,
+        "mp": 11,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 2,
+        "speed": 1
       }
     },
-    "DRUIDA": {
-      "name": "Druid",
-      "role": "healer",
-      "baseStats": {
-        "maxHp": 700,
-        "attack": 100,
-        "defense": 30,
-        "crit": 20
+    {
+      "id": "hunter",
+      "name": "Cazador",
+      "description": "Arquero ágil y calculador, especializado en emboscadas, trampas y combate a distancia.",
+      "role": "dps",
+      "avatar": "assets/hunter.png",
+      "stats": {
+        "hp": 105,
+        "mp": 35,
+        "attack": 19,
+        "defense": 10,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 15,
+        "critRate": 10,
+        "evasion": 6
+      },
+      "skills": [
+        "aimed_Shoot",
+        "trap_Set",
+        "stealth"
+      ],
+      "levelUp": {
+        "hp": 11,
+        "mp": 4,
+        "attack": 3,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "Cleric",
+      "name": "Clérigo",
+      "description": "Sanador y protector, especializado en magia de curación y apoyo.",
+      "role": "support",
+      "avatar": "assets/cleric.png",
+      "stats": {
+        "hp": 95,
+        "mp": 130,
+        "attack": 5,
+        "defense": 8,
+        "magicAttack": 14,
+        "magicDefense": 14,
+        "speed": 11,
+        "critRate": 4,
+        "evasion": 5
+      },
+      "skills": [
+        "heal",
+        "blessing",
+        "Punishment"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 14,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 3,
+        "speed": 1
       }
     }
-  }
+  ]
 }

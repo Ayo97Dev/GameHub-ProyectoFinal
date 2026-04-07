@@ -1,0 +1,52 @@
+{
+  "classes": {
+    "BARBARIAN": {
+      "name": "Barbarian",
+      "role": "tank",
+      "baseStats": {
+        "maxHp": 950,
+        "attack": 110,
+        "defense": 35,
+        "crit": 11
+      },
+      "skills": ["Rage", "Smash", "Blood Fury"],
+      "startingItems": ["Axe"]
+    },
+    "FIGHTER": {
+      "name": "Fighter",
+      "role": "balanced",
+      "baseStats": {
+        "maxHp": 750,
+        "attack": 110,
+        "defense": 40,
+        "crit": 12
+      },
+      "skills": ["Power Strike", "Guard Stance", "Combo Attack"],
+      "startingItems": ["Sword", "Armor"]
+    },
+    "BARD": {
+      "name": "Bard",
+      "role": "support",
+      "baseStats": {
+        "maxHp": 650,
+        "attack": 90,
+        "defense": 30,
+        "crit": 30
+      },
+      "skills": ["Motivating Song", "Disrupt Tune", "Healing Melody"],
+      "startingItems": ["Lute"]
+    },
+    "DRUID": {
+      "name": "Druid",
+      "role": "healer",
+      "baseStats": {
+        "maxHp": 700,
+        "attack": 100,
+        "defense": 30,
+        "crit": 25
+      },
+      "skills": ["Rejuvenation", "Entangle", "Shapeshift"],
+      "startingItems": ["Totem"]
+    }
+  }
+}

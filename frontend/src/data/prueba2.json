@@ -1,0 +1,59 @@
+[
+  {
+    "id": "paladin",
+    "name": "Paladín",
+    "description": "Guerrero sagrado, combina resistencia física con magia de apoyo.",
+    "role": "tanque",
+    "avatar": "assets/paladin.png",
+    "stats": {
+      "hp": 140,
+      "mp": 50,
+      "attack": 16,
+      "defense": 14,
+      "magicAttack": 10,
+      "magicDefense": 12,
+      "speed": 9,
+      "critRate": 5,
+      "evasion": 4
+    },
+    "skills": [
+      {
+        "id": ,
+        "name": ,
+        "description": ,
+        "type": ,
+        "mpCost": ,
+        "power": ,
+        "cooldown": 
+      },
+      {
+        "id": "divineShield",
+        "name": "Escudo Divino",
+        "description": "Aumenta tu defensa y defensa mágica durante 2 turnos.",
+        "type": "buff",
+        "mpCost": 15,
+        "power": 0,
+        "cooldown": 3
+      },
+        {
+        "id": "healDivine",
+        "name": "Cura Divina",
+        "description": "Restaura puntos de vida a ti mismo",
+        "type": "curación",
+        "mpCost": 15,
+        "power": 35,
+        "cooldown": 2
+      }
+      
+    ],
+    "levelUp": {
+      "hp": 14,
+      "mp": 5,
+      "attack": 2,
+      "defense": 2,
+      "magicAttack": 1,
+      "magicDefense": 1,
+      "speed": 1
+    }
+  }
+]
