@@ -84,7 +84,7 @@
       "skills": [
         "backstab",
         "dagger_Throw",
-        "vanish"
+        "shadow_Recovery"
       ],
       "levelUp": {
         "hp": 9,
@@ -116,7 +116,7 @@
       "skills": [
         "fireball",
         "lightning_Bolt",
-        "ice_Shards"
+        "arcane_Recovery"
       ],
       "levelUp": {
         "hp": 7,
@@ -147,7 +147,7 @@
       },
       "skills": [
         "aimed_Shoot",
-        "trap_Set",
+        "survival_Instinct",
         "stealth"
       ],
       "levelUp": {
@@ -164,7 +164,7 @@
       "id": "Cleric",
       "name": "Clérigo",
       "description": "Sanador y protector, especializado en magia de curación y apoyo.",
-      "role": "support",
+      "role": "healer",
       "avatar": "assets/cleric.png",
       "stats": {
         "hp": 95,
@@ -180,13 +180,205 @@
       "skills": [
         "heal",
         "blessing",
-        "Punishment"
+        "punishment"
       ],
       "levelUp": {
         "hp": 10,
         "mp": 14,
         "attack": 1,
         "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 3,
+        "speed": 1
+      }
+    },
+    {
+      "id": "warlock",
+      "name": "Brujo",
+      "description": "Maestro de las artes oscuras, inflige gran daño mágico y efectos de estado.",
+      "role": "dps",
+      "avatar": "assets/warlock.png",
+      "stats": {
+        "hp": 85,
+        "mp": 105,
+        "attack": 4,
+        "defense": 6,
+        "magicAttack": 21,
+        "magicDefense": 11,
+        "speed": 10,
+        "critRate": 6,
+        "evasion": 5
+      },
+      "skills": [
+        "curse",
+        "life_Drain",
+        "dark_Pact"
+      ],
+      "levelUp": {
+        "hp": 8,
+        "mp": 10,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 2,
+        "speed": 1
+      }
+    },
+    {
+      "id": "Swordsman",
+      "name": "Espadachín",
+      "description": "Maestro de la espada, especializado en combate cuerpo a cuerpo y alta velocidad.",
+      "role": "dps",
+      "avatar": "assets/swordsman.png",
+      "stats": {
+        "hp": 110,
+        "mp": 30,
+        "attack": 20,
+        "defense": 12,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 14,
+        "critRate": 8,
+        "evasion": 6
+      },
+      "skills": [
+        "double_Slash",
+        "blade_Dance",
+        "battle_Recovery"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 3,
+        "attack": 3,
+        "defense": 2,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "Gunslinger",
+      "name": "Francotirador",
+      "description": "Experto en armas de fuego, especializado en combate a distancia y precisión.",
+      "role": "dps",
+      "avatar": "assets/gunslinger.png",
+      "stats": {
+        "hp": 95,
+        "mp": 25,
+        "attack": 21,
+        "defense": 9,
+        "magicAttack": 4,
+        "magicDefense": 7,
+        "speed": 16,
+        "critRate": 12,
+        "evasion": 7
+      },
+      "skills": [
+        "quick_Shot",
+        "reload",
+        "adrenaline_Shot"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 2,
+        "attack": 3,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "druid",
+      "name": "Druida",
+      "description": "Maestro de la naturaleza, especializado en magia de curación y transformación.",
+      "role": "healer",
+      "avatar": "assets/druid.png",
+      "stats": {
+        "hp": 100,
+        "mp": 120,
+        "attack": 6,
+        "defense": 9,
+        "magicAttack": 13,
+        "magicDefense": 13,
+        "speed": 10,
+        "critRate": 4,
+        "evasion": 6
+      },
+      "skills": [
+        "regrowth",
+        "nature_Strike",
+        "nature_Blessing"
+      ],
+      "levelUp": {
+        "hp": 11,
+        "mp": 13,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 2,
+        "speed": 1
+      }
+    },
+    {
+      "id": "bard",
+      "name": "Bardo",
+      "description": "Maestro de la música, especializado en apoyo y magia de área.",
+      "role": "support",
+      "avatar": "assets/bard.png",
+      "stats": {
+        "hp": 95,
+        "mp": 110,
+        "attack": 7,
+        "defense": 8,
+        "magicAttack": 12,
+        "magicDefense": 12,
+        "speed": 14,
+        "critRate": 5,
+        "evasion": 7
+      },
+      "skills": [
+        "song_of_power",
+        "inspiration",
+        "healing_Melody"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 12,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 2,
+        "speed": 2
+      }
+    },
+    {
+      "id": "shaman",
+      "name": "Chamán",
+      "description": "Maestro de las artes místicas, especializado en magia de elemento y comunicación con espíritus.",
+      "role": "support",
+      "avatar": "assets/shaman.png",
+      "stats": {
+        "hp": 105,
+        "mp": 115,
+        "attack": 6,
+        "defense": 10,
+        "magicAttack": 13,
+        "magicDefense": 15,
+        "speed": 9,
+        "critRate": 4,
+        "evasion": 5
+      },
+      "skills": [
+        "totem",
+        "earth_Shield",
+        "spirit_Recovery"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 12,
+        "attack": 1,
+        "defense": 2,
         "magicAttack": 2,
         "magicDefense": 3,
         "speed": 1

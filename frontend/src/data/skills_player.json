@@ -1,0 +1,387 @@
+{
+  "skills": [
+    // ===== WARRIOR =====
+    {
+      "id": "slash",
+      "name": "Golpe",
+      "description": "Ataque físico básico.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 5,
+      "power": 100,
+      "cooldown": 0
+    },
+    {
+      "id": "shield_Block",
+      "name": "Bloqueo",
+      "description": "Reduce el daño recibido.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 10,
+      "power": 40,
+      "cooldown": 3
+    },
+    {
+      "id": "second_Wind",
+      "name": "Segundo Aliento",
+      "description": "Recupera vida.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 25,
+      "cooldown": 4
+    },
+
+    // ===== PALADIN =====
+    {
+      "id": "divine_Shield",
+      "name": "Escudo Divino",
+      "description": "Reduce gran cantidad de daño.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 60,
+      "cooldown": 4
+    },
+    {
+      "id": "holy_Light",
+      "name": "Luz Sagrada",
+      "description": "Cura a un aliado.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 35,
+      "cooldown": 2
+    },
+    {
+      "id": "judgment",
+      "name": "Juicio",
+      "description": "Ataque mágico moderado.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 12,
+      "power": 110,
+      "cooldown": 1
+    },
+
+    // ===== ROGUE =====
+    {
+      "id": "backstab",
+      "name": "Puñalada",
+      "description": "Gran daño crítico.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 10,
+      "power": 140,
+      "cooldown": 2
+    },
+    {
+      "id": "dagger_Throw",
+      "name": "Lanzamiento de Daga",
+      "description": "Ataque rápido a distancia.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 6,
+      "power": 90,
+      "cooldown": 0
+    },
+    {
+      "id": "shadow_Recovery",
+      "name": "Recuperación Sombría",
+      "description": "Se cura ligeramente tras atacar.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 12,
+      "power": 22,
+      "cooldown": 3
+    },
+
+    // ===== HUNTER =====
+    {
+      "id": "aimed_Shoot",
+      "name": "Disparo Preciso",
+      "description": "Ataque a distancia potente.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 10,
+      "power": 120,
+      "cooldown": 1
+    },
+    {
+      "id": "stealth",
+      "name": "Sigilo",
+      "description": "Aumenta crítico y evasión.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 45,
+      "cooldown": 4
+    },
+    {
+      "id": "survival_Instinct",
+      "name": "Instinto de Supervivencia",
+      "description": "Se cura y gana ligera evasión.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 25,
+      "cooldown": 3
+    },
+
+    // ===== MAGE =====
+    {
+      "id": "fireball",
+      "name": "Bola de Fuego",
+      "description": "Daño mágico alto.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 15,
+      "power": 130,
+      "cooldown": 1
+    },
+    {
+      "id": "lightning_Bolt",
+      "name": "Rayo",
+      "description": "Daño mágico rápido.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 10,
+      "power": 100,
+      "cooldown": 0
+    },
+    {
+      "id": "arcane_Recovery",
+      "name": "Recuperación Arcana",
+      "description": "Convierte energía mágica en vida.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 16,
+      "power": 28,
+      "cooldown": 3
+    },
+
+    // ===== CLERIC =====
+    {
+      "id": "heal",
+      "name": "Curar",
+      "description": "Restaura HP.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 40,
+      "cooldown": 1
+    },
+    {
+      "id": "blessing",
+      "name": "Bendición",
+      "description": "Aumenta stats.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 35,
+      "cooldown": 3
+    },
+    {
+      "id": "punishment",
+      "name": "Castigo",
+      "description": "Ataque mágico.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 10,
+      "power": 100,
+      "cooldown": 1
+    },
+
+    // ===== SWORDSMAN =====
+    {
+      "id": "double_Slash",
+      "name": "Doble Corte",
+      "description": "Ataque doble.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 12,
+      "power": 110,
+      "cooldown": 1
+    },
+    {
+      "id": "blade_Dance",
+      "name": "Danza de Espadas",
+      "description": "Ataque potente continuo.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 18,
+      "power": 140,
+      "cooldown": 3
+    },
+    {
+      "id": "battle_Recovery",
+      "name": "Recuperación de Combate",
+      "description": "Recupera vida en medio del combate.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 26,
+      "cooldown": 3
+    },
+
+    // ===== WARLOCK =====
+    {
+      "id": "curse",
+      "name": "Maldición",
+      "description": "Reduce defensa.",
+      "type": "debuff",
+      "damageType": null,
+      "mpCost": 12,
+      "power": 40,
+      "cooldown": 2
+    },
+    {
+      "id": "life_Drain",
+      "name": "Drenar Vida",
+      "description": "Daño y cura.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 14,
+      "power": 100,
+      "cooldown": 2
+    },
+    {
+      "id": "dark_Pact",
+      "name": "Pacto Oscuro",
+      "description": "Aumenta poder a cambio de HP.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 0,
+      "power": 50,
+      "cooldown": 4
+    },
+
+    // ===== GUNSLINGER =====
+    {
+      "id": "quick_Shot",
+      "name": "Disparo Rápido",
+      "description": "Ataque veloz.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 6,
+      "power": 95,
+      "cooldown": 0
+    },
+    {
+      "id": "reload",
+      "name": "Recargar",
+      "description": "Aumenta ataque.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 8,
+      "power": 40,
+      "cooldown": 2
+    },
+    {
+      "id": "adrenaline_Shot",
+      "name": "Disparo de Adrenalina",
+      "description": "Se cura tras disparar.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 12,
+      "power": 24,
+      "cooldown": 3
+    },
+
+    // ===== DRUID =====
+    {
+      "id": "regrowth",
+      "name": "Regeneración",
+      "description": "Cura progresiva.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 30,
+      "cooldown": 2
+    },
+    {
+      "id": "nature_Strike",
+      "name": "Golpe Natural",
+      "description": "Ataque mágico de la naturaleza.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 12,
+      "power": 105,
+      "cooldown": 1
+    },
+    {
+      "id": "nature_Blessing",
+      "name": "Bendición Natural",
+      "description": "Buff a aliados.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 35,
+      "cooldown": 3
+    },
+
+    // ===== BARD =====
+    {
+      "id": "sonic_Strike",
+      "name": "Golpe Sonoro",
+      "description": "Ataque mágico basado en ondas de sonido.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 12,
+      "power": 100,
+      "cooldown": 1
+    },
+    {
+      "id": "inspiration",
+      "name": "Inspiración",
+      "description": "Aumenta crítico.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 35,
+      "cooldown": 3
+    },
+    {
+      "id": "healing_Melody",
+      "name": "Melodía Sanadora",
+      "description": "Cura moderadamente al objetivo.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 30,
+      "cooldown": 2
+    },
+
+    // ===== SHAMAN =====
+    {
+      "id": "elemental_Blast",
+      "name": "Explosión Elemental",
+      "description": "Ataque mágico elemental.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 13,
+      "power": 110,
+      "cooldown": 1
+    },
+    {
+      "id": "earth_Shield",
+      "name": "Escudo de Tierra",
+      "description": "Reduce daño.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 16,
+      "power": 45,
+      "cooldown": 3
+    },
+    {
+      "id": "spirit_Recovery",
+      "name": "Recuperación Espiritual",
+      "description": "Cura usando energía espiritual.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 17,
+      "power": 28,
+      "cooldown": 3
+    }
+  ]
+}
