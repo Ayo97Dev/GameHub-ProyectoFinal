@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGameStore } from '../stores/game'
 import { useClickerStore } from '../stores/games/clicker'
@@ -7,6 +7,7 @@ import api from '../lib/axios'
 import Rpg from '../components/games/Rpg.vue'
 import Clicker from '../components/games/Clicker.vue'
 import Quiz from '../components/games/Quiz.vue'
+import Battleship from '../components/games/Battleship.vue'
 import MockAd from '../components/ads/MockAd.vue'
 
 const route      = useRoute()
@@ -14,11 +15,13 @@ const gameStore  = useGameStore()
 const clicker    = useClickerStore()
 
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
+const externalScore = ref(0)
 
 const FALLBACK_TITLE_BY_SLUG = {
   clicker: 'Reactor de Clics',
   rpg: 'Modo RPG',
   quiz: 'Modo Quiz',
+  battleship: 'Hundir la Flota',
 }
 
 const pageTitle = computed(() => {
@@ -32,21 +35,40 @@ const gameComponent = computed(() => {
   if (route.params.slug === 'rpg')     return Rpg
   if (route.params.slug === 'clicker') return Clicker
   if (route.params.slug === 'quiz')    return Quiz
+  if (route.params.slug === 'battleship') return Battleship
   return null
 })
 
 const liveScore = computed(() => {
   if (route.params.slug === 'clicker') return Math.floor(clicker.balance)
+  if (route.params.slug === 'battleship') return Math.floor(externalScore.value)
   return 0
 })
 
-onMounted(async () => {
+function handleScoreChange(nextScore) {
+  externalScore.value = Number(nextScore) || 0
+}
+
+async function fetchLeaderboard() {
   try {
     const { data } = await api.get(`/leaderboard/${route.params.slug}`)
     leaderboard.value = data.data?.slice(0, 3) ?? []
   } catch {
     leaderboard.value = []
   }
+}
+
+function handleGameCompleted() {
+  void fetchLeaderboard()
+}
+
+watch(() => route.params.slug, () => {
+  externalScore.value = 0
+  void fetchLeaderboard()
+})
+
+onMounted(async () => {
+  await fetchLeaderboard()
 })
 </script>
 
@@ -71,7 +93,7 @@ onMounted(async () => {
       </aside>
 
       <div class="order-2 lg:order-1 xl:order-2 gh-panel p-4 sm:p-5">
-        <component :is="gameComponent" v-if="gameComponent" />
+        <component :is="gameComponent" v-if="gameComponent" @score-change="handleScoreChange" @game-completed="handleGameCompleted" />
         <div v-else class="min-h-[320px] rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-zinc-900 p-6 text-slate-600 dark:text-slate-300 transition-colors">
           El slug del juego no es válido.
         </div>

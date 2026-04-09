@@ -11,6 +11,7 @@ use App\Http\Resources\GameSessionResource;
 use App\Models\Game;
 use App\Models\GameSession;
 use App\Services\AchievementService;
+use App\Services\Games\BattleshipGameService;
 use App\Services\Games\ClickerGameService;
 use App\Services\GameService;
 use Illuminate\Http\JsonResponse;
@@ -166,7 +167,8 @@ class GameController extends Controller
         $result  = $service->completeSession(
             $session,
             $request->input('final_score'),
-            $request->input('duration')
+            $request->input('duration'),
+            $request->input('game_state', [])
         );
 
         return response()->json($result);
@@ -176,6 +178,7 @@ class GameController extends Controller
     {
         return match ($game->slug) {
             'clicker' => new ClickerGameService($user, $game),
+            'battleship' => new BattleshipGameService($user, $game),
             default   => new ClickerGameService($user, $game), // fallback genérico
         };
     }

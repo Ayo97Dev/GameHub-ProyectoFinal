@@ -52,6 +52,16 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        Game::firstOrCreate(['slug' => 'battleship'], [
+            'title'       => 'Hundir la Flota',
+            'description' => 'Encuentra y hunde la escuadra enemiga en un combate naval por turnos.',
+            'is_active'   => true,
+            'config'      => [
+                'allowed_actions'       => ['fire', 'scan', 'restart'],
+                'rate_limit_per_minute' => 90,
+            ],
+        ]);
+
         // Achievements globales
         $achievementsData = [
             // ── Puntuación ──────────────────────────────────────────────────────

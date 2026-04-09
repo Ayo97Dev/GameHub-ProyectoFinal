@@ -75,7 +75,7 @@ abstract class GameService
     /**
      * Cierra la sesión, guarda progreso y comprueba logros.
      */
-    public function completeSession(GameSession $session, int $finalScore, int $duration): array
+    public function completeSession(GameSession $session, int $finalScore, int $duration, array $finalState = []): array
     {
         $session->update([
             'score'            => $finalScore,
@@ -84,7 +84,8 @@ abstract class GameService
             'ended_at'         => now(),
         ]);
 
-        $this->saveProgress($session->session_data ?? [], $finalScore, $duration);
+        $stateForSave = !empty($finalState) ? $finalState : ($session->session_data ?? []);
+        $this->saveProgress($stateForSave, $finalScore, $duration);
 
         $achievementService  = new AchievementService();
         $newAchievements     = $achievementService->checkAndUnlock(

@@ -17,6 +17,7 @@ class CompleteGameRequest extends FormRequest
             'session_id'  => 'required|exists:game_sessions,id',
             'final_score' => 'required|integer|min:0',
             'duration'    => 'required|integer|min:0',
+            'game_state'  => 'sometimes|array',
         ];
     }
 }
