@@ -82,7 +82,7 @@
         "evasion": 8
       },
       "skills": [
-        "fire_Breath",
+        "dragon's_Fire_Breath",
         "tail_Swipe",
         "wing_Buffet"
       ],
@@ -660,7 +660,7 @@
       "skills": [
         "dagger_Stab",
         "trap_Setup",
-        "quick_Strike"
+        "quick_Stab"
       ],
       "levelUp": {
         "hp": 8,
@@ -722,7 +722,7 @@
         "evasion": 4
       },
       "skills": [
-        "heavy_Slam",
+        "heavy_Slash",
         "charge",
         "war_Cry"
       ],

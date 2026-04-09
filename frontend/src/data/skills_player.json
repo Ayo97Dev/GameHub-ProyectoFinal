@@ -1,6 +1,5 @@
 {
   "skills": [
-    // ===== WARRIOR =====
     {
       "id": "slash",
       "name": "Golpe",
@@ -31,8 +30,6 @@
       "power": 25,
       "cooldown": 4
     },
-
-    // ===== PALADIN =====
     {
       "id": "divine_Shield",
       "name": "Escudo Divino",
@@ -63,8 +60,6 @@
       "power": 110,
       "cooldown": 1
     },
-
-    // ===== ROGUE =====
     {
       "id": "backstab",
       "name": "Puñalada",
@@ -95,8 +90,6 @@
       "power": 22,
       "cooldown": 3
     },
-
-    // ===== HUNTER =====
     {
       "id": "aimed_Shoot",
       "name": "Disparo Preciso",
@@ -127,8 +120,6 @@
       "power": 25,
       "cooldown": 3
     },
-
-    // ===== MAGE =====
     {
       "id": "fireball",
       "name": "Bola de Fuego",
@@ -159,8 +150,6 @@
       "power": 28,
       "cooldown": 3
     },
-
-    // ===== CLERIC =====
     {
       "id": "heal",
       "name": "Curar",
@@ -191,8 +180,6 @@
       "power": 100,
       "cooldown": 1
     },
-
-    // ===== SWORDSMAN =====
     {
       "id": "double_Slash",
       "name": "Doble Corte",
@@ -223,8 +210,6 @@
       "power": 26,
       "cooldown": 3
     },
-
-    // ===== WARLOCK =====
     {
       "id": "curse",
       "name": "Maldición",
@@ -255,8 +240,6 @@
       "power": 50,
       "cooldown": 4
     },
-
-    // ===== GUNSLINGER =====
     {
       "id": "quick_Shot",
       "name": "Disparo Rápido",
@@ -287,8 +270,6 @@
       "power": 24,
       "cooldown": 3
     },
-
-    // ===== DRUID =====
     {
       "id": "regrowth",
       "name": "Regeneración",
@@ -319,8 +300,6 @@
       "power": 35,
       "cooldown": 3
     },
-
-    // ===== BARD =====
     {
       "id": "sonic_Strike",
       "name": "Golpe Sonoro",
@@ -351,8 +330,6 @@
       "power": 30,
       "cooldown": 2
     },
-
-    // ===== SHAMAN =====
     {
       "id": "elemental_Blast",
       "name": "Explosión Elemental",

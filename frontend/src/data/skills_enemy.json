@@ -1,244 +1,914 @@
 {
-  "skills": [
-    {
-      "id": "claw_Strike",
-      "name": "Golpe de Garra",
-      "description": "Ataque físico rápido con garras afiladas.",
-      "mpCost": 0,
-      "cooldown": 0,
-      "type": "physical",
-      "effect": "damage",
-      "power": 22
-    },
-    {
-      "id": "aerial_Rush",
-      "name": "Carga Aérea",
-      "description": "Se lanza desde el aire causando daño elevado.",
-      "mpCost": 5,
-      "cooldown": 2,
-      "type": "physical",
-      "effect": "damage",
-      "power": 30
-    },
-    {
-      "id": "wing_Buffet",
-      "name": "Golpe de Alas",
-      "description": "Ataque con las alas que puede desestabilizar al enemigo.",
-      "mpCost": 3,
-      "cooldown": 1,
-      "type": "physical",
-      "effect": "damage",
-      "power": 18
-    },
-
-    {
-      "id": "tail_Swipe",
-      "name": "Latigazo de Cola",
-      "description": "Ataque físico con la cola que golpea a un enemigo.",
-      "mpCost": 0,
-      "cooldown": 1,
-      "type": "physical",
-      "effect": "damage",
-      "power": 24
-    },
-    {
-      "id": "venom_Bite",
-      "name": "Mordisco Venenoso",
-      "description": "Muerde al enemigo e inflige veneno.",
-      "mpCost": 5,
-      "cooldown": 2,
-      "type": "physical",
-      "effect": "damage_poison",
-      "power": 20
-    },
-    {
-      "id": "aerial_Assault",
-      "name": "Asalto Aéreo",
-      "description": "Ataque descendente desde el aire con gran impacto.",
-      "mpCost": 6,
-      "cooldown": 2,
-      "type": "physical",
-      "effect": "damage",
-      "power": 28
-    },
-
-    {
-      "id": "fire_Breath",
-      "name": "Aliento de Fuego",
-      "description": "Exhala fuego que inflige gran daño a los enemigos.",
-      "mpCost": 20,
-      "cooldown": 3,
-      "type": "magic",
-      "effect": "damage",
-      "power": 40
-    },
-    {
-      "id": "tail_Swipe",
-      "name": "Latigazo de Cola",
-      "description": "Ataque con la cola que golpea con fuerza.",
-      "mpCost": 5,
-      "cooldown": 1,
-      "type": "physical",
-      "effect": "damage",
-      "power": 26
-    },
-    {
-      "id": "wing_Buffet",
-      "name": "Golpe de Alas",
-      "description": "Genera una ráfaga que empuja y daña al enemigo.",
-      "mpCost": 6,
-      "cooldown": 2,
-      "type": "physical",
-      "effect": "damage",
-      "power": 22
-    },
-
-    {
-      "id": "maul",
-      "name": "Desgarrar",
-      "description": "Ataque brutal con garras que inflige gran daño físico.",
-      "mpCost": 0,
-      "cooldown": 1,
-      "type": "physical",
-      "effect": "damage",
-      "power": 28
-    },
-    {
-      "id": "roar",
-      "name": "Rugido",
-      "description": "Rugido intimidante que puede debilitar al enemigo.",
-      "mpCost": 5,
-      "cooldown": 2,
-      "type": "utility",
-      "effect": "debuff_attack",
-      "power": 0
-    },
-    {
-      "id": "ground_Slam",
-      "name": "Golpe de Tierra",
-      "description": "Golpea el suelo causando daño en área.",
-      "mpCost": 8,
-      "cooldown": 2,
-      "type": "physical",
-      "effect": "aoe_damage",
-      "power": 24
-    },
-
-    {
-      "id": "bite",
-      "name": "Mordisco",
-      "description": "Ataque rápido con los colmillos.",
-      "mpCost": 0,
-      "cooldown": 0,
-      "type": "physical",
-      "effect": "damage",
-      "power": 18
-    },
-    {
-      "id": "pounce",
-      "name": "Salto",
-      "description": "Se lanza sobre el enemigo causando daño rápido.",
-      "mpCost": 3,
-      "cooldown": 1,
-      "type": "physical",
-      "effect": "damage",
-      "power": 22
-    },
-    {
-      "id": "howl",
-      "name": "Aullido",
-      "description": "Aumenta la agresividad o fortalece a aliados cercanos.",
-      "mpCost": 5,
-      "cooldown": 2,
-      "type": "utility",
-      "effect": "buff_attack",
-      "power": 0
-    },
-
-    {
-      "id": "claw_Swipe",
-      "name": "Zarpazo",
-      "description": "Ataque con garras rápido y preciso.",
-      "mpCost": 0,
-      "cooldown": 0,
-      "type": "physical",
-      "effect": "damage",
-      "power": 20
-    },
-    {
-      "id": "leap_Attack",
-      "name": "Ataque Saltante",
-      "description": "Salta sobre el enemigo infligiendo daño crítico.",
-      "mpCost": 4,
-      "cooldown": 1,
-      "type": "physical",
-      "effect": "damage",
-      "power": 24
-    },
-    {
-      "id": "stealth_Pounce",
-      "name": "Emboscada Sigilosa",
-      "description": "Ataque sorpresa desde sigilo con alto daño crítico.",
-      "mpCost": 6,
-      "cooldown": 3,
-      "type": "physical",
-      "effect": "damage",
-      "power": 30
-    },
-
-    {
-      "id": "petrifying_Gaze",
-      "name": "Mirada Petrificante",
-      "description": "Puede petrificar al enemigo, dejándolo inmóvil temporalmente.",
-      "mpCost": 10,
-      "cooldown": 3,
-      "type": "magic",
-      "effect": "petrify",
-      "power": 0
-    },
-    {
-      "id": "tail_Whip",
-      "name": "Latigazo",
-      "description": "Golpea con la cola causando daño físico.",
-      "mpCost": 2,
-      "cooldown": 1,
-      "type": "physical",
-      "effect": "damage",
-      "power": 20
-    },
-    {
-      "id": "venom_Spike",
-      "name": "Espina Venenosa",
-      "description": "Ataque que inflige daño y envenena al enemigo.",
-      "mpCost": 6,
-      "cooldown": 2,
-      "type": "physical",
-      "effect": "damage_poison",
-      "power": 18
-    },
-
-    {
-      "id": "squeak",
-      "name": "Chillido",
-      "description": "Sonido molesto que puede distraer o debilitar al enemigo.",
-      "mpCost": 2,
-      "cooldown": 2,
-      "type": "utility",
-      "effect": "debuff_defense",
-      "power": 0
-    },
-    {
-      "id": "swarm_Attack",
-      "name": "Ataque en Enjambre",
-      "description": "Varias ratas atacan simultáneamente causando daño acumulativo.",
-      "mpCost": 4,
-      "cooldown": 2,
-      "type": "physical",
-      "effect": "multi_hit",
-      "power": 16
-    },
-
-    
-
-  ]
+    "skills": [
+        {
+            "id": "claw_Strike",
+            "name": "Golpe de Garra",
+            "description": "Ataque físico rápido con garras afiladas.",
+            "mpCost": 0,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 23
+        },
+        {
+            "id": "aerial_Rush",
+            "name": "Carga Aérea",
+            "description": "Se lanza desde el aire causando daño elevado.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage",
+            "power": 30
+        },
+        {
+            "id": "wing_Buffet",
+            "name": "Golpe de Alas",
+            "description": "Ataque con las alas que puede desestabilizar al enemigo.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 20
+        },
+        {
+            "id": "tail_Swipe",
+            "name": "Latigazo de Cola",
+            "description": "Ataque físico con la cola que golpea a un enemigo con fuerza.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 25
+        },
+        {
+            "id": "venom_Bite",
+            "name": "Mordisco Venenoso",
+            "description": "Muerde al enemigo e inflige veneno.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage_poison",
+            "power": 20
+        },
+        {
+            "id": "aerial_Assault",
+            "name": "Asalto Aéreo",
+            "description": "Ataque descendente desde el aire con gran impacto.",
+            "mpCost": 6,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage",
+            "power": 28
+        },
+        {
+            "id": "dragon's_Fire_Breath",
+            "name": "Aliento de Fuego de Dragón",
+            "description": "Exhala fuego que inflige gran daño a los enemigos.",
+            "mpCost": 20,
+            "cooldown": 3,
+            "type": "magic",
+            "effect": "damage",
+            "power": 40
+        },
+        {
+            "id": "maul",
+            "name": "Desgarrar",
+            "description": "Ataque brutal con garras que inflige gran daño físico.",
+            "mpCost": 0,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 28
+        },
+        {
+            "id": "roar",
+            "name": "Rugido",
+            "description": "Rugido intimidante que puede debilitar al enemigo.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "debuff_attack",
+            "power": 0
+        },
+        {
+            "id": "ground_Slam",
+            "name": "Golpe de Tierra",
+            "description": "Golpea el suelo causando daño en área.",
+            "mpCost": 7,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "aoe_damage",
+            "power": 26
+        },
+        {
+            "id": "bite",
+            "name": "Mordisco",
+            "description": "Ataque rápido con los colmillos.",
+            "mpCost": 0,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 18
+        },
+        {
+            "id": "pounce",
+            "name": "Salto",
+            "description": "Se lanza sobre el enemigo causando daño rápido.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "claw_Swipe",
+            "name": "Zarpazo",
+            "description": "Ataque con garras rápido y preciso.",
+            "mpCost": 0,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 20
+        },
+        {
+            "id": "leap_Attack",
+            "name": "Ataque Saltante",
+            "description": "Salta sobre el enemigo infligiendo daño crítico.",
+            "mpCost": 4,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 24
+        },
+        {
+            "id": "stealth_Pounce",
+            "name": "Emboscada Sigilosa",
+            "description": "Ataque sorpresa desde sigilo con alto daño crítico.",
+            "mpCost": 6,
+            "cooldown": 3,
+            "type": "physical",
+            "effect": "damage",
+            "power": 30
+        },
+        {
+            "id": "petrifying_Gaze",
+            "name": "Mirada Petrificante",
+            "description": "Puede petrificar al enemigo, dejándolo inmóvil temporalmente.",
+            "mpCost": 10,
+            "cooldown": 3,
+            "type": "magic",
+            "effect": "petrify",
+            "power": 0
+        },
+        {
+            "id": "venom_Spike",
+            "name": "Espina Venenosa",
+            "description": "Ataque que inflige daño y envenena al enemigo.",
+            "mpCost": 6,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage_poison",
+            "power": 18
+        },
+        {
+            "id": "squeak",
+            "name": "Chillido",
+            "description": "Sonido molesto que puede distraer o debilitar al enemigo.",
+            "mpCost": 2,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "debuff_defense",
+            "power": 0
+        },
+        {
+            "id": "swarm_Attack",
+            "name": "Ataque en Enjambre",
+            "description": "Varias ratas atacan simultáneamente causando daño acumulativo.",
+            "mpCost": 4,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "multi_hit",
+            "power": 16
+        },
+        {
+            "id": "claw_Attack",
+            "name": "Ataque de Garra",
+            "description": "Ataque físico básico con garras.",
+            "mpCost": 0,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "tail_Whip",
+            "name": "Latigazo",
+            "description": "Golpea con la cola causando daño físico.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 21
+        },
+        {
+            "id": "swoop",
+            "name": "Picado",
+            "description": "Ataque descendente rápido desde el aire.",
+            "mpCost": 4,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 24
+        },
+        {
+            "id": "wind_Buffet",
+            "name": "Ráfaga de Viento",
+            "description": "Golpe de aire con las alas que empuja al enemigo.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "magic",
+            "effect": "damage",
+            "power": 18
+        },
+        {
+            "id": "multi_Bite",
+            "name": "Múltiples Mordiscos",
+            "description": "Ataca varias veces con sus cabezas.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "multi_hit",
+            "power": 22
+        },
+        {
+            "id": "tail_Sweep",
+            "name": "Barrido de Cola",
+            "description": "Golpea en área con su cola.",
+            "mpCost": 6,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "aoe_damage",
+            "power": 24
+        },
+        {
+            "id": "regeneration",
+            "name": "Regeneración",
+            "description": "Recupera parte de su vida con el tiempo.",
+            "mpCost": 8,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "heal_over_time",
+            "power": 20
+        },
+        {
+            "id": "tail_Sting",
+            "name": "Aguijón de Cola",
+            "description": "Ataque con veneno que daña al enemigo.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage_poison",
+            "power": 20
+        },
+        {
+            "id": "wing_Slam",
+            "name": "Golpe de Alas",
+            "description": "Impacto con las alas que causa daño físico.",
+            "mpCost": 4,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "giga_Claw",
+            "name": "Garra Gigante",
+            "description": "Ataque poderoso con sus enormes garras.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage",
+            "power": 28
+        },
+        {
+            "id": "bone_Slash",
+            "name": "Corte Óseo",
+            "description": "Ataque con arma o extremidad ósea.",
+            "mpCost": 0,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 18
+        },
+        {
+            "id": "shield_Bone",
+            "name": "Escudo Óseo",
+            "description": "Aumenta la defensa usando huesos como protección.",
+            "mpCost": 4,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "buff_defense",
+            "power": 0
+        },
+        {
+            "id": "rattle",
+            "name": "Traqueteo",
+            "description": "Sonido inquietante que puede debilitar al enemigo.",
+            "mpCost": 3,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "debuff_attack",
+            "power": 0
+        },
+        {
+            "id": "slam",
+            "name": "Golpe",
+            "description": "Ataque físico lento pero contundente.",
+            "mpCost": 0,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 20
+        },
+        {
+            "id": "moan",
+            "name": "Gemido",
+            "description": "Sonido perturbador que debilita al enemigo.",
+            "mpCost": 3,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "debuff_attack",
+            "power": 0
+        },
+        {
+            "id": "dark_Bolt",
+            "name": "Rayo Oscuro",
+            "description": "Dispara energía oscura causando daño mágico.",
+            "mpCost": 10,
+            "cooldown": 1,
+            "type": "magic",
+            "effect": "damage",
+            "power": 26
+        },
+        {
+            "id": "curse",
+            "name": "Maldición",
+            "description": "Aplica un efecto negativo prolongado al enemigo.",
+            "mpCost": 12,
+            "cooldown": 3,
+            "type": "magic",
+            "effect": "debuff_all",
+            "power": 0
+        },
+        {
+            "id": "soul_Drain",
+            "name": "Drenaje de Alma",
+            "description": "Roba vida del enemigo para curarse a sí mismo.",
+            "mpCost": 8,
+            "cooldown": 2,
+            "type": "magic",
+            "effect": "life_steal",
+            "power": 20
+        },
+        {
+            "id": "headless_Strike",
+            "name": "Golpe Decapitado",
+            "description": "Ataque veloz con su arma espectral.",
+            "mpCost": 4,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 26
+        },
+        {
+            "id": "swift_Slash",
+            "name": "Corte Rápido",
+            "description": "Ataque rápido que puede golpear antes que el enemigo.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "phantom_Ride",
+            "name": "Carga Fantasmal",
+            "description": "Se desplaza rápidamente atravesando al enemigo.",
+            "mpCost": 6,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage",
+            "power": 28
+        },
+        {
+            "id": "poison_Claw",
+            "name": "Garra Venenosa",
+            "description": "Ataque que inflige daño y envenena al enemigo.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage_poison",
+            "power": 18
+        },
+        {
+            "id": "ethereal_Touch",
+            "name": "Toque Etéreo",
+            "description": "Ataque mágico que atraviesa la defensa física.",
+            "mpCost": 5,
+            "cooldown": 1,
+            "type": "magic",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "haunt",
+            "name": "Atormentar",
+            "description": "Persigue al enemigo causando daño continuo.",
+            "mpCost": 8,
+            "cooldown": 2,
+            "type": "magic",
+            "effect": "damage_over_time",
+            "power": 18
+        },
+        {
+            "id": "phase_Shift",
+            "name": "Desfase",
+            "description": "Reduce temporalmente el daño recibido.",
+            "mpCost": 6,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "buff_evasion",
+            "power": 0
+        },
+        {
+            "id": "wail",
+            "name": "Lamento",
+            "description": "Grito espectral que daña y debilita al enemigo.",
+            "mpCost": 10,
+            "cooldown": 2,
+            "type": "magic",
+            "effect": "damage_debuff",
+            "power": 20
+        },
+        {
+            "id": "fear",
+            "name": "Terror",
+            "description": "Infunde miedo reduciendo la eficacia del enemigo.",
+            "mpCost": 8,
+            "cooldown": 3,
+            "type": "magic",
+            "effect": "debuff_attack",
+            "power": 0
+        },
+        {
+            "id": "quick_Stab",
+            "name": "Puñalada Rápida",
+            "description": "Ataque veloz con arma ligera.",
+            "mpCost": 2,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 18
+        },
+        {
+            "id": "dirty_Trick",
+            "name": "Truco Sucio",
+            "description": "Ataque engañoso que reduce la defensa del enemigo.",
+            "mpCost": 4,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "debuff_defense",
+            "power": 0
+        },
+        {
+            "id": "pack_Tactics",
+            "name": "Tácticas de Manada",
+            "description": "Aumenta el ataque cuando hay aliados cercanos.",
+            "mpCost": 5,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "buff_attack",
+            "power": 0
+        },
+        {
+            "id": "dagger_Strike",
+            "name": "Golpe de Daga",
+            "description": "Ataque preciso con daga.",
+            "mpCost": 2,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 17
+        },
+        {
+            "id": "trap_Set",
+            "name": "Colocar Trampa",
+            "description": "Prepara una trampa que dañará al enemigo.",
+            "mpCost": 6,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "trap",
+            "power": 20
+        },
+        {
+            "id": "heavy_Slash",
+            "name": "Corte Pesado",
+            "description": "Ataque fuerte con arma pesada.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 26
+        },
+        {
+            "id": "war_Cry",
+            "name": "Grito de Guerra",
+            "description": "Aumenta el ataque del usuario o aliados cercanos.",
+            "mpCost": 5,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "buff_attack",
+            "power": 0
+        },
+        {
+            "id": "smash",
+            "name": "Aplastamiento",
+            "description": "Golpe contundente que causa gran daño físico.",
+            "mpCost": 4,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage",
+            "power": 28
+        },
+        {
+            "id": "regenerate",
+            "name": "Regenerar",
+            "description": "Recupera vida de forma progresiva.",
+            "mpCost": 6,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "heal_over_time",
+            "power": 22
+        },
+        {
+            "id": "club_Swing",
+            "name": "Golpe de Garrote",
+            "description": "Ataque básico con arma contundente.",
+            "mpCost": 0,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 24
+        },
+        {
+            "id": "brutal_Strike",
+            "name": "Golpe Brutal",
+            "description": "Ataque extremadamente fuerte pero lento.",
+            "mpCost": 4,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage",
+            "power": 30
+        },
+        {
+            "id": "thick_Skin",
+            "name": "Piel Gruesa",
+            "description": "Aumenta la defensa del usuario.",
+            "mpCost": 6,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "buff_defense",
+            "power": 0
+        },
+        {
+            "id": "charge",
+            "name": "Carga",
+            "description": "Embiste al enemigo con gran velocidad.",
+            "mpCost": 4,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 26
+        },
+        {
+            "id": "spear_Thrust",
+            "name": "Estocada",
+            "description": "Ataque preciso con lanza.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "trample",
+            "name": "Arrollar",
+            "description": "Pisotea al enemigo causando daño continuo.",
+            "mpCost": 6,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "multi_hit",
+            "power": 24
+        },
+        {
+            "id": "life_Drain",
+            "name": "Drenar Vida",
+            "description": "Roba vida del enemigo al atacar.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "heal_damage",
+            "power": 22
+        },
+        {
+            "id": "shadow_Claw",
+            "name": "Garra Sombría",
+            "description": "Ataque rápido que ignora parte de la defensa.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 20
+        },
+        {
+            "id": "blood_Scream",
+            "name": "Grito Sangriento",
+            "description": "Daño en área y debuff de ataque al enemigo.",
+            "mpCost": 8,
+            "cooldown": 3,
+            "type": "physical",
+            "effect": "damage_debuff",
+            "power": 18
+        },
+        {
+            "id": "nature_Strike",
+            "name": "Golpe Natural",
+            "description": "Ataque físico imbuido de fuerza natural.",
+            "mpCost": 4,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 19
+        },
+        {
+            "id": "charm",
+            "name": "Encanto",
+            "description": "Reduce temporalmente la eficacia del enemigo.",
+            "mpCost": 6,
+            "cooldown": 2,
+            "type": "magic",
+            "effect": "debuff_attack",
+            "power": 0
+        },
+        {
+            "id": "feral_Bite",
+            "name": "Mordisco Feral",
+            "description": "Ataque físico rápido con posibilidad de sangrado.",
+            "mpCost": 0,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 20
+        },
+        {
+            "id": "howl",
+            "name": "Aullido",
+            "description": "Aumenta ataque de aliados cercanos o intimida enemigos.",
+            "mpCost": 5,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "buff_attack",
+            "power": 0
+        },
+        {
+            "id": "claw_Rend",
+            "name": "Desgarrar con Garras",
+            "description": "Ataque físico agresivo, puede reducir defensa.",
+            "mpCost": 3,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage_debuff",
+            "power": 22
+        },
+        {
+            "id": "fire_Bolt",
+            "name": "Rayo de Fuego",
+            "description": "Daño mágico de fuego dirigido a un enemigo.",
+            "mpCost": 8,
+            "cooldown": 1,
+            "type": "magic",
+            "effect": "damage",
+            "power": 24
+        },
+        {
+            "id": "dark_Pact",
+            "name": "Pacto Oscuro",
+            "description": "Consume vida propia para causar gran daño mágico.",
+            "mpCost": 10,
+            "cooldown": 2,
+            "type": "magic",
+            "effect": "damage_self",
+            "power": 28
+        },
+        {
+            "id": "horn_Strike",
+            "name": "Golpe con Cuerno",
+            "description": "Ataque físico devastador con cuernos.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage",
+            "power": 30
+        },
+        {
+            "id": "earth_Shock",
+            "name": "Choque de Tierra",
+            "description": "Daño en área alrededor del enemigo.",
+            "mpCost": 6,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "aoe_damage",
+            "power": 24
+        },
+        {
+            "id": "stone_Form",
+            "name": "Forma de Piedra",
+            "description": "Aumenta defensa física temporalmente.",
+            "mpCost": 5,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "buff_defense",
+            "power": 0
+        },
+        {
+            "id": "wing_Bash",
+            "name": "Golpe de Ala",
+            "description": "Ataque con alas que derriba o desequilibra al enemigo.",
+            "mpCost": 4,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage_stun",
+            "power": 22
+        },
+        {
+            "id": "poison_Bite",
+            "name": "Mordisco Venenoso",
+            "description": "Ataque que aplica daño en el tiempo por veneno.",
+            "mpCost": 4,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage_over_time",
+            "power": 20
+        },
+        {
+            "id": "constrict",
+            "name": "Constricción",
+            "description": "Atrapamiento que reduce velocidad y causa daño físico.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "damage_debuff",
+            "power": 18
+        },
+        {
+            "id": "stomp",
+            "name": "Pisotón",
+            "description": "Daño en área y aturde temporalmente a enemigos cercanos.",
+            "mpCost": 5,
+            "cooldown": 2,
+            "type": "physical",
+            "effect": "aoe_damage",
+            "power": 26
+        },
+        {
+            "id": "arrow_Shot",
+            "name": "Disparo de Flecha",
+            "description": "Lanza una flecha básica al enemigo.",
+            "mpCost": 2,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 18
+        },
+        {
+            "id": "magic_Arrow",
+            "name": "Flecha Mágica",
+            "description": "Flecha imbuida de magia que ignora parte de la defensa.",
+            "mpCost": 5,
+            "cooldown": 1,
+            "type": "magic",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "quick_Step",
+            "name": "Paso Rápido",
+            "description": "Aumenta temporalmente la velocidad y evasión del usuario.",
+            "mpCost": 3,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "speed_evasion_buff",
+            "power": 0
+        },
+        {
+            "id": "axe_Swing",
+            "name": "Golpe de Hacha",
+            "description": "Ataque físico contundente, lento pero poderoso.",
+            "mpCost": 0,
+            "cooldown": 1,
+            "type": "physical",
+            "effect": "damage",
+            "power": 24
+        },
+        {
+            "id": "shield_Block",
+            "name": "Bloqueo con Escudo",
+            "description": "Reduce daño recibido durante un turno.",
+            "mpCost": 2,
+            "cooldown": 1,
+            "type": "utility",
+            "effect": "damage_reduction",
+            "power": 0
+        },
+        {
+            "id": "sturdy_Stance",
+            "name": "Postura Firme",
+            "description": "Aumenta defensa física y resistencia temporalmente.",
+            "mpCost": 3,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "buff_defense",
+            "power": 0
+        },
+        {
+            "id": "sword_Strike",
+            "name": "Golpe de Espada",
+            "description": "Ataque físico básico con espada.",
+            "mpCost": 0,
+            "cooldown": 0,
+            "type": "physical",
+            "effect": "damage",
+            "power": 20
+        },
+        {
+            "id": "magic_Blast",
+            "name": "Explosión Mágica",
+            "description": "Hechizo que inflige daño mágico a un enemigo.",
+            "mpCost": 6,
+            "cooldown": 1,
+            "type": "magic",
+            "effect": "damage",
+            "power": 22
+        },
+        {
+            "id": "quick_Move",
+            "name": "Movimiento Rápido",
+            "description": "Aumenta temporalmente la velocidad y evasión del usuario.",
+            "mpCost": 3,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "speed_evasion_buff",
+            "power": 0
+        },
+        {
+            "id": "fire_Breath",
+            "name": "Aliento de Fuego",
+            "description": "Ataque mágico en línea que quema a los enemigos.",
+            "mpCost": 8,
+            "cooldown": 2,
+            "type": "magic",
+            "effect": "damage",
+            "power": 28
+        },
+        {
+            "id": "magic_Bolt",
+            "name": "Rayo Mágico",
+            "description": "Disparo mágico de daño directo a un enemigo.",
+            "mpCost": 5,
+            "cooldown": 1,
+            "type": "magic",
+            "effect": "damage",
+            "power": 20
+        },
+        {
+            "id": "trap_Setup",
+            "name": "Preparar Trampa",
+            "description": "Coloca una trampa que dañará al enemigo al activarse.",
+            "mpCost": 4,
+            "cooldown": 2,
+            "type": "utility",
+            "effect": "trap",
+            "power": 18
+        },
+        {
+            "id": "supportive_Charm",
+            "name": "Encanto de Apoyo",
+            "description": "Aumenta temporalmente la defensa o ataque de un aliado.",
+            "mpCost": 5,
+            "cooldown": 3,
+            "type": "utility",
+            "effect": "buff",
+            "power": 0
+        }
+    ]
 }
