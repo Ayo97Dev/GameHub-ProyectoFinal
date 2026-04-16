@@ -13,6 +13,9 @@ export const useGameStore = defineStore('game', () => {
     'clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
     'quiz': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
     'battleship': 'https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1200&q=80',
+    //'chess': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
+    'chess': '/assets/boardKing/boardKingLogo.png',
+  
   }
 
   const LOCAL_GAMES = [
@@ -43,6 +46,13 @@ export const useGameStore = defineStore('game', () => {
       description: 'Encuentra la posicion de la escuadra enemiga y destruye todos sus barcos.',
       cover: DEFAULT_COVERS['battleship'],
       route: '/play/battleship',
+    },
+    {
+      slug: 'chess',
+      title: 'Board King',
+      description: 'Enfréntate a oponentes en partidas de ajedrez rápidas y emocionantes.',
+      cover: DEFAULT_COVERS['chess'],
+      route: '/play/chess',
     },
   ]
 

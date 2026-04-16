@@ -8,6 +8,7 @@ import Rpg from '../components/games/Rpg.vue'
 import Clicker from '../components/games/Clicker.vue'
 import Quiz from '../components/games/Quiz.vue'
 import Battleship from '../components/games/Battleship.vue'
+import Chess from '../components/games/Chess.vue'
 import MockAd from '../components/ads/MockAd.vue'
 
 const route      = useRoute()
@@ -22,6 +23,7 @@ const FALLBACK_TITLE_BY_SLUG = {
   rpg: 'Modo RPG',
   quiz: 'Modo Quiz',
   battleship: 'Hundir la Flota',
+  chess: 'Modo Ajedrez'
 }
 
 const pageTitle = computed(() => {
@@ -36,6 +38,7 @@ const gameComponent = computed(() => {
   if (route.params.slug === 'clicker') return Clicker
   if (route.params.slug === 'quiz')    return Quiz
   if (route.params.slug === 'battleship') return Battleship
+  if (route.params.slug === 'chess')   return Chess
   return null
 })
 
