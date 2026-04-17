@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 // ────── Crear Tablero ──────
+// Crea matriz 8x8 de celdas, cada celda tiene coordenada (row,col) y piece (null o {type,color})
 const board = ref(
   Array.from({ length: 8 }, (_, row) =>
     Array.from({ length: 8 }, (_, col) => ({
@@ -13,9 +14,10 @@ const board = ref(
 )
 
 // ────── Inicializacion de piezas ──────
+// Coloca piezas en su posición estandar inicial
+// Usa backRow para piezas mayores
 const initialSetup = () => {
   const newBoard = board.value
-
   const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook']
 
   //Filas negras
@@ -36,12 +38,26 @@ const initialSetup = () => {
 }
 initialSetup()
 
-// ────── Seleccion y movimiento ──────
+// ────── Seleccion──────
+// Guarda la celda actualmente seleccionada
+// Se usa para saber desde donde mover y para mostrar posibles movimientos
 const selected = ref(null)
 
 // ────── Helper para manejar clicks en celdas ──────
-const isInsideBoard = (row, col) => row >= 0 && row < 8 && col >= 0 && col < 8
-const getPieceAt = (row, col) => board.value[row]?.[col]?.piece || null
+// Comprueba si una coordenada está dentro del tablero
+const isInsideBoard = (row, col) => 
+  row >= 0 && row < 8 && col >= 0 && col < 8
+
+// Devuelve la pieza en una posición (o null)
+const getPieceAt = (row, col) => 
+  board.value[row]?.[col]?.piece || null
+
+// ────── helper global ──────
+// Centraliza acceso seguro al tablero evintando out-of-bounds
+const get = (row, col) => {
+  if (!isInsideBoard(row, col)) return null
+  return getPieceAt(row, col)
+}
 
 // ────── SVG piezas ──────
 const getPieceImage = (piece) => {
@@ -50,22 +66,23 @@ const getPieceImage = (piece) => {
 }
 
 // ────── Movimiento de piezas (sin reglas) ──────
+// Solo ejecuta movimiento -> NO VALIDA REGLAS
 const movePiece = (targetCell) => {
   if (!selected.value) return
-
   targetCell.piece = selected.value.piece
   selected.value.piece = null
   selected.value = null
 }
 
 // ────── Manejo de clicks en celdas ──────
+// si hay pieza seleccinada -> intentar mover
+// Si no -> seleccionar pieza
 const handleClick = (cell) => {
   if (selected.value) {
     const moves = getLegalMoves(selected.value)
 
-    const isValid = moves.includes(cell)
-
-    if (isValid) {
+    // includes funciona porque compara referencias de objetos(misma celda)
+    if (moves.includes(cell)) {
       movePiece(cell)
     } else {
       selected.value = null
@@ -75,9 +92,43 @@ const handleClick = (cell) => {
   }
 }
 
-// ────── Movimientos legales de piezas ──────
+// ────── Movimientos de piezas ──────
+// Reutilizable para torre, alfil y reina
+// direcciones: vector de movimientos (dr, dc) para cada dirección válida
+// Se detiene cuando encuentra una pieza (amiga o enemiga) o sale del tablero
+const getSlidingMoves = (cell, directions) => {
+  const moves = []
+  const { row: r, col: c, piece } = cell
 
-// Peón
+  for (const [dr, dc] of directions) {
+    let tr = r + dr
+    let tc = c + dc
+
+    while (isInsideBoard(tr, tc)) {
+      const target = get(tr, tc)
+
+      // casilla vacía -> movimiento válido
+      if (!target) {
+        moves.push(board.value[tr][tc])
+      } else {
+        // pieza enemiga -> capturable
+        if (target.color !== piece.color) {
+          moves.push(board.value[tr][tc])
+        }
+        // se bloquea siempre que haya una pieza (amiga o enemiga)
+        break
+      }
+
+      tr += dr
+      tc += dc
+    }
+  }
+
+  return moves
+}
+
+// PEON
+// Se mueve 1 casilla hacia adelante (2 desde su posición inicial) y captura diagonal
 const getPawnMoves = (cell) => {
   const moves = []
   const { row: r, col: c, piece } = cell
@@ -85,37 +136,26 @@ const getPawnMoves = (cell) => {
   const dir = piece.color === 'white' ? -1 : 1
   const startRow = piece.color === 'white' ? 6 : 1
 
-  const forward1Row = r + dir
-  const forward2Row = r + 2 * dir
+  const f1 = r + dir
+  const f2 = r + 2 * dir
 
-  // helper seguro: evitamos duplicar checks
-  const get = (row, col) => {
-    if (!isInsideBoard(row, col)) return null
-    return getPieceAt(row, col)
-  }
+  // Movimiento hacia adelante
+  if (isInsideBoard(f1, c) && !get(f1, c)) {
+    moves.push(board.value[f1][c])
 
-  // avanzar 1 casilla
-  if (isInsideBoard(forward1Row, c) && !get(forward1Row, c)) {
-    moves.push(board.value[forward1Row][c])
-
-    // avanzar 2
-    if (
-      r === startRow &&
-      isInsideBoard(forward2Row, c) &&
-      !get(forward2Row, c)
-    ) {
-      moves.push(board.value[forward2Row][c])
+    if (r === startRow && isInsideBoard(f2, c) && !get(f2, c)) {
+      moves.push(board.value[f2][c])
     }
   }
   // Capturas diagonales
   for (const dc of [-1, 1]) {
-    const tr = forward1Row
+    const tr = f1
     const tc = c + dc
 
     if (!isInsideBoard(tr, tc)) continue
 
-    const targetPiece = get(tr, tc)
-    if (targetPiece && targetPiece.color !== piece.color) {
+    const target = get(tr, tc)
+    if (target && target.color !== piece.color) {
       moves.push(board.value[tr][tc])
     }
   }
@@ -124,118 +164,50 @@ const getPawnMoves = (cell) => {
 }
 
 // TORRE
+// La torre se mueve en línea recta (horizontal y vertical)
 const getRookMoves = (cell) => {
-  const moves = []
-  const { row: r, col: c, piece } = cell
-
-  // helper seguro: evitamos duplicar checks
-  const get = (row, col) => {
-    if (!isInsideBoard(row, col)) return null
-    return getPieceAt(row, col)
-  }
-
-  // Direcciones: arriba, abajo, izquierda, derecha
-  const directions = [
+  return getSlidingMoves(cell, [
     [-1, 0], [1, 0], [0, -1], [0, 1]
-  ]
-
-  for (const [dr, dc] of directions) {
-    let tr = r + dr
-    let tc = c + dc
-
-    while (isInsideBoard(tr, tc)) {
-      const targetPiece = get(tr, tc)
-
-      if (!targetPiece) {
-        moves.push(board.value[tr][tc])
-      } else {
-        if (targetPiece.color !== piece.color) {
-          moves.push(board.value[tr][tc])
-        }
-        break
-      }
-
-      tr += dr
-      tc += dc
-    }
-  }
-
-  return moves
+  ])
 }
 
 // ALFIL
+// El alfil se mueve en diagonal
 const getBishopMoves = (cell) => {
-  const moves = []
-  const { row: r, col: c, piece } = cell
-
-  // helper seguro: evitamos duplicar checks
-  const get = (row, col) => {
-    if (!isInsideBoard(row, col)) return null
-    return getPieceAt(row, col)
-  }
-
-  // Direcciones diagonales
-  const directions = [
+  return getSlidingMoves(cell, [
     [-1, -1], [-1, 1], [1, -1], [1, 1]
-  ]
-
-  for (const [dr, dc] of directions) {
-    let tr = r + dr
-    let tc = c + dc
-
-    while (isInsideBoard(tr, tc)) {
-      const targetPiece = get(tr, tc)
-
-      if (!targetPiece) {
-        moves.push(board.value[tr][tc])
-      } else {
-        if (targetPiece.color !== piece.color) {
-          moves.push(board.value[tr][tc])
-        }
-        break
-      }
-
-      tr += dr
-      tc += dc
-    }
-  }
-
-  return moves
+  ])
 }
 
 // REINA
+// La reina combina los movimientos de torre y alfil
 const getQueenMoves = (cell) => {
-  // La reina combina los movimientos de torre y alfil
-  return [...getRookMoves(cell), ...getBishopMoves(cell)]
+  return getSlidingMoves(cell, [
+    [-1, 0], [1, 0], [0, -1], [0, 1],
+    [-1, -1], [-1, 1], [1, -1], [1, 1]
+  ])
 }
 
-// CABALLO
+// CABALLO 
+// El caballo se mueve en forma de "L"
 const getKnightMoves = (cell) => {
   const moves = []
   const { row: r, col: c, piece } = cell
 
-  // helper seguro: evitamos duplicar checks
-  const get = (row, col) => {
-    if (!isInsideBoard(row, col)) return null
-    return getPieceAt(row, col)
-  }
-
-  // Movimientos en "L"
-  const knightMoves = [
+  const jumps = [
     [-2, -1], [-2, 1], [-1, -2], [-1, 2],
     [1, -2], [1, 2], [2, -1], [2, 1]
   ]
 
-  for (const [dr, dc] of knightMoves) {
+  for (const [dr, dc] of jumps) {
     const tr = r + dr
     const tc = c + dc
 
-    if (isInsideBoard(tr, tc)) {
-      const targetPiece = get(tr, tc)
+    if (!isInsideBoard(tr, tc)) continue
 
-      if (!targetPiece || targetPiece.color !== piece.color) {
-        moves.push(board.value[tr][tc])
-      }
+    const target = get(tr, tc)
+    if (!target || target.color !== piece.color) {
+      moves.push(board.value[tr][tc])
     }
   }
 
@@ -243,58 +215,44 @@ const getKnightMoves = (cell) => {
 }
 
 // REY
+// El rey se mueve 1 casilla en cualquier dirección y no puede moverse a una casilla atacada por el oponente
 const getKingMoves = (cell) => {
   const moves = []
   const { row: r, col: c, piece } = cell
 
-  // helper seguro: evitamos duplicar checks
-  const get = (row, col) => {
-    if (!isInsideBoard(row, col)) return null
-    return getPieceAt(row, col)
-  }
-
-  // Movimientos a las 8 casillas adyacentes
-  const kingMoves = [
+  const directions = [
     [-1, -1], [-1, 0], [-1, 1],
     [0, -1],           [0, 1],
     [1, -1], [1, 0], [1, 1]
   ]
 
-  for (const [dr, dc] of kingMoves) {
+  for (const [dr, dc] of directions) {
     const tr = r + dr
     const tc = c + dc
 
-    if (isInsideBoard(tr, tc)) {
-      const targetPiece = get(tr, tc)
+    if (!isInsideBoard(tr, tc)) continue
 
-      if (!targetPiece || targetPiece.color !== piece.color) {
-        moves.push(board.value[tr][tc])
-      }
+    const target = get(tr, tc)
+    if (!target || target.color !== piece.color) {
+      moves.push(board.value[tr][tc])
     }
   }
 
   return moves
 }
 
-// dispatcher de movimientos legales
+// dispatcher de movimientos según tipo de pieza
 const getLegalMoves = (cell) => {
   if (!cell.piece) return []
 
   switch (cell.piece.type) {
-    case 'pawn':
-      return getPawnMoves(cell)
-    case 'rook':
-      return getRookMoves(cell)
-    case 'bishop':
-      return getBishopMoves(cell)
-    case 'queen':
-      return getQueenMoves(cell)
-    case 'knight':
-      return getKnightMoves(cell)
-    case 'king':
-      return getKingMoves(cell)
-    default:
-      return []
+    case 'pawn': return getPawnMoves(cell)
+    case 'rook': return getRookMoves(cell)
+    case 'bishop': return getBishopMoves(cell)
+    case 'queen': return getQueenMoves(cell)
+    case 'knight': return getKnightMoves(cell)
+    case 'king': return getKingMoves(cell)
+    default: return []
   }
 }
 </script>
