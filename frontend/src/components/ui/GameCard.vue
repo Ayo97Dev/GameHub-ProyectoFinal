@@ -11,19 +11,23 @@ defineProps({
 </script>
 
 <template>
-  <article class="group gh-surface gh-neon-ring overflow-hidden transition duration-300 hover:-translate-y-1.5">
-    <div class="relative">
-      <img :src="game.cover" :alt="game.title" class="h-48 w-full object-cover opacity-90 dark:opacity-85 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100" />
-      <div class="absolute inset-0 bg-gradient-to-t from-white/90 via-white/10 dark:from-slate-950/90 dark:via-slate-950/10 to-transparent transition-colors" />
-      <div class="absolute left-3 top-3 rounded-full border border-violet-300 bg-violet-100 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-violet-700 dark:border-violet-500/50 dark:bg-violet-500/20 dark:text-violet-200 transition-colors">
-        Online
+  <article class="group gh-surface gh-surface-hover flex flex-col relative overflow-hidden p-0 h-full">
+    <div class="relative border-b-4 border-retro-black dark:border-neon-cyan">
+      <div class="gh-scanlines aspect-video overflow-hidden bg-black">
+        <img :src="game.cover" :alt="game.title" class="h-full w-full object-cover grayscale opacity-80 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105" />
+      </div>
+      <div class="absolute top-2 left-2 border-2 border-retro-black bg-neon-yellow px-2 py-0.5 font-pixel text-sm uppercase text-retro-black shadow-[2px_2px_0px_#09090b] dark:border-neon-pink dark:bg-neon-pink/90 dark:text-retro-white dark:shadow-[2px_2px_0px_#f472b6]">
+        ONLINE
       </div>
     </div>
-    <div class="space-y-3 p-4">
-      <h3 class="text-xl font-bold text-slate-800 dark:text-white transition-colors">{{ game.title }}</h3>
-      <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 transition-colors">{{ game.description }}</p>
-      <RouterLink :to="game.route || `/play/${game.slug}`" class="inline-flex mt-2">
-        <BaseButton>Jugar ahora</BaseButton>
+    
+    <div class="flex flex-col flex-grow p-5 justify-between bg-white dark:bg-retro-dark">
+      <div>
+        <h3 class="font-display text-2xl font-black uppercase tracking-wider text-retro-black dark:text-retro-white border-b-2 border-retro-black dark:border-neon-cyan pb-2 mb-3 group-hover:text-neon-blue dark:group-hover:text-neon-cyan transition-colors">{{ game.title }}</h3>
+        <p class="font-sans text-xs font-bold uppercase leading-relaxed text-retro-black dark:text-retro-white line-clamp-3 mb-6">{{ game.description }}</p>
+      </div>
+      <RouterLink :to="game.route || `/play/${game.slug}`" class="block mt-auto w-full">
+        <BaseButton class="w-full">PLAY NOW</BaseButton>
       </RouterLink>
     </div>
   </article>

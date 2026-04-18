@@ -5,6 +5,7 @@ import { useGameStore } from '../stores/game'
 import { useClickerStore } from '../stores/games/clicker'
 import { useConnect4Store } from '../stores/games/connect4'
 import { useTowerDefenseStore } from '../stores/games/towerdefense'
+import { useLeaderboardStore } from '../stores/leaderboard'
 import api from '../lib/axios'
 import Rpg from '../components/games/Rpg.vue'
 import Clicker from '../components/games/Clicker.vue'
@@ -27,23 +28,24 @@ const gameStore  = useGameStore()
 const clicker    = useClickerStore()
 const connect4   = useConnect4Store()
 const towerDefense = useTowerDefenseStore()
+const leaderboardStore = useLeaderboardStore()
 
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
 
 const FALLBACK_TITLE_BY_SLUG = {
-  clicker: 'Reactor de Clics',
-  rpg: 'Modo RPG',
-  quiz: 'Modo Quiz',
-  connect4: 'Conecta 4',
-  'tower-defense': 'Tower Defense',
+  clicker: 'REACTOR_CLICK.EXE',
+  rpg: 'RPG_MODULE.EXE',
+  quiz: 'QUIZ_MASTER.SYS',
+  connect4: 'CONNECT_4.BIN',
+  'tower-defense': 'TOWER_DEF.DAT',
 }
 
 const pageTitle = computed(() => {
   if (game.value?.title) return game.value.title
-  return FALLBACK_TITLE_BY_SLUG[route.params.slug] ?? 'Modo Juego'
+  return FALLBACK_TITLE_BY_SLUG[route.params.slug] ?? '>> UNKNOWN_MOD'
 })
 
-const leaderboard = ref([])
+const leaderboard = computed(() => leaderboardStore.getEntries(route.params.slug).slice(0, 3))
 const towerDefenseScore = ref(0)
 const debouncedFetchLeaderboard = useDebouncedFunction(fetchLeaderboard, 300)
 
@@ -64,15 +66,15 @@ const liveScore = computed(() => {
 })
 
 const liveScoreLabel = computed(() => {
-  if (route.params.slug === 'connect4') return 'Victorias'
-  if (route.params.slug === 'tower-defense') return 'Oleadas superadas'
-  return 'Puntos'
+  if (route.params.slug === 'connect4') return 'WINS'
+  if (route.params.slug === 'tower-defense') return 'WAVES_CLEARED'
+  return 'SCORE'
 })
 
 const leaderboardLabel = computed(() => {
-  if (route.params.slug === 'connect4') return 'Top 3 — Victorias'
-  if (route.params.slug === 'tower-defense') return 'Top 3 — Oleadas'
-  return 'Top 3 — Clasificación'
+  if (route.params.slug === 'connect4') return 'TOP_3_WINS'
+  if (route.params.slug === 'tower-defense') return 'TOP_3_WAVES'
+  return 'TOP_3_RANKING'
 })
 
 function handleLiveScore(value) {
@@ -81,12 +83,7 @@ function handleLiveScore(value) {
 }
 
 async function fetchLeaderboard() {
-  try {
-    const { data } = await api.get(`/leaderboard/${route.params.slug}`)
-    leaderboard.value = data.data?.slice(0, 3) ?? []
-  } catch {
-    leaderboard.value = []
-  }
+  leaderboardStore.fetchLeaderboard(route.params.slug, true) // Force true to get fresh scores while playing
 }
 
 onMounted(() => {
@@ -101,67 +98,79 @@ watch(() => route.params.slug, () => {
 
 <template>
   <section class="mx-auto w-full max-w-[96rem] px-3 py-8 sm:px-4 lg:px-5 xl:px-6 sm:py-10">
-    <header class="mb-5">
-      <p class="text-xs font-bold uppercase tracking-[0.24em] text-cyan-600 dark:text-cyan-400">Modo Juego</p>
-      <h1 class="mt-2 text-2xl font-black text-slate-800 dark:text-white transition-colors sm:text-3xl">
+    <header class="mb-5 border-b-4 border-retro-black dark:border-neon-cyan pb-3">
+      <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-blue dark:text-neon-yellow">>> SYSTEM_MODE: PLAY</p>
+      <h1 class="mt-2 text-3xl font-display font-black uppercase tracking-widest text-retro-black dark:text-retro-white sm:text-4xl">
         {{ pageTitle }}
       </h1>
-      <p class="mt-1 text-slate-600 dark:text-slate-300 transition-colors">Modo Cine activo: foco en gameplay + estadísticas en vivo.</p>
     </header>
 
-    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[240px_minmax(0,1fr)_340px]">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[240px_minmax(0,1fr)_340px]">
+      
+      <!-- AD SPACE -->
       <aside class="hidden xl:flex xl:order-1 xl:sticky xl:top-24 h-fit">
-        <div class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-zinc-900 p-3 shadow-lg shadow-slate-200/50 dark:shadow-black/20 transition-colors">
-          <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Publicidad</p>
-          <div class="mt-2 flex items-center justify-center px-1 py-2">
+        <div class="w-full gh-panel p-3 bg-retro-cream dark:bg-black">
+          <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-retro-black dark:text-retro-white border-b-2 border-retro-black dark:border-neon-cyan pb-1 mb-2">SPONSORED_DATA</p>
+          <div class="flex items-center justify-center p-1 bg-black border-2 border-retro-black dark:border-neon-cyan">
             <MockAd size="skyscraper" :rotate="true" :interval="7000" />
           </div>
         </div>
       </aside>
 
-      <div class="order-2 lg:order-1 xl:order-2 gh-panel p-4 sm:p-5">
-        <component :is="gameComponent" v-if="gameComponent" @live-score="handleLiveScore" />
-        <div v-else class="min-h-[320px] rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-zinc-900 p-6 text-slate-600 dark:text-slate-300 transition-colors">
-          El slug del juego no es válido.
+      <!-- GAME CONTAINER -->
+      <div class="order-2 lg:order-1 xl:order-2 gh-panel p-0 relative overflow-hidden bg-black flex flex-col items-center justify-center min-h-[400px]">
+        <div class="gh-scanlines pointer-events-none absolute inset-0 z-10 opacity-20 dark:opacity-30"></div>
+        <component :is="gameComponent" v-if="gameComponent" @live-score="handleLiveScore" class="relative z-20 w-full h-full" />
+        <div v-else class="relative z-20 p-6 gh-panel text-neon-pink font-pixel text-xl blink border-none shadow-none text-center">
+          ERR_MODULE_NOT_FOUND
         </div>
       </div>
 
-      <aside class="order-1 lg:order-2 xl:order-3 lg:sticky lg:top-24 h-fit flex flex-col gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-zinc-900 p-4 sm:p-5 shadow-lg shadow-slate-200/50 dark:shadow-black/20 transition-colors">
-        <!-- Puntuación en vivo -->
+      <!-- STATS & LEADERBOARD -->
+      <aside class="order-1 lg:order-2 xl:order-3 lg:sticky lg:top-24 h-fit flex flex-col gap-6 gh-panel p-4 sm:p-5 bg-retro-cream dark:bg-black">
+        
+        <!-- Live Score -->
         <div>
-          <h2 class="text-base sm:text-lg font-black text-violet-600 dark:text-cyan-300 transition-colors">Estadísticas en vivo</h2>
-          <div class="mt-2 space-y-2">
-            <div class="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors">
-              <p class="text-[11px] uppercase tracking-wide text-slate-600 dark:text-slate-300">{{ liveScoreLabel }}</p>
-              <p class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">{{ liveScore.toLocaleString() }}</p>
-            </div>
+          <h2 class="font-display text-lg font-black uppercase text-neon-blue dark:text-neon-pink border-b-2 border-neon-blue dark:border-neon-pink pb-1">>> LIVE_STATS</h2>
+          <div class="mt-3 bg-retro-cream dark:bg-retro-dark border-[3px] border-retro-black dark:border-neon-cyan p-3 shadow-[inset_3px_3px_0px_rgba(0,0,0,0.5)] dark:shadow-[inset_3px_3px_0px_#22d3ee]">
+            <p class="font-pixel text-[11px] uppercase tracking-wide text-retro-black dark:text-neon-yellow">{{ liveScoreLabel }}</p>
+            <p class="font-sans text-2xl font-bold text-retro-black dark:text-neon-cyan leading-none mt-1">{{ liveScore.toLocaleString() }}</p>
           </div>
         </div>
 
-        <!-- Top 3 de clasificación -->
+        <!-- Leaderboard -->
         <div>
-          <h2 class="text-base font-semibold text-slate-700 dark:text-slate-200 transition-colors">{{ leaderboardLabel }}</h2>
-          <div class="mt-2 space-y-2">
+          <h2 class="font-display text-lg font-black uppercase text-neon-blue dark:text-neon-pink border-b-2 border-neon-blue dark:border-neon-pink pb-1">>> {{ leaderboardLabel }}</h2>
+          <div class="mt-3 space-y-3">
             <div
               v-for="(entry, i) in leaderboard"
               :key="entry.user_id"
-              class="flex items-center gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors"
+              class="flex items-center gap-3 border-[3px] border-retro-black dark:border-neon-pink bg-white dark:bg-retro-dark p-2"
             >
-              <span class="text-lg font-bold w-6 text-center" :class="['#FFD700','#C0C0C0','#CD7F32'][i] ? '' : ''">
-                {{ ['🥇','🥈','🥉'][i] }}
+              <span class="font-pixel text-lg font-bold w-8 text-center text-white bg-retro-black dark:bg-neon-pink p-1 block">
+                {{ ['1P','2P','3P'][i] }}
               </span>
               <div class="flex-1 min-w-0">
-                <p class="truncate text-sm font-medium text-slate-800 dark:text-white">{{ entry.username }}</p>
+                <p class="truncate font-sans font-bold uppercase text-xs text-retro-black dark:text-retro-white">{{ entry.username }}</p>
               </div>
-              <span class="text-sm font-bold text-violet-600 dark:text-cyan-400">
+              <span class="font-sans text-sm font-bold text-neon-blue dark:text-neon-yellow pr-1">
                 {{ Number(entry.high_score).toLocaleString() }}
               </span>
             </div>
-            <p v-if="leaderboard.length === 0" class="text-xs text-slate-400 dark:text-slate-500">Aún no hay puntuaciones.</p>
+            <p v-if="leaderboard.length === 0" class="font-pixel text-xs text-retro-black dark:text-retro-white uppercase blink">AWAITING CONNECTIONS...</p>
           </div>
         </div>
+
       </aside>
     </div>
   </section>
 </template>
 
+<style scoped>
+.blink {
+  animation: blink 1.5s step-start infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+</style>

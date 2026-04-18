@@ -1,0 +1,32 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{vue,js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['"Space Mono"', 'monospace'],
+        display: ['Orbitron', 'sans-serif'],
+        pixel: ['VT323', 'monospace'],
+      },
+      colors: {
+        neon: {
+          pink: '#f472b6',
+          fuchsia: '#e02fe8',
+          cyan: '#22d3ee',
+          blue: '#1d4ed8',
+          yellow: '#fef08a',
+        },
+        retro: {
+          white: '#fafafa',
+          cream: '#f8fafc',
+          black: '#09090b',
+          dark: '#18181b',
+        }
+      },
+    },
+  },
+  plugins: [],
+}

@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   size: {
@@ -17,34 +18,53 @@ const props = defineProps({
   },
 })
 
+const router = useRouter()
+
 const ADS = [
   {
-    brand: 'GameHub Plus',
-    headline: 'Boost para tus partidas',
-    tagline: 'Retos diarios, recompensas y eventos especiales.',
-    cta: 'Descubrir',
-    color: 'from-cyan-500 to-blue-600',
+    brand: 'REACTOR_CLICK.EXE',
+    headline: 'IMPULSO_CRÍTICO',
+    tagline: 'GOLPEA EL NÚCLEO PARA INICIAR LA SECUENCIA DE COMBO.',
+    cta: 'CONECTAR',
+    color: 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan',
+    accent: 'bg-neon-cyan',
+    slug: 'clicker',
   },
   {
-    brand: 'Cosmic Arena',
-    headline: 'Nueva temporada competitiva',
-    tagline: 'Sube de liga y desbloquea recompensas exclusivas.',
-    cta: 'Jugar ahora',
-    color: 'from-violet-500 to-fuchsia-600',
+    brand: 'CONNECT_4.BIN',
+    headline: 'VS_CORE_INTELLIGENCE',
+    tagline: 'RETA A LA IA EN UN DUELO DE CÓDIGO CLÁSICO.',
+    cta: 'DESAFÍO',
+    color: 'border-neon-blue bg-neon-blue/10 text-neon-blue',
+    accent: 'bg-neon-blue',
+    slug: 'connect4',
   },
   {
-    brand: 'Pixel Store',
-    headline: 'Skins de edición limitada',
-    tagline: 'Solo esta semana con bonus de lanzamiento.',
-    cta: 'Ver ofertas',
-    color: 'from-emerald-500 to-teal-600',
+    brand: 'QUIZ_MASTER.SYS',
+    headline: 'DATA_MINING_MODE',
+    tagline: 'EXAMINA TU MEMORIA EN EL DUELO DE DATOS.',
+    cta: 'INICIAR',
+    color: 'border-neon-fuchsia bg-neon-fuchsia/10 text-neon-fuchsia',
+    accent: 'bg-neon-fuchsia',
+    slug: 'quiz',
   },
   {
-    brand: 'Quiz Nights',
-    headline: 'Torneo del fin de semana',
-    tagline: 'Compite con la comunidad y entra al top 100.',
-    cta: 'Unirme',
-    color: 'from-amber-500 to-orange-600',
+    brand: 'RPG_MODULE.EXE',
+    headline: 'SENDA_DEL_HÉROE',
+    tagline: 'EXPLORA LAS SALAS DEL SISTEMA. SOBREVIVE AL CÓDIGO.',
+    cta: 'BOOT_GAME',
+    color: 'border-neon-pink bg-neon-pink/10 text-neon-pink',
+    accent: 'bg-neon-pink',
+    slug: 'rpg',
+  },
+  {
+    brand: 'TOWER_DEF.DAT',
+    headline: 'CORE_DEFENSE',
+    tagline: 'PROTEGE EL REACTOR DE LAS OLEADAS DE MALWARE.',
+    cta: 'DEFENDER',
+    color: 'border-neon-yellow bg-neon-yellow/10 text-neon-yellow',
+    accent: 'bg-neon-yellow',
+    slug: 'tower-defense',
   },
 ]
 
@@ -55,6 +75,12 @@ let rotationTimer = null
 
 function nextAd() {
   currentIndex.value = (currentIndex.value + 1) % ADS.length
+}
+
+function handleAdClick() {
+  if (currentAd.value.slug) {
+    router.push({ name: 'play', params: { slug: currentAd.value.slug } })
+  }
 }
 
 onMounted(() => {
@@ -68,78 +94,80 @@ onUnmounted(() => {
 
 const wrapperClass = computed(() => {
   if (props.size === 'leaderboard') return 'w-[728px] h-[90px]'
-  if (props.size === 'rectangle') return 'w-[300px] h-[250px]'
-  if (props.size === 'skyscraper') return 'w-[160px] h-[600px]'
-  return 'w-[320px] h-[50px]'
+  if (props.size === 'rectangle') return 'w-full max-w-[300px] h-[250px]'
+  if (props.size === 'skyscraper') return 'w-full max-w-[160px] h-[600px]'
+  return 'w-full max-w-[320px] h-fit'
 })
 </script>
 
 <template>
-  <div class="group relative select-none cursor-pointer" :class="wrapperClass" @click="nextAd">
-    <div
-      v-if="size === 'leaderboard'"
-      class="relative flex h-full w-full items-center overflow-hidden rounded-lg border border-slate-200/80 bg-white/95 transition-all duration-200 dark:border-slate-700/70 dark:bg-slate-900/95"
-    >
-      <div class="h-full w-24 bg-gradient-to-br" :class="currentAd.color" />
-      <div class="flex-1 px-3">
-        <p class="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{{ currentAd.brand }}</p>
-        <p class="text-sm font-medium text-slate-700 dark:text-slate-200">{{ currentAd.tagline }}</p>
+  <div class="group relative select-none cursor-pointer gh-surface gh-surface-hover p-0 overflow-hidden bg-black" :class="wrapperClass" @click="handleAdClick">
+    <div class="gh-scanlines absolute inset-0 opacity-20 pointer-events-none z-10"></div>
+    
+    <!-- Leaderboard -->
+    <div v-if="size === 'leaderboard'" class="relative flex h-full w-full items-center">
+      <div class="h-full w-12 shrink-0 border-r-2 border-retro-black dark:border-current opacity-40" :class="currentAd.color"></div>
+      <div class="flex-1 px-4">
+        <p class="font-pixel text-[10px] font-bold uppercase tracking-widest opacity-60 text-retro-white">{{ currentAd.brand }}</p>
+        <p class="font-display text-sm font-black text-neon-yellow dark:text-retro-white truncate">{{ currentAd.headline }}</p>
+        <p class="font-sans text-[10px] uppercase font-bold text-retro-white/70 truncate">{{ currentAd.tagline }}</p>
       </div>
-      <button class="mr-3 rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r shadow-sm" :class="currentAd.color">
-        {{ currentAd.cta }}
-      </button>
-      <span class="absolute right-2 top-2 rounded-full border border-slate-200 bg-white/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-400">Ad</span>
-    </div>
-
-    <div
-      v-else-if="size === 'rectangle'"
-      class="relative flex h-full w-full flex-col overflow-hidden rounded-lg border border-slate-200/80 bg-white/95 transition-all duration-200 dark:border-slate-700/70 dark:bg-slate-900/95"
-    >
-      <div class="h-24 bg-gradient-to-br" :class="currentAd.color" />
-      <div class="flex flex-1 flex-col gap-1.5 px-3 py-3">
-        <p class="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">{{ currentAd.brand }}</p>
-        <p class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ currentAd.headline }}</p>
-        <p class="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{{ currentAd.tagline }}</p>
-        <button class="mt-auto w-full rounded-lg px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r shadow-sm" :class="currentAd.color">
+      <div class="px-4">
+        <button class="gh-surface px-4 py-1.5 font-pixel text-sm font-bold uppercase transition-all bg-white text-black hover:bg-neon-yellow active:translate-y-0.5">
           {{ currentAd.cta }}
         </button>
       </div>
-      <span class="absolute right-2 top-2 rounded-full border border-slate-200 bg-white/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-400">Ad</span>
+      <span class="absolute right-0 top-0 bg-retro-black text-white px-2 py-0.5 font-pixel text-[8px] uppercase tracking-tighter">PROM_01</span>
     </div>
 
-    <div
-      v-else-if="size === 'skyscraper'"
-      class="relative flex h-full w-full flex-col overflow-hidden rounded-lg border border-slate-200/80 bg-white/95 transition-all duration-200 dark:border-slate-700/70 dark:bg-slate-900/95"
-    >
-      <div class="h-14 px-3 flex items-center bg-gradient-to-r" :class="currentAd.color">
-        <p class="text-sm font-extrabold uppercase tracking-[0.1em] text-white">{{ currentAd.brand }}</p>
+    <!-- Rectangle -->
+    <div v-else-if="size === 'rectangle'" class="relative flex h-full w-full flex-col">
+      <div class="h-24 shrink-0 border-b-2 border-retro-black dark:border-current overflow-hidden flex items-center justify-center bg-retro-black" :class="currentAd.color">
+         <span class="font-pixel text-6xl opacity-30 select-none">DATA_PULSE</span>
       </div>
-      <div class="flex-1 bg-gradient-to-b from-transparent to-slate-50/70 dark:to-slate-900/60">
-        <div class="h-40 bg-gradient-to-br" :class="currentAd.color" />
-        <div class="flex h-[calc(100%-10rem)] flex-col gap-2 px-3 py-3">
-        <p class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ currentAd.headline }}</p>
-        <p class="text-xs leading-relaxed text-slate-600 dark:text-slate-300">{{ currentAd.tagline }}</p>
-        <button class="mt-auto w-full rounded-lg px-3 py-2 text-xs font-semibold text-white bg-gradient-to-r shadow-sm" :class="currentAd.color">
+      <div class="flex flex-1 flex-col gap-2 p-4">
+        <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-cyan">{{ currentAd.brand }}</p>
+        <p class="font-display text-lg font-black text-retro-white leading-tight">{{ currentAd.headline }}</p>
+        <p class="font-sans text-[10px] font-bold text-retro-white/60 mb-2 uppercase">{{ currentAd.tagline }}</p>
+        <button class="mt-auto w-full gh-surface py-2 font-pixel text-lg font-bold uppercase bg-white text-black hover:bg-neon-yellow">
           {{ currentAd.cta }}
         </button>
+      </div>
+      <span class="absolute right-0 top-0 bg-retro-black text-white px-2 py-0.5 font-pixel text-[8px] uppercase tracking-tighter">PROM_04</span>
+    </div>
+
+    <!-- Skyscraper -->
+    <div v-else-if="size === 'skyscraper'" class="relative flex h-full w-full flex-col">
+      <div class="p-3 border-b-2 border-retro-black dark:border-current bg-retro-black" :class="currentAd.color">
+        <p class="font-pixel text-xs font-bold uppercase tracking-widest text-white">{{ currentAd.brand }}</p>
+      </div>
+      <div class="flex-1 flex flex-col p-3">
+        <div class="h-48 shrink-0 mb-4 border-2 border-retro-white/20 bg-retro-white/5 flex items-center justify-center relative">
+          <div class="absolute inset-0 flex items-center justify-center font-pixel text-4xl opacity-10 rotate-90">SKYSCRAPER_MOD</div>
+          <span class="font-pixel text-2xl text-neon-pink">>> {{ currentAd.slug }}</span>
         </div>
+        <p class="font-display text-sm font-black text-retro-white underline decoration-neon-cyan underline-offset-4 mb-2">{{ currentAd.headline }}</p>
+        <p class="font-sans text-[10px] font-bold text-retro-white/50 uppercase leading-relaxed">{{ currentAd.tagline }}</p>
+        <button class="mt-auto w-full gh-surface py-3 font-pixel text-xl font-bold uppercase bg-white text-black hover:bg-neon-yellow">
+          {{ currentAd.cta }}
+        </button>
       </div>
-      <span class="absolute right-2 top-2 rounded-full border border-slate-200 bg-white/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-400">Ad</span>
+      <span class="absolute right-0 top-0 bg-retro-black text-white px-2 py-0.5 font-pixel text-[8px] uppercase tracking-tighter">PROM_09</span>
     </div>
 
-    <div
-      v-else
-      class="relative flex h-full w-full items-center gap-2 overflow-hidden rounded-lg border border-slate-200/80 bg-white/95 px-2 transition-all duration-200 dark:border-slate-700/70 dark:bg-slate-900/95"
-    >
-      <div class="size-7 rounded-md bg-gradient-to-br" :class="currentAd.color" />
-      <div class="min-w-0 flex-1">
-        <p class="truncate text-[11px] font-semibold text-slate-800 dark:text-slate-100">{{ currentAd.brand }}</p>
-        <p class="truncate text-[10px] text-slate-600 dark:text-slate-300">{{ currentAd.tagline }}</p>
+    <!-- Mobile / Small -->
+    <div v-else class="relative flex h-16 w-full items-center gap-3 px-3">
+      <div class="size-10 shrink-0 border-2 border-retro-white/20 bg-retro-white/5 flex items-center justify-center font-pixel text-xl text-neon-cyan">
+        !
       </div>
-      <button class="rounded-md px-2 py-1 text-[10px] font-semibold text-white bg-gradient-to-r" :class="currentAd.color">
+      <div class="min-w-0 flex-1">
+        <p class="truncate font-pixel text-[10px] font-bold text-neon-yellow">{{ currentAd.brand }}</p>
+        <p class="truncate font-sans text-[10px] font-bold text-retro-white/50 uppercase">{{ currentAd.headline }}</p>
+      </div>
+      <button class="gh-surface px-3 py-1 font-pixel text-xs font-bold uppercase bg-white text-black">
         {{ currentAd.cta }}
       </button>
-      <span class="absolute right-1.5 top-1 rounded-full border border-slate-200 bg-white/85 px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.08em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-400">Ad</span>
+      <span class="absolute right-0 top-0 bg-retro-black text-white px-1.5 py-0.5 font-pixel text-[7px] uppercase">ADV_MOBILE</span>
     </div>
   </div>
 </template>

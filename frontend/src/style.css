@@ -1,7 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Syne:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "Space Mono", monospace;
+  --font-display: "Orbitron", sans-serif;
+  --font-pixel: "VT323", monospace;
+
+  --color-neon-pink: #ff2d55;
+  --color-neon-fuchsia: #e02fe8;
+  --color-neon-cyan: #00f2ff;
+  --color-neon-blue: #007aff;
+  --color-neon-yellow: #fff200;
+
+  --color-retro-white: #f8fafc;
+  --color-retro-cream: #f1f5f9;
+  --color-retro-black: #0c0c0e;
+  --color-retro-dark: #121214;
+  --color-retro-deep: #08080a;
+}
 
 @layer base {
   html, body, #app {
@@ -13,74 +31,112 @@
   }
 
   body {
-    @apply font-sans antialiased text-slate-800 bg-slate-50 transition-colors duration-300;
-    font-family: 'Rajdhani', sans-serif;
+    @apply font-sans antialiased text-retro-black bg-retro-cream transition-colors duration-300;
+    /* Grid Paper Effect */
     background-image:
-      radial-gradient(80rem 30rem at 10% -10%, rgba(34, 211, 238, 0.15), transparent 45%),
-      radial-gradient(70rem 30rem at 90% -20%, rgba(139, 92, 246, 0.15), transparent 45%),
-      linear-gradient(to bottom, #f8fafc, #e2e8f0 65%);
+      linear-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px),
+      linear-gradient(to right, rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+    background-size: 20px 20px;
     background-attachment: fixed;
   }
 
   html.dark body {
-    @apply text-slate-100 bg-zinc-950;
+    @apply text-retro-white bg-retro-black;
     background-image:
-      radial-gradient(80rem 30rem at 10% -10%, rgba(34, 211, 238, 0.12), transparent 45%),
-      radial-gradient(70rem 30rem at 90% -20%, rgba(139, 92, 246, 0.14), transparent 45%),
-      linear-gradient(to bottom, #09090b, #020617 65%);
+      linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+      linear-gradient(to right, rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+      radial-gradient(ellipse at bottom, rgba(224,47,232,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at top, rgba(34,211,238,0.1) 0%, transparent 50%);
+    background-size: 30px 30px, 30px 30px, 100% 100%, 100% 100%;
+    background-attachment: fixed;
   }
 
-  h1, h2, h3 {
-    font-family: 'Syne', 'Rajdhani', sans-serif;
-    letter-spacing: 0.01em;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-widest uppercase;
   }
 
   ::selection {
-    @apply bg-violet-500/30 text-slate-900 dark:bg-cyan-400/35 dark:text-white;
+    @apply bg-neon-fuchsia text-retro-white dark:bg-neon-cyan dark:text-retro-black;
   }
 }
 
 @layer components {
   .gh-surface {
-    @apply rounded-2xl border border-slate-200/80 bg-white/85 backdrop-blur-md shadow-sm transition-colors duration-300;
+    @apply border-2 border-retro-black bg-white transition-all duration-200;
+    box-shadow: 4px 4px 0px var(--color-retro-black);
   }
   
   html.dark .gh-surface {
-    @apply border-slate-800/80 bg-slate-900/65 shadow-none;
+    @apply border-2 border-neon-cyan/80 bg-retro-dark;
+    box-shadow: 4px 4px 0px rgba(34, 211, 238, 0.6),
+                0 0 15px rgba(34, 211, 238, 0.2);
   }
 
-  .gh-neon-ring {
-    box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.2) inset,
-      0 0 0 1px rgba(139, 92, 246, 0.15),
-      0 8px 30px rgba(100, 116, 139, 0.2);
+  .gh-glass {
+    @apply bg-black/40 backdrop-blur-xl border-2 border-white/20;
+    box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.2);
   }
 
-  html.dark .gh-neon-ring {
-    box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.15) inset,
-      0 0 0 1px rgba(139, 92, 246, 0.1),
-      0 10px 40px rgba(2, 6, 23, 0.65);
+  .gh-surface-hover {
+    @apply hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px];
+  }
+  
+  .gh-surface-hover:hover {
+    box-shadow: 2px 2px 0px var(--color-retro-black);
+  }
+  
+  .gh-surface-hover:active {
+    box-shadow: 0px 0px 0px var(--color-retro-black);
   }
 
-  .gh-grid-bg {
-    background-image:
-      linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
-      linear-gradient(to right, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
-    background-size: 24px 24px;
+  html.dark .gh-surface-hover:hover {
+    box-shadow: 2px 2px 0px rgba(34, 211, 238, 0.6),
+                0 0 20px rgba(34, 211, 238, 0.3);
   }
 
-  html.dark .gh-grid-bg {
-    background-image:
-      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-      linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  html.dark .gh-surface-hover:active {
+    box-shadow: 0px 0px 0px rgba(34, 211, 238, 1),
+                0 0 30px rgba(34, 211, 238, 0.5);
   }
 
-  .gh-panel {
-    @apply rounded-2xl border border-slate-200/90 bg-white/90 shadow-xl shadow-slate-200/60 backdrop-blur-md transition-colors duration-300 dark:border-slate-800/80 dark:bg-slate-900/80 dark:shadow-black/20;
+  .gh-retro-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-retro-black focus:ring-offset-2 dark:focus:ring-neon-fuchsia dark:focus:ring-offset-retro-black;
   }
 
   .gh-title-gradient {
-    @apply bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent dark:from-violet-300 dark:via-fuchsia-300 dark:to-cyan-300;
+    @apply bg-gradient-to-r from-neon-blue via-neon-fuchsia to-neon-fuchsia bg-clip-text text-transparent;
+    text-shadow: 2px 2px 0px var(--color-retro-black);
+  }
+  html.dark .gh-title-gradient {
+    @apply from-neon-cyan via-neon-fuchsia to-neon-fuchsia;
+    text-shadow: 3px 3px 0px var(--color-retro-black), 0 0 10px rgba(34, 211, 238, 0.5);
+  }
+
+  .gh-panel {
+    @apply border-2 border-retro-black bg-white p-6 transition-all duration-300 dark:border-neon-cyan/50 dark:bg-retro-dark;
+    box-shadow: 6px 6px 0px var(--color-retro-black);
+  }
+  
+  html.dark .gh-panel {
+     box-shadow: 6px 6px 0px rgba(244, 114, 182, 0.6),
+                0 0 15px rgba(244, 114, 182, 0.2);
+  }
+
+  .gh-title-glow {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+
+  .gh-scanlines {
+    position: relative;
+    overflow: hidden;
+  }
+  .gh-scanlines::after {
+    content: " ";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 10;
   }
 }

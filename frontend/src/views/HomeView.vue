@@ -15,36 +15,49 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-7xl px-4 py-10 sm:py-14">
-    <div class="gh-surface gh-neon-ring gh-grid-bg relative overflow-hidden p-6 sm:p-10">
-      <div class="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-violet-300/30 dark:bg-violet-500/20 blur-3xl transition-colors" />
-      <div class="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-cyan-300/30 dark:bg-cyan-500/15 blur-3xl transition-colors" />
-      
-      <p class="text-xs font-bold uppercase tracking-[0.28em] text-cyan-600 dark:text-cyan-400">GameHub Universe</p>
-      
-      <h1 class="mt-3 text-3xl font-black leading-tight text-slate-800 dark:text-white sm:text-5xl transition-colors">
-        Juega. Compite. Sube en el ranking.
-      </h1>
-      <p class="mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300 transition-colors">
-        Tu hub gamer moderno. Diseñado para ofrecer la mejor experiencia multijugador con progresión centralizada.
-      </p>
-      <div class="mt-6 flex flex-wrap gap-3 relative z-10">
-        <RouterLink to="/play/rpg">
-          <BaseButton>Comenzar partida</BaseButton>
-        </RouterLink>
-        <RouterLink to="/profile">
-          <BaseButton variant="ghost">Ver perfil</BaseButton>
-        </RouterLink>
+  <section class="mx-auto w-full max-w-7xl px-4 py-8 sm:py-12">
+    <!-- Hero Section with Retro Styling -->
+    <div class="gh-panel gh-scanlines relative overflow-hidden mb-8">
+      <div class="relative z-10">
+        <p class="font-pixel text-xl sm:text-2xl font-bold uppercase tracking-[0.2em] text-neon-blue dark:text-neon-yellow mb-2">>> SYSTEM.INIT()</p>
+        
+        <h1 class="text-4xl font-display font-black uppercase text-retro-black dark:text-retro-white sm:text-6xl max-w-3xl leading-none md:leading-[1.1]">
+          GAME_HUB <br/>
+          <span class="gh-title-gradient">INSERT COIN</span>
+        </h1>
+        
+        <p class="mt-6 max-w-xl font-sans text-sm sm:text-base font-bold uppercase leading-relaxed text-retro-white dark:text-retro-black bg-retro-black dark:bg-neon-cyan p-3 border-[3px] border-retro-black dark:border-neon-cyan shadow-[4px_4px_0px_#22d3ee] dark:shadow-none inline-block">
+          La mejor experiencia multijugador arcade. Juega. Compite. Gana.
+        </p>
+        
+        <div class="mt-8 flex flex-wrap gap-4 relative z-10 w-full sm:w-auto">
+          <RouterLink to="/play/rpg">
+            <BaseButton>START GAME</BaseButton>
+          </RouterLink>
+          <RouterLink to="/profile">
+            <BaseButton variant="ghost">VIEW PROFILE</BaseButton>
+          </RouterLink>
+        </div>
       </div>
     </div>
 
     <!-- Indicador de carga -->
-    <div v-if="gameStore.isLoading" class="mt-20 flex justify-center text-slate-500 dark:text-slate-400">
-      <p>Cargando juegos...</p>
+    <div v-if="gameStore.isLoading" class="mt-16 flex justify-center text-retro-black dark:text-neon-cyan font-pixel text-2xl uppercase blink">
+      <p>LOADING MODULES...</p>
     </div>
 
-    <div v-else class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Game Cards Grid -->
+    <div v-else class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <GameCard v-for="game in gameStore.games" :key="game.slug" :game="game" />
     </div>
   </section>
 </template>
+
+<style scoped>
+.blink {
+  animation: blink 1s step-start infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+</style>

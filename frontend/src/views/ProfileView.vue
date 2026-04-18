@@ -2,30 +2,21 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useAchievementStore } from '../stores/achievement'
 import api from '../lib/axios'
+import BaseButton from '../components/ui/BaseButton.vue'
 
 const authStore = useAuthStore()
+const achievementStore = useAchievementStore()
 const router    = useRouter()
 const isLoading = ref(true)
 
-const achievements     = ref([])
-const achievementsByGame = computed(() => {
-  const map = {}
-  for (const a of achievements.value) {
-    if (a.game_id !== null) {
-      if (!map[a.game_id]) map[a.game_id] = []
-      map[a.game_id].push(a)
-    }
-  }
-  return map
-})
-
 const RARITY_BADGE = {
-  common:    'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200',
-  uncommon:  'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-  rare:      'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  epic:      'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
-  legendary: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+  common:    'bg-white text-retro-black border-retro-black dark:bg-transparent dark:text-retro-white dark:border-retro-white',
+  uncommon:  'bg-neon-cyan/20 text-retro-black border-neon-cyan dark:text-neon-cyan dark:border-neon-cyan',
+  rare:      'bg-neon-blue/20 text-retro-black border-neon-blue dark:text-neon-blue dark:border-neon-blue',
+  epic:      'bg-neon-pink/20 text-retro-black border-neon-pink dark:text-neon-pink dark:border-neon-pink',
+  legendary: 'bg-neon-yellow/20 text-retro-black border-neon-yellow dark:bg-neon-yellow/10 dark:text-neon-yellow dark:border-neon-yellow',
 }
 
 // Reset de progreso
@@ -41,12 +32,10 @@ async function executeReset() {
   isResetting.value = true
   try {
     await api.delete(`/games/${resetTarget.value.slug}/reset`)
-    // Refrescar el usuario para actualizar stats
-    await authStore.fetchUser()
-    // Limpiar logros del juego reseteado de la lista local para reflejar el cambio
-    achievements.value = []
-    const { data } = await api.get('/achievements')
-    achievements.value = data.data ?? []
+    await Promise.all([
+      authStore.fetchUser(true), 
+      achievementStore.fetchAchievements(true)
+    ])
   } catch { /* silencioso */ } finally {
     isResetting.value = false
     resetTarget.value = null
@@ -58,10 +47,12 @@ onMounted(async () => {
     router.push('/login')
     return
   }
-  await authStore.fetchUser()
+  
   try {
-    const { data } = await api.get('/achievements')
-    achievements.value = data.data ?? []
+    await Promise.all([
+      authStore.fetchUser(),
+      achievementStore.fetchAchievements()
+    ])
   } catch { /* silencioso */ }
   isLoading.value = false
 })
@@ -79,88 +70,85 @@ function formatDate(isoDate) {
 
 <template>
   <section class="mx-auto w-full max-w-7xl px-4 py-10">
-    <div v-if="isLoading" class="text-center text-slate-500 dark:text-slate-400 py-20">
-      Cargando perfil...
+    <div v-if="isLoading" class="text-center text-retro-black dark:text-retro-white py-20 font-pixel text-2xl uppercase blink">
+      LOADING_PROFILE...
     </div>
 
     <template v-else-if="authStore.user">
-      <div class="gh-panel flex items-center gap-5 overflow-hidden p-6 relative">
-        <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-cyan-300/20 dark:bg-cyan-500/10 blur-3xl" />
-        <div class="pointer-events-none absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-violet-300/20 dark:bg-violet-500/10 blur-3xl" />
-        <div class="relative z-10 h-16 w-16 rounded-full bg-gradient-to-br from-violet-500 to-cyan-400 flex items-center justify-center text-xl font-bold text-white shadow-lg shadow-violet-500/30 dark:shadow-cyan-500/20 shrink-0">
+      <!-- Profile Header -->
+      <div class="gh-panel flex flex-col sm:flex-row items-center gap-6 overflow-hidden p-6 relative bg-retro-cream dark:bg-black mb-10">
+        <div class="gh-scanlines absolute inset-0 opacity-10 pointer-events-none"></div>
+        <div class="relative z-10 h-24 w-24 border-4 border-retro-black dark:border-neon-cyan flex items-center justify-center text-5xl font-display font-black text-retro-black bg-neon-yellow dark:text-retro-black dark:bg-neon-cyan shrink-0 shadow-[4px_4px_0px_#09090b] dark:shadow-[4px_4px_0px_#f472b6]">
           {{ authStore.user.name.charAt(0).toUpperCase() }}
         </div>
-        <div class="relative z-10">
-          <p class="text-xs font-bold uppercase tracking-[0.24em] text-cyan-600 dark:text-cyan-400">Perfil</p>
-          <h1 class="text-3xl font-black text-slate-800 dark:text-white transition-colors">{{ authStore.user.name }}</h1>
-          <p class="mt-1 text-slate-500 dark:text-slate-400 transition-colors">{{ authStore.user.email }}</p>
+        <div class="relative z-10 text-center sm:text-left">
+          <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-blue dark:text-neon-yellow border-b-2 border-retro-black dark:border-neon-cyan mb-2 pb-1 inline-block">PLAYER_DATA</p>
+          <h1 class="text-4xl font-display font-black uppercase text-retro-black dark:text-retro-white">{{ authStore.user.name }}</h1>
+          <p class="font-sans text-sm font-bold mt-1 text-slate-600 dark:text-slate-400">ID: {{ authStore.user.email }}</p>
         </div>
       </div>
 
       <div class="mt-8">
-        <h2 class="mb-4 text-2xl font-black text-slate-800 dark:text-white transition-colors">Estadísticas por Juego</h2>
+        <h2 class="mb-6 font-display text-2xl font-black uppercase tracking-widest text-retro-black dark:text-retro-white border-b-4 border-retro-black dark:border-neon-cyan pb-2 inline-block">SYSTEM_STATS</h2>
         
-        <div v-if="!authStore.user.global_stats || authStore.user.global_stats.length === 0" class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-zinc-900 p-6 text-center text-slate-500 dark:text-slate-400 transition-colors">
-          Aún no tienes estadísticas. ¡Juega para empezar a registrar tu progreso!
+        <div v-if="!authStore.user.global_stats || authStore.user.global_stats.length === 0" class="gh-panel text-center text-retro-black dark:text-retro-white font-pixel uppercase tracking-widest p-10 bg-retro-cream dark:bg-retro-dark">
+          NO DATA ON SERVER. INSERT COIN TO PLAY.
         </div>
 
-        <div v-else class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <article 
             v-for="stat in authStore.user.global_stats" 
             :key="stat.game_id" 
-            class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-zinc-900 p-5 shrink-0 shadow-lg shadow-slate-200/50 dark:shadow-black/20 transition-colors flex flex-col gap-4"
+            class="gh-panel flex flex-col gap-4 p-5 bg-white dark:bg-retro-dark"
           >
-            <h3 class="text-lg font-bold text-cyan-600 dark:text-cyan-300 transition-colors">{{ stat.game.title }}</h3>
+            <h3 class="font-display text-xl font-black uppercase text-retro-black dark:text-neon-cyan border-b-2 border-retro-black dark:border-neon-cyan pb-1">{{ stat.game.title }}</h3>
 
             <!-- Stats -->
-            <div class="space-y-3">
-              <div class="flex justify-between items-center bg-slate-50 dark:bg-zinc-950 px-3 py-2 rounded border-l-2 border-l-cyan-400 dark:border-l-cyan-500 border border-slate-100 dark:border-slate-800/50 transition-colors">
-                <span class="text-sm text-slate-500 dark:text-slate-400">Puntaje Máx</span>
-                <span class="font-semibold text-slate-700 dark:text-slate-200">{{ stat.high_score }}</span>
+            <div class="space-y-3 mt-2">
+              <div class="flex justify-between items-center bg-retro-cream dark:bg-black px-3 py-2 border-2 border-retro-black dark:border-neon-pink shadow-[inset_2px_2px_0px_#09090b] dark:shadow-[inset_2px_2px_0px_#f472b6]">
+                <span class="font-pixel text-xs text-retro-black dark:text-retro-white uppercase tracking-wider">HIGH_SCORE</span>
+                <span class="font-sans font-bold text-retro-black dark:text-neon-pink">{{ stat.high_score }}</span>
               </div>
-              <div class="flex justify-between items-center bg-slate-50 dark:bg-zinc-950 px-3 py-2 rounded border-l-2 border-l-violet-400 dark:border-l-violet-500 border border-slate-100 dark:border-slate-800/50 transition-colors">
-                <span class="text-sm text-slate-500 dark:text-slate-400">Tiempo Jugado</span>
-                <span class="font-semibold text-violet-600 dark:text-violet-300">{{ formatTime(stat.time_played) }}</span>
+              <div class="flex justify-between items-center bg-retro-cream dark:bg-black px-3 py-2 border-2 border-retro-black dark:border-neon-cyan shadow-[inset_2px_2px_0px_#09090b] dark:shadow-[inset_2px_2px_0px_#22d3ee]">
+                <span class="font-pixel text-xs text-retro-black dark:text-retro-white uppercase tracking-wider">TIME_PLAYED</span>
+                <span class="font-sans font-bold text-retro-black dark:text-neon-cyan">{{ formatTime(stat.time_played) }}</span>
               </div>
-              <div class="flex justify-between items-center bg-slate-50 dark:bg-zinc-950 px-3 py-2 rounded border-l-2 border-l-slate-300 dark:border-l-slate-600 border border-slate-100 dark:border-slate-800/50 transition-colors">
-                <span class="text-sm text-slate-500 dark:text-slate-400">Última partida</span>
-                <span class="font-semibold text-slate-700 dark:text-slate-200">{{ formatDate(stat.last_played_at) }}</span>
+              <div class="flex justify-between items-center bg-retro-cream dark:bg-black px-3 py-2 border-2 border-retro-black dark:border-neon-yellow shadow-[inset_2px_2px_0px_#09090b] dark:shadow-[inset_2px_2px_0px_#fef08a]">
+                <span class="font-pixel text-xs text-retro-black dark:text-retro-white uppercase tracking-wider">LAST_LOGIN</span>
+                <span class="font-sans font-bold text-retro-black dark:text-neon-yellow">{{ formatDate(stat.last_played_at) }}</span>
               </div>
             </div>
 
             <!-- Logros del juego -->
-            <div v-if="achievementsByGame[stat.game_id]?.length" class="border-t border-slate-100 dark:border-slate-800 pt-3">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-2">
-                Logros
-                <span class="ml-1 text-slate-500 dark:text-slate-400">
-                  {{ achievementsByGame[stat.game_id].filter(a => a.unlocked).length }}/{{ achievementsByGame[stat.game_id].length }}
+            <div v-if="achievementStore.achievementsByGame[stat.game_id]?.length" class="border-t-2 border-retro-black dark:border-neon-cyan border-dashed pt-4 mt-2">
+              <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-retro-black dark:text-retro-white mb-3">
+                ACHIEVEMENTS
+                <span class="ml-2 bg-retro-black text-white dark:bg-neon-cyan dark:text-black px-1">
+                  {{ achievementStore.achievementsByGame[stat.game_id].filter(a => a.unlocked).length }}/{{ achievementStore.achievementsByGame[stat.game_id].length }}
                 </span>
               </p>
               <div class="flex flex-wrap gap-2">
                 <div
-                  v-for="a in achievementsByGame[stat.game_id]"
+                  v-for="a in achievementStore.achievementsByGame[stat.game_id]"
                   :key="a.id"
                   :title="a.title + (a.unlocked ? '\n✅ ' + (a.earned_at ? new Date(a.earned_at).toLocaleDateString() : 'Desbloqueado') : '\n🔒 Bloqueado') + '\n' + a.description"
-                  class="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all"
+                  class="flex items-center gap-1.5 border-2 px-2 py-0.5 font-sans text-[10px] font-bold uppercase tracking-wider transition-all"
                   :class="[
                     RARITY_BADGE[a.rarity] ?? RARITY_BADGE.common,
-                    a.unlocked ? 'opacity-100' : 'opacity-35 grayscale'
+                    a.unlocked ? '' : 'opacity-40 grayscale border-dashed border-slate-400 dark:border-slate-600 bg-transparent'
                   ]"
                 >
-                  <span>{{ a.unlocked ? '🏆' : '🔒' }}</span>
+                  <span class="font-pixel">{{ a.unlocked ? '★' : 'x' }}</span>
                   <span class="max-w-28 truncate">{{ a.title }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Botón reset -->
-            <div class="border-t border-slate-100 dark:border-slate-800 pt-3 mt-auto">
-              <button
-                @click="confirmReset(stat)"
-                class="w-full rounded-lg border border-red-300 dark:border-red-800/60 bg-red-50 dark:bg-red-900/10 px-3 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/25 transition-colors"
-              >
-                🗑️ Reiniciar progreso
-              </button>
+            <div class="pt-4 mt-auto">
+              <BaseButton size="sm" variant="danger" class="w-full" @click="confirmReset(stat)">
+                RESET_DATA
+              </BaseButton>
             </div>
           </article>
         </div>
@@ -170,33 +158,25 @@ function formatDate(isoDate) {
 
   <!-- Modal de confirmación de reset -->
   <Teleport to="body">
-    <Transition name="fade">
+    <Transition name="pixel-fade">
       <div
         v-if="resetTarget"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
         @click.self="resetTarget = null"
       >
-        <div class="w-full max-w-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-2xl">
-          <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2">¿Reiniciar progreso?</h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
-            Se borrará toda la partida guardada y las estadísticas de
-            <span class="font-semibold text-slate-700 dark:text-slate-200">{{ resetTarget.title }}</span>.
-            Esta acción no se puede deshacer.
+        <div class="w-full max-w-sm gh-panel bg-white dark:bg-black border-4 border-retro-black dark:border-neon-pink">
+          <h3 class="font-display text-2xl font-black uppercase tracking-wider text-neon-pink mb-2 border-b-2 border-neon-pink pb-2">WARNING!</h3>
+          <p class="font-sans text-sm font-bold uppercase text-retro-black dark:text-retro-white mb-6 mt-4">
+            SYSTEM WILL ERASE ALL PROGRESS AND STATS FOR 
+            <span class="text-neon-pink bg-retro-black dark:bg-retro-dark px-1 inline-block">{{ resetTarget.title }}</span>. <br><br>THIS CANNOT BE UNDONE.
           </p>
           <div class="flex gap-3">
-            <button
-              @click="resetTarget = null"
-              class="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              @click="executeReset"
-              :disabled="isResetting"
-              class="flex-1 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 px-4 py-2 text-sm font-semibold text-white transition-colors"
-            >
-              {{ isResetting ? 'Borrando…' : 'Sí, reiniciar' }}
-            </button>
+            <BaseButton variant="ghost" @click="resetTarget = null" class="flex-1">
+              CANCEL
+            </BaseButton>
+            <BaseButton variant="danger" @click="executeReset" :disabled="isResetting" class="flex-1">
+              {{ isResetting ? 'ERASING...' : 'CONFIRM' }}
+            </BaseButton>
           </div>
         </div>
       </div>
@@ -205,6 +185,12 @@ function formatDate(isoDate) {
 </template>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
-.fade-enter-from, .fade-leave-to       { opacity: 0; }
+.blink {
+  animation: blink 1.5s step-start infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.pixel-fade-enter-active, .pixel-fade-leave-active { transition: opacity 0.1s step-end; }
+.pixel-fade-enter-from, .pixel-fade-leave-to       { opacity: 0; }
 </style>

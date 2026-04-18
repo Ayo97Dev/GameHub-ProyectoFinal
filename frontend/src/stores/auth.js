@@ -20,15 +20,29 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.user
   }
 
-  async function fetchUser() {
+  const hasFetched = ref(false)
+  let pendingFetch = null
+
+  async function fetchUser(force = false) {
     if (!token.value) return null
-    try {
-      const { data } = await api.get('/user')
-      user.value = data.data
-      isLoggedIn.value = true
-    } catch (error) {
-      logout()
-    }
+    if (!force && hasFetched.value && user.value) return user.value
+    if (!force && pendingFetch) return pendingFetch
+
+    pendingFetch = (async () => {
+      try {
+        const { data } = await api.get('/user')
+        user.value = data.data
+        isLoggedIn.value = true
+        hasFetched.value = true
+      } catch (error) {
+        logout()
+      } finally {
+        pendingFetch = null
+      }
+      return user.value
+    })()
+
+    return pendingFetch
   }
 
   async function logout() {

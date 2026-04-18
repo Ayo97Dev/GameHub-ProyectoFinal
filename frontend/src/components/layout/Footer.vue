@@ -1,8 +1,10 @@
 <template>
-  <footer class="border-t border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md transition-colors">
-    <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-sm text-slate-500 dark:text-slate-400 sm:flex-row transition-colors">
-      <p class="uppercase tracking-[0.12em]">© 2026 GameHub. Todos los derechos reservados.</p>
-      <p class="font-semibold uppercase tracking-[0.18em] text-violet-600 dark:text-cyan-400 transition-colors">Play hard. Level up.</p>
+  <footer class="border-t-4 border-retro-black bg-retro-cream dark:border-neon-cyan dark:bg-retro-dark transition-colors duration-300">
+    <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm font-pixel text-retro-black dark:text-retro-white sm:flex-row transition-colors">
+      <p class="text-lg tracking-widest uppercase">© 2026 GAMEHUB // SYS_ONLINE</p>
+      <p class="font-display font-black text-xl uppercase tracking-widest text-neon-blue dark:text-neon-pink">
+        PLAY HARD // LEVEL UP_
+      </p>
     </div>
   </footer>
 </template>

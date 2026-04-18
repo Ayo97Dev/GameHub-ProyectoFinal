@@ -26,7 +26,7 @@ async function submitRegister() {
     if (error.response?.data?.message) {
       errorMsg.value = error.response.data.message
     } else {
-      errorMsg.value = 'Error al registrarte. Verifica los datos introducidos.'
+      errorMsg.value = 'REG_ERR // Data integrity check failed.'
     }
   } finally {
     isLoading.value = false
@@ -35,46 +35,52 @@ async function submitRegister() {
 </script>
 
 <template>
-  <section class="mx-auto flex w-full max-w-7xl justify-center px-4 py-10">
-    <div class="gh-panel relative w-full max-w-md overflow-hidden p-6 sm:p-8">
-      <div class="pointer-events-none absolute -right-14 -top-14 h-36 w-36 rounded-full bg-cyan-300/30 dark:bg-cyan-500/20 blur-3xl transition-colors" />
-      <div class="pointer-events-none absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-violet-300/30 dark:bg-violet-500/20 blur-3xl transition-colors" />
+  <section class="mx-auto flex w-full max-w-7xl justify-center px-4 py-16 lg:py-24">
+    <div class="gh-panel relative w-full max-w-md p-6 sm:p-10 border-[4px] border-retro-black dark:border-neon-pink shadow-[8px_8px_0px_#09090b] dark:shadow-[8px_8px_0px_#f472b6] bg-retro-cream dark:bg-black">
+      <div class="gh-scanlines absolute inset-0 opacity-20 pointer-events-none"></div>
 
-      <p class="relative z-10 text-xs font-bold uppercase tracking-[0.24em] text-violet-600 dark:text-violet-300">Onboarding</p>
-      <h1 class="relative z-10 mt-2 text-3xl font-black text-slate-800 dark:text-white transition-colors">Crear cuenta</h1>
-      <p class="relative z-10 mt-1 text-sm text-slate-500 dark:text-slate-400 transition-colors">Regístrate para guardar partidas y logros.</p>
-
-      <div v-if="errorMsg" class="mt-4 rounded-md bg-red-50 dark:bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-500 border border-red-200 dark:border-red-500/20 transition-colors">
-        {{ errorMsg }}
+      <p class="relative z-10 font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-blue dark:text-neon-yellow mb-2 border-b-2 border-retro-black dark:border-neon-pink pb-1 inline-block">REG_MODULE</p>
+      <h1 class="relative z-10 mt-2 text-4xl font-display font-black uppercase tracking-widest text-retro-black dark:text-retro-white">REGISTER</h1>
+      
+      <div v-if="errorMsg" class="relative z-10 mt-6 border-[3px] border-neon-pink bg-retro-black p-3 font-pixel text-xs text-neon-pink uppercase blink shadow-[4px_4px_0px_#f472b6]">
+        ERR: {{ errorMsg }}
       </div>
       
-      <form class="relative z-10 mt-6 space-y-4" @submit.prevent="submitRegister">
+      <form class="relative z-10 mt-8 space-y-6" @submit.prevent="submitRegister">
         <div>
-          <label class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300 transition-colors">Usuario</label>
-          <input v-model="form.name" type="text" required class="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-zinc-950 px-3 py-2 text-slate-800 dark:text-slate-100 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:focus:border-violet-400 dark:focus:ring-violet-400/20" />
+          <label class="mb-2 block font-pixel text-xs font-bold uppercase tracking-widest text-retro-black dark:text-retro-white">USERNAME</label>
+          <input v-model="form.name" type="text" required class="w-full border-4 border-retro-black bg-white dark:bg-retro-dark px-4 py-3 font-sans font-bold text-retro-black dark:text-retro-white outline-none transition focus:border-neon-pink focus:shadow-[inset_4px_4px_0px_#f472b6] dark:border-neon-pink dark:focus:shadow-[inset_4px_4px_0px_#f472b6]" />
         </div>
         <div>
-          <label class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300 transition-colors">Email</label>
-          <input v-model="form.email" type="email" required class="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-zinc-950 px-3 py-2 text-slate-800 dark:text-slate-100 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:focus:border-violet-400 dark:focus:ring-violet-400/20" />
+          <label class="mb-2 block font-pixel text-xs font-bold uppercase tracking-widest text-retro-black dark:text-retro-white">EMAIL</label>
+          <input v-model="form.email" type="email" required class="w-full border-4 border-retro-black bg-white dark:bg-retro-dark px-4 py-3 font-sans font-bold text-retro-black dark:text-retro-white outline-none transition focus:border-neon-pink focus:shadow-[inset_4px_4px_0px_#f472b6] dark:border-neon-pink dark:focus:shadow-[inset_4px_4px_0px_#f472b6]" />
         </div>
         <div>
-          <label class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300 transition-colors">Contraseña</label>
-          <input v-model="form.password" type="password" required class="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-zinc-950 px-3 py-2 text-slate-800 dark:text-slate-100 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:focus:border-violet-400 dark:focus:ring-violet-400/20" />
+          <label class="mb-2 block font-pixel text-xs font-bold uppercase tracking-widest text-retro-black dark:text-retro-white">PASSWORD</label>
+          <input v-model="form.password" type="password" required class="w-full border-4 border-retro-black bg-white dark:bg-retro-dark px-4 py-3 font-sans font-bold text-retro-black dark:text-retro-white outline-none transition focus:border-neon-pink focus:shadow-[inset_4px_4px_0px_#f472b6] dark:border-neon-pink dark:focus:shadow-[inset_4px_4px_0px_#f472b6]" />
         </div>
         <div>
-          <label class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300 transition-colors">Confirmar Contraseña</label>
-          <input v-model="form.password_confirmation" type="password" required class="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-zinc-950 px-3 py-2 text-slate-800 dark:text-slate-100 outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:focus:border-violet-400 dark:focus:ring-violet-400/20" />
+          <label class="mb-2 block font-pixel text-xs font-bold uppercase tracking-widest text-retro-black dark:text-retro-white">CONFIRM_PASS</label>
+          <input v-model="form.password_confirmation" type="password" required class="w-full border-4 border-retro-black bg-white dark:bg-retro-dark px-4 py-3 font-sans font-bold text-retro-black dark:text-retro-white outline-none transition focus:border-neon-pink focus:shadow-[inset_4px_4px_0px_#f472b6] dark:border-neon-pink dark:focus:shadow-[inset_4px_4px_0px_#f472b6]" />
         </div>
-        <BaseButton type="submit" class="w-full" :disabled="isLoading">
-          <span v-if="isLoading">Registrando...</span>
-          <span v-else>Registrarme</span>
+        <BaseButton variant="danger" type="submit" class="w-full mt-4 py-4 text-xl">
+          {{ isLoading ? 'UPLOADING...' : 'SUBMIT_DATA' }}
         </BaseButton>
       </form>
 
-      <p class="relative z-10 mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
-        ¿Ya tienes cuenta?
-        <RouterLink to="/login" class="font-medium text-violet-600 dark:text-cyan-400 hover:underline">Inicia sesión</RouterLink>
+      <p class="relative z-10 mt-8 text-center font-sans font-bold text-sm text-retro-black dark:text-retro-white">
+        ALREADY USER? 
+        <RouterLink to="/login" class="font-pixel text-neon-blue dark:text-neon-cyan underline underline-offset-4 ml-2">LOGIN_NOW</RouterLink>
       </p>
     </div>
   </section>
 </template>
+
+<style scoped>
+.blink {
+  animation: blink 1s step-start infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+</style>
