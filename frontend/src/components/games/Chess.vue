@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 // ────── Crear Tablero ──────
-// Crea matriz 8x8 de celdas, cada celda tiene coordenada (row,col) y piece (null o {type,color})
+// Creamos matriz 8x8 de celdas, cada celda tiene coordenada (row,col) y piece (null o {type,color})
 const board = ref(
   Array.from({ length: 8 }, (_, row) =>
     Array.from({ length: 8 }, (_, col) => ({
@@ -74,11 +74,12 @@ const movePiece = (targetCell) => {
   if (!selected.value) return
 
   const piece = selected.value.piece
-  targetCell.piece = selected.value.piece
+
+  targetCell.piece = piece
   selected.value.piece = null
   selected.value = null
 
-// ────── PROMOCIÓN ──────
+  // PROMOCIÓN
   if (piece.type === 'pawn') {
     const isPromotion =
       (piece.color === 'white' && targetCell.row === 0) ||
@@ -86,10 +87,9 @@ const movePiece = (targetCell) => {
 
     if (isPromotion) {
       promotionCell.value = targetCell
-      return // bloquea cambio de turno
+      return
     }
   }
-
 // Cambio de turno
   currentTurn.value = currentTurn.value === 'white' ? 'black' : 'white'
 }
@@ -99,21 +99,29 @@ const movePiece = (targetCell) => {
 // si hay pieza seleccinada -> intentar mover
 // Si no -> seleccionar pieza
 const handleClick = (cell) => {
-  if (promotionCell.value) return // bloqueo durante promoción
+  // Limpieza defensiva
+  if (selected.value && !selected.value.piece) {
+    selected.value = null
+  }
 
+  // Bloqueo durante promoción
+  if (promotionCell.value) return
+
+  // ────── HAY PIEZA SELECCIONADA ──────
   if (selected.value) {
     const moves = getLegalMoves(selected.value)
-    // includes funciona porque compara referencias de objetos(misma celda)
+
     if (moves.includes(cell)) {
       movePiece(cell)
     } else {
       selected.value = null
     }
-  return
-}
 
-// Solo selecciona piezas del turno actual
-  if(cell.piece && cell.piece.color === currentTurn.value){
+    return
+  }
+
+  // ────── SELECCIONAR PIEZA ──────
+  if (cell.piece && cell.piece.color === currentTurn.value) {
     selected.value = cell
   }
 }
@@ -130,7 +138,7 @@ const promotePawn = (type) => {
     currentTurn.value === 'white' ? 'black' : 'white'
 }
 
-// ────── PseudoMovimientos de piezas ──────
+// ────── Movimientos Base ──────
 // Reutilizable para torre, alfil y reina
 // direcciones: vector de movimientos (dr, dc) para cada dirección válida
 // Se detiene cuando encuentra una pieza (amiga o enemiga) o sale del tablero
@@ -178,12 +186,13 @@ const getPawnMoves = (cell) => {
   const f2 = r + 2 * dir
 
   // Movimiento hacia adelante
-  if (isInsideBoard(f1, c) && !get(f1, c)) {
-    moves.push(board.value[f1][c])
-    if (r === startRow && isInsideBoard(f2, c) && !get(f2, c)) {
-      moves.push(board.value[f2][c])
-    }
+ if (isInsideBoard(f1, c) && !get(f1, c)) {
+  moves.push(board.value[f1][c])
+
+  if (r === startRow && isInsideBoard(f2, c) && !get(f2, c)) {
+    moves.push(board.value[f2][c])
   }
+}
   // Capturas diagonales
   for (const dc of [-1, 1]) {
     const tr = f1
@@ -202,26 +211,20 @@ const getPawnMoves = (cell) => {
 // TORRE
 // La torre se mueve en línea recta (horizontal y vertical)
 const getRookMoves = (cell) => {
-  return getSlidingMoves(cell, [
-    [-1, 0], [1, 0], [0, -1], [0, 1]
-  ])
+  return getSlidingMoves(cell, [[-1, 0], [1, 0], [0, -1], [0, 1]])
 }
 
 // ALFIL
 // El alfil se mueve en diagonal
 const getBishopMoves = (cell) => {
-  return getSlidingMoves(cell, [
-    [-1, -1], [-1, 1], [1, -1], [1, 1]
-  ])
+  return getSlidingMoves(cell, [[-1, -1], [-1, 1], [1, -1], [1, 1]])
 }
 
 // REINA
 // La reina combina los movimientos de torre y alfil
 const getQueenMoves = (cell) => {
-  return getSlidingMoves(cell, [
-    [-1, 0], [1, 0], [0, -1], [0, 1],
-    [-1, -1], [-1, 1], [1, -1], [1, 1]
-  ])
+  return getSlidingMoves(cell, [[-1, 0], [1, 0], [0, -1], [0, 1],
+    [-1, -1], [-1, 1], [1, -1], [1, 1]])
 }
 
 // CABALLO 
@@ -290,7 +293,12 @@ const getPseudoMoves = (cell) => {
 
 // ────── Motor real ──────
 
-//clone
+// helpers tablero simulado
+const getFromBoard = (b,r,c)=>{
+  if(!isInsideBoard(r,c)) return null
+  return b[r]?.[c]?.piece||null
+}
+
 const cloneBoard = ()=>{
   return board.value.map(r=>
     r.map(c=>({
@@ -301,13 +309,14 @@ const cloneBoard = ()=>{
   )
 }
 
-// simulate
-const simulateMove = (b,from,to)=>{
-  b[to.row][to.col].piece = b[from.row][from.col].piece
+const simulateMove = (b, from, to) => {
+  const piece = b[from.row][from.col].piece
+  if (!piece) return
+
+  b[to.row][to.col].piece = piece
   b[from.row][from.col].piece = null
 }
 
-// find king
 const findKing = (b,color)=>{
   for(const r of b){
     for(const c of r){
@@ -316,23 +325,111 @@ const findKing = (b,color)=>{
       }
     }
   }
+  return null
 }
 
-// pseudo desde board simulado (simplificado)
+// dispatcher simulado
 const getPseudoMovesFromBoard = (cell,b)=>{
-  const piece = b[cell.row][cell.col].piece
+  const piece=b[cell.row][cell.col].piece
   if(!piece) return []
 
-  const fake = {...cell,piece}
+  const fake={row:cell.row,col:cell.col,piece}
 
-  // reutilizamos lógica global (rápido y suficiente aquí)
-  return getPseudoMoves(fake)
+  switch(piece.type){
+    case 'pawn': return getPawnMovesFromBoard(fake,b)
+    case 'rook': return getSlidingMovesFromBoard(fake,b,[[-1,0],[1,0],[0,-1],[0,1]])
+    case 'bishop': return getSlidingMovesFromBoard(fake,b,[[-1,-1],[-1,1],[1,-1],[1,1]])
+    case 'queen': return getSlidingMovesFromBoard(fake,b,[
+      [-1,0],[1,0],[0,-1],[0,1],
+      [-1,-1],[-1,1],[1,-1],[1,1]
+    ])
+    case 'knight': {
+      const moves=[]
+      const jumps=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]
+      for(const[dr,dc] of jumps){
+        const tr=fake.row+dr, tc=fake.col+dc
+        const t=getFromBoard(b,tr,tc)
+        if(!t||t.color!==piece.color){
+          moves.push({row:tr,col:tc})
+        }
+      }
+      return moves
+    }
+    case 'king': {
+      const moves=[]
+      const dirs=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]
+      for(const[dr,dc] of dirs){
+        const tr=fake.row+dr, tc=fake.col+dc
+        const t=getFromBoard(b,tr,tc)
+        if(!t||t.color!==piece.color){
+          moves.push({row:tr,col:tc})
+        }
+      }
+      return moves
+    }
+  }
+  return []
 }
 
-// check
+
+//----------------------------------------------------------------------------------------------------------------------------
+// sliding simulado
+const getSlidingMovesFromBoard = (cell,b,dirs)=>{
+  const moves=[]
+  const {row:r,col:c,piece}=cell
+
+  for(const[dr,dc] of dirs){
+    let tr=r+dr, tc=c+dc
+
+    while(isInsideBoard(tr,tc)){
+      const t=getFromBoard(b,tr,tc)
+
+      if(!t) moves.push({row:tr,col:tc})
+      else{
+        if(t.color!==piece.color) moves.push({row:tr,col:tc})
+        break
+      }
+
+      tr+=dr
+      tc+=dc
+    }
+  }
+  return moves
+}
+
+// pawn simulado
+const getPawnMovesFromBoard = (cell,b)=>{
+  const moves=[]
+  const {row:r,col:c,piece}=cell
+
+  const dir=piece.color==='white'?-1:1
+  const start=piece.color==='white'?6:1
+
+  const f1=r+dir
+  const f2=r+2*dir
+
+  if(!getFromBoard(b,f1,c)){
+    moves.push({row:f1,col:c})
+    if(r===start && !getFromBoard(b,f2,c)){
+      moves.push({row:f2,col:c})
+    }
+  }
+
+  for(const dc of[-1,1]){
+    const tr=f1, tc=c+dc
+    const t=getFromBoard(b,tr,tc)
+    if(t && t.color!==piece.color){
+      moves.push({row:tr,col:tc})
+    }
+  }
+  return moves
+}
+
 const isKingInCheck = (b,color)=>{
-  const king=findKing(b,color)
-  const enemy=color==='white'?'black':'white'
+  const king = findKing(b,color)
+  if (!king) return false 
+
+  const enemy = color==='white'?'black':'white'
 
   for(const r of b){
     for(const c of r){
@@ -347,12 +444,17 @@ const isKingInCheck = (b,color)=>{
   return false
 }
 
-// LEGAL
+// movimiento legal
 const getLegalMoves = (cell)=>{
-  const pseudo=getPseudoMoves(cell)
+  if (!cell.piece || cell.piece.color !== currentTurn.value) return []
+
+  const pseudo = getPseudoMoves(cell)
 
   return pseudo.filter(target=>{
-    const b=cloneBoard()
+    const b = cloneBoard()
+
+    if (!b[cell.row][cell.col].piece) return false
+
     simulateMove(b,cell,target)
     return !isKingInCheck(b,cell.piece.color)
   })
@@ -445,7 +547,6 @@ const getLegalMoves = (cell)=>{
   width: 42px;
   height: 42px;
   pointer-events: none;
-  user-select: none;
 }
 
 .promotion-modal{
