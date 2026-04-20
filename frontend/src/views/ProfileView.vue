@@ -82,22 +82,6 @@ function formatDate(isoDate) {
 function isChessStat(stat) {
   return stat?.game?.slug === 'chess'
 }
-
-function getFirstResultMilestones(stat) {
-  const wins = Number(stat?.wins ?? 0)
-  const draws = Number(stat?.draws ?? 0)
-  const losses = Number(stat?.losses ?? 0)
-
-  return [
-    { key: 'first-win', title: 'Primer Win', unlocked: wins > 0 },
-    { key: 'first-draw', title: 'Primer Draw', unlocked: draws > 0 },
-    { key: 'first-loss', title: 'Primer Loss', unlocked: losses > 0 },
-  ]
-}
-
-function getUnlockedMilestonesCount(stat) {
-  return getFirstResultMilestones(stat).filter(m => m.unlocked).length
-}
 </script>
 
 <template>
@@ -154,28 +138,6 @@ function getUnlockedMilestonesCount(stat) {
               <div class="flex justify-between items-center bg-slate-50 dark:bg-zinc-950 px-3 py-2 rounded border-l-2 border-l-slate-300 dark:border-l-slate-600 border border-slate-100 dark:border-slate-800/50 transition-colors">
                 <span class="text-sm text-slate-500 dark:text-slate-400">Última partida</span>
                 <span class="font-semibold text-slate-700 dark:text-slate-200">{{ formatDate(stat.last_played_at) }}</span>
-              </div>
-            </div>
-
-            <div v-if="isChessStat(stat)" class="border-t border-slate-100 dark:border-slate-800 pt-3">
-              <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-2">
-                Logros
-                <span class="ml-1 text-slate-500 dark:text-slate-400">
-                  {{ getUnlockedMilestonesCount(stat) }}/3
-                </span>
-              </p>
-              <div class="flex flex-wrap gap-2">
-                <div
-                  v-for="milestone in getFirstResultMilestones(stat)"
-                  :key="milestone.key"
-                  class="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all"
-                  :class="milestone.unlocked
-                    ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                    : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 opacity-70'"
-                >
-                  <span>{{ milestone.unlocked ? '🏆' : '🔒' }}</span>
-                  <span>{{ milestone.title }}</span>
-                </div>
               </div>
             </div>
 

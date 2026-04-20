@@ -10,7 +10,8 @@ class AchievementService
     /**
      * Comprueba condiciones y desbloquea los logros que correspondan.
      * triggerData debe incluir: score, upgrades (array id=>count), total_clicks,
-     * prestige_level, total_upgrades_bought, max_upgrade_count.
+         * prestige_level, total_upgrades_bought, max_upgrade_count,
+         * wins, draws, losses, non_loss_streak, wins_without_queen_loss.
      */
     public function checkAndUnlock(User $user, int $gameId, array $triggerData): array
     {
@@ -62,6 +63,14 @@ class AchievementService
             'max_upgrade_count'     => $data['max_upgrade_count'] ?? 0,
             // Número de veces que se ha comprado una mejora específica
             'upgrade_count'         => $data['upgrades'][$condition['upgrade_id'] ?? 0] ?? 0,
+            // Resultados acumulados por juego
+            'wins'                  => $data['wins'] ?? 0,
+            'draws'                 => $data['draws'] ?? 0,
+            'losses'                => $data['losses'] ?? 0,
+            // Racha actual de partidas sin derrota
+            'non_loss_streak'       => $data['non_loss_streak'] ?? 0,
+            // Victorias donde el jugador no perdio su reina
+            'wins_without_queen_loss' => $data['wins_without_queen_loss'] ?? 0,
             default                 => null,
         };
 

@@ -27,6 +27,7 @@ class UpdateStatRequest extends FormRequest
             'wins' => ['nullable', 'integer', 'min:0'],
             'draws' => ['nullable', 'integer', 'min:0'],
             'losses' => ['nullable', 'integer', 'min:0'],
+            'wins_without_queen_loss' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

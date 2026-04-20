@@ -69,7 +69,9 @@ const aiMoveTimer = ref(null)
 const gameTimer = ref(null)
 const gameDurationSeconds = ref(0)
 const resultReported = ref(false)
+const resultEventEmitted = ref(false)
 const resultReportPending = ref(false)
+const playerQueenCaptured = ref(false)
 const castlingRights = ref(createInitialCastlingRights())
 const checkState = ref(createDefaultCheckState())
 
@@ -160,12 +162,19 @@ const startGame = (color) => {
   playerColor.value = color
   selected.value = null
   resultReported.value = false
+  resultEventEmitted.value = false
+  playerQueenCaptured.value = false
   updateCheckState()
   startGameTimer()
 }
 
-const restartGame = () => {
+const restartGame = async () => {
   if (!gameStarted.value || resultReportPending.value) return
+
+  // Evita perder el resultado si se reinicia justo al terminar la partida.
+  if (gameOver.value && !resultReported.value) {
+    await reportGameResult()
+  }
 
   resetBoard()
   currentTurn.value = 'white'
@@ -178,7 +187,9 @@ const restartGame = () => {
   castlingRights.value = createInitialCastlingRights()
   checkState.value = createDefaultCheckState()
   resultReported.value = false
+  resultEventEmitted.value = false
   resultReportPending.value = false
+  playerQueenCaptured.value = false
   updateCheckState()
   startGameTimer()
 }
@@ -419,6 +430,7 @@ const buildResultPayload = (result) => {
     wins: result === 'win' ? 1 : 0,
     draws: result === 'draw' ? 1 : 0,
     losses: result === 'loss' ? 1 : 0,
+    wins_without_queen_loss: result === 'win' && !playerQueenCaptured.value ? 1 : 0,
     time_played: Math.max(gameDurationSeconds.value, 0),
   }
 }
@@ -429,12 +441,17 @@ const reportGameResult = async () => {
   const result = playerResult.value
   if (!result) return
 
+  // Actualiza el panel en vivo aunque el backend tarde en confirmar.
+  if (!resultEventEmitted.value) {
+    emit('game-completed', { result })
+    resultEventEmitted.value = true
+  }
+
   resultReportPending.value = true
 
   try {
     await api.post(`/games/${route.params.slug}/stats`, buildResultPayload(result))
     resultReported.value = true
-    emit('game-completed', { result })
   } catch {
     resultReported.value = false
   } finally {
@@ -533,6 +550,10 @@ const movePiece = (targetCell, options = {}) => {
   const capturedPiece = enPassantCaptureCell?.piece
     ? { ...enPassantCaptureCell.piece }
     : (targetCell.piece ? { ...targetCell.piece } : null)
+
+  if (capturedPiece?.type === 'queen' && capturedPiece.color === playerColor.value) {
+    playerQueenCaptured.value = true
+  }
 
   const isCapture = Boolean(capturedPiece)
   const baseSan = createMoveNotationBase({ fromCell, toCell: targetCell, piece, isCapture })

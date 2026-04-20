@@ -62,6 +62,16 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        $chess = Game::firstOrCreate(['slug' => 'chess'], [
+            'title'       => 'Board King',
+            'description' => 'Juega partidas de ajedrez contra la IA y mejora tu ranking.',
+            'is_active'   => true,
+            'config'      => [
+                'allowed_actions'       => ['move', 'promote', 'restart'],
+                'rate_limit_per_minute' => 90,
+            ],
+        ]);
+
         // Achievements globales
         $achievementsData = [
             // ── Puntuación ──────────────────────────────────────────────────────
@@ -98,6 +108,18 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'prestige-3',         'title' => 'Triple Renacimiento',      'description' => 'Realiza 3 Prestiges.',                       'game_id' => $clicker->id, 'points_reward' => 100, 'rarity' => 'rare',      'condition' => ['field' => 'prestige_level', 'operator' => 'greater_than_or_equal', 'value' => 3]],
             ['slug' => 'prestige-master',    'title' => 'Maestro del Renacimiento', 'description' => 'Realiza 5 Prestiges.',                       'game_id' => $clicker->id, 'points_reward' => 200, 'rarity' => 'epic',      'condition' => ['field' => 'prestige_level', 'operator' => 'greater_than_or_equal', 'value' => 5]],
             ['slug' => 'prestige-legend',    'title' => 'Eterno',                   'description' => 'Realiza 10 Prestiges.',                      'game_id' => $clicker->id, 'points_reward' => 500, 'rarity' => 'legendary', 'condition' => ['field' => 'prestige_level', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+
+            // ── Ajedrez (resultados) ───────────────────────────────────────
+            ['slug' => 'chess-first-win',    'title' => 'Primer Win',               'description' => 'Gana tu primera partida de ajedrez.',         'game_id' => $chess->id,   'points_reward' => 25,  'rarity' => 'common',    'condition' => ['field' => 'wins',   'operator' => 'greater_than_or_equal', 'value' => 1]],
+            ['slug' => 'chess-first-draw',   'title' => 'Primer Draw',              'description' => 'Consigue tu primer empate en ajedrez.',       'game_id' => $chess->id,   'points_reward' => 20,  'rarity' => 'common',    'condition' => ['field' => 'draws',  'operator' => 'greater_than_or_equal', 'value' => 1]],
+            ['slug' => 'chess-first-loss',   'title' => 'Primer Loss',              'description' => 'Termina tu primera partida perdida en ajedrez.', 'game_id' => $chess->id, 'points_reward' => 15,  'rarity' => 'common',    'condition' => ['field' => 'losses', 'operator' => 'greater_than_or_equal', 'value' => 1]],
+            ['slug' => 'chess-10-wins',      'title' => '10 Wins',                  'description' => 'Consigue 10 victorias en ajedrez.',            'game_id' => $chess->id,   'points_reward' => 100, 'rarity' => 'uncommon',  'condition' => ['field' => 'wins',   'operator' => 'greater_than_or_equal', 'value' => 10]],
+            ['slug' => 'chess-10-draws',     'title' => '10 Draws',                 'description' => 'Consigue 10 empates en ajedrez.',              'game_id' => $chess->id,   'points_reward' => 80,  'rarity' => 'uncommon',  'condition' => ['field' => 'draws',  'operator' => 'greater_than_or_equal', 'value' => 10]],
+            ['slug' => 'chess-10-losses',    'title' => '10 Losses',                'description' => 'Registra 10 derrotas en ajedrez.',             'game_id' => $chess->id,   'points_reward' => 60,  'rarity' => 'common',    'condition' => ['field' => 'losses', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+            ['slug' => 'chess-streak-5',     'title' => 'Racha Sin Derrota x5',     'description' => 'Encadena 5 partidas sin perder en ajedrez.',   'game_id' => $chess->id,   'points_reward' => 120, 'rarity' => 'rare',      'condition' => ['field' => 'non_loss_streak', 'operator' => 'greater_than_or_equal', 'value' => 5]],
+            ['slug' => 'chess-streak-10',    'title' => 'Racha Sin Derrota x10',    'description' => 'Encadena 10 partidas sin perder en ajedrez.',  'game_id' => $chess->id,   'points_reward' => 220, 'rarity' => 'epic',      'condition' => ['field' => 'non_loss_streak', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+            ['slug' => 'chess-streak-20',    'title' => 'Racha Sin Derrota x20',    'description' => 'Encadena 20 partidas sin perder en ajedrez.',  'game_id' => $chess->id,   'points_reward' => 400, 'rarity' => 'legendary', 'condition' => ['field' => 'non_loss_streak', 'operator' => 'greater_than_or_equal', 'value' => 20]],
+            ['slug' => 'chess-win-no-queen-loss', 'title' => 'Victoria Sin Caer La Reina', 'description' => 'Gana una partida sin perder tu reina.', 'game_id' => $chess->id, 'points_reward' => 180, 'rarity' => 'rare', 'condition' => ['field' => 'wins_without_queen_loss', 'operator' => 'greater_than_or_equal', 'value' => 1]],
 
             // ── Global ───────────────────────────────────────────────────────
             ['slug' => 'speed-runner',       'title' => 'Speed Runner',             'description' => 'Completa una sesión en menos de 60 segundos.', 'game_id' => null,       'points_reward' => 75,  'rarity' => 'epic',      'condition' => ['field' => 'duration', 'operator' => 'less_than_or_equal', 'value' => 60]],

@@ -18,6 +18,9 @@ class GameStat extends Model
         'wins',
         'draws',
         'losses',
+        'current_non_loss_streak',
+        'best_non_loss_streak',
+        'wins_without_queen_loss',
         'last_played_at',
     ];
 

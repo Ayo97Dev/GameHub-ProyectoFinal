@@ -25,7 +25,7 @@ const FALLBACK_TITLE_BY_SLUG = {
   rpg: 'Modo RPG',
   quiz: 'Modo Quiz',
   battleship: 'Hundir la Flota',
-  chess: 'Modo Ajedrez'
+  chess: 'Board King',
 }
 
 const pageTitle = computed(() => {
@@ -74,7 +74,7 @@ function addChessResult(result) {
   }
 }
 
-async function fetchPlayerRecord() {
+async function fetchPlayerRecord({ preserveCurrent = false } = {}) {
   if (!isChess.value) {
     resetPlayerRecord()
     return
@@ -90,13 +90,26 @@ async function fetchPlayerRecord() {
       return
     }
 
-    playerRecord.value = {
+    const nextRecord = {
       wins: wins == null ? playerRecord.value.wins : Number(wins),
       draws: draws == null ? playerRecord.value.draws : Number(draws),
       losses: losses == null ? playerRecord.value.losses : Number(losses),
     }
+
+    if (preserveCurrent) {
+      playerRecord.value = {
+        wins: Math.max(playerRecord.value.wins, nextRecord.wins),
+        draws: Math.max(playerRecord.value.draws, nextRecord.draws),
+        losses: Math.max(playerRecord.value.losses, nextRecord.losses),
+      }
+      return
+    }
+
+    playerRecord.value = nextRecord
   } catch {
-    resetPlayerRecord()
+    if (!preserveCurrent) {
+      resetPlayerRecord()
+    }
   }
 }
 
@@ -110,11 +123,14 @@ async function fetchLeaderboard() {
 }
 
 function handleGameCompleted(payload) {
-  if (isChess.value && payload?.result) {
+  const hasChessResult = isChess.value && payload?.result
+
+  if (hasChessResult) {
     addChessResult(payload.result)
   }
 
-  void Promise.all([fetchLeaderboard(), fetchPlayerRecord()])
+  void fetchLeaderboard()
+  void fetchPlayerRecord({ preserveCurrent: hasChessResult })
 }
 
 watch(() => route.params.slug, () => {
