@@ -24,6 +24,9 @@ class UpdateStatRequest extends FormRequest
         return [
             'high_score' => ['nullable', 'integer', 'min:0'],
             'time_played' => ['nullable', 'integer', 'min:0'],
+            'wins' => ['nullable', 'integer', 'min:0'],
+            'draws' => ['nullable', 'integer', 'min:0'],
+            'losses' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

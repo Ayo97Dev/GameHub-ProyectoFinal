@@ -74,22 +74,27 @@ class GameController extends Controller
         $game     = Game::active()->where('slug', $slug)->firstOrFail();
         $service  = $this->resolveService($request->user(), $game);
         $progress = $service->loadProgress();
+        $stat     = $request->user()->gameStats()->where('game_id', $game->id)->first();
 
         if (!$progress) {
             return response()->json([
                 'game_state'  => $service->getInitialState(),
-                'score'       => 0,
-                'playtime'    => 0,
-                'last_played' => null,
+                'score'       => $stat?->high_score ?? 0,
+                'playtime'    => $stat?->time_played ?? 0,
+                'wins'        => $stat?->wins ?? 0,
+                'draws'       => $stat?->draws ?? 0,
+                'losses'      => $stat?->losses ?? 0,
+                'last_played' => $stat?->last_played_at,
             ]);
         }
-
-        $stat = $request->user()->gameStats()->where('game_id', $game->id)->first();
 
         return response()->json([
             'game_state'  => $progress->payload,
             'score'       => $stat?->high_score ?? 0,
             'playtime'    => $stat?->time_played ?? 0,
+            'wins'        => $stat?->wins ?? 0,
+            'draws'       => $stat?->draws ?? 0,
+            'losses'      => $stat?->losses ?? 0,
             'last_played' => $stat?->last_played_at,
         ]);
     }

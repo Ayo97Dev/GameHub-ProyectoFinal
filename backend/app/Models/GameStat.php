@@ -15,6 +15,9 @@ class GameStat extends Model
         'game_id',
         'high_score',
         'time_played',
+        'wins',
+        'draws',
+        'losses',
         'last_played_at',
     ];
 

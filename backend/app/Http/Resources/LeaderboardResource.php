@@ -20,6 +20,9 @@ class LeaderboardResource extends JsonResource
             'avatar' => $this->user->avatar ?? null,
             'high_score' => $this->high_score,
             'time_played' => $this->time_played,
+            'wins' => $this->wins,
+            'draws' => $this->draws,
+            'losses' => $this->losses,
         ];
     }
 }

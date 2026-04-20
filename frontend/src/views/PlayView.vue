@@ -17,6 +17,8 @@ const clicker    = useClickerStore()
 
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
 const externalScore = ref(0)
+const playerRecord = ref({ wins: 0, draws: 0, losses: 0 })
+const isChess = computed(() => route.params.slug === 'chess')
 
 const FALLBACK_TITLE_BY_SLUG = {
   clicker: 'Reactor de Clics',
@@ -52,6 +54,52 @@ function handleScoreChange(nextScore) {
   externalScore.value = Number(nextScore) || 0
 }
 
+function resetPlayerRecord() {
+  playerRecord.value = { wins: 0, draws: 0, losses: 0 }
+}
+
+function addChessResult(result) {
+  if (result === 'win') {
+    playerRecord.value.wins += 1
+    return
+  }
+
+  if (result === 'draw') {
+    playerRecord.value.draws += 1
+    return
+  }
+
+  if (result === 'loss') {
+    playerRecord.value.losses += 1
+  }
+}
+
+async function fetchPlayerRecord() {
+  if (!isChess.value) {
+    resetPlayerRecord()
+    return
+  }
+
+  try {
+    const { data } = await api.get(`/games/${route.params.slug}/load`)
+    const wins = data?.wins
+    const draws = data?.draws
+    const losses = data?.losses
+
+    if (wins == null && draws == null && losses == null) {
+      return
+    }
+
+    playerRecord.value = {
+      wins: wins == null ? playerRecord.value.wins : Number(wins),
+      draws: draws == null ? playerRecord.value.draws : Number(draws),
+      losses: losses == null ? playerRecord.value.losses : Number(losses),
+    }
+  } catch {
+    resetPlayerRecord()
+  }
+}
+
 async function fetchLeaderboard() {
   try {
     const { data } = await api.get(`/leaderboard/${route.params.slug}`)
@@ -61,17 +109,22 @@ async function fetchLeaderboard() {
   }
 }
 
-function handleGameCompleted() {
-  void fetchLeaderboard()
+function handleGameCompleted(payload) {
+  if (isChess.value && payload?.result) {
+    addChessResult(payload.result)
+  }
+
+  void Promise.all([fetchLeaderboard(), fetchPlayerRecord()])
 }
 
 watch(() => route.params.slug, () => {
   externalScore.value = 0
-  void fetchLeaderboard()
+  resetPlayerRecord()
+  void Promise.all([fetchLeaderboard(), fetchPlayerRecord()])
 })
 
 onMounted(async () => {
-  await fetchLeaderboard()
+  await Promise.all([fetchLeaderboard(), fetchPlayerRecord()])
 })
 </script>
 
@@ -107,10 +160,27 @@ onMounted(async () => {
         <div>
           <h2 class="text-base sm:text-lg font-black text-violet-600 dark:text-cyan-300 transition-colors">Estadísticas en vivo</h2>
           <div class="mt-2 space-y-2">
-            <div class="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors">
+            <div
+              v-if="!isChess"
+              class="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors"
+            >
               <p class="text-[11px] uppercase tracking-wide text-slate-600 dark:text-slate-300">Puntos</p>
               <p class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">{{ liveScore.toLocaleString() }}</p>
             </div>
+            <template v-else>
+              <div class="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors">
+                <p class="text-[11px] uppercase tracking-wide text-slate-600 dark:text-slate-300">Partidas ganadas</p>
+                <p class="text-lg sm:text-xl font-bold text-emerald-600 dark:text-emerald-300">{{ playerRecord.wins }}</p>
+              </div>
+              <div class="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors">
+                <p class="text-[11px] uppercase tracking-wide text-slate-600 dark:text-slate-300">Partidas empatadas</p>
+                <p class="text-lg sm:text-xl font-bold text-amber-600 dark:text-amber-300">{{ playerRecord.draws }}</p>
+              </div>
+              <div class="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 transition-colors">
+                <p class="text-[11px] uppercase tracking-wide text-slate-600 dark:text-slate-300">Partidas perdidas</p>
+                <p class="text-lg sm:text-xl font-bold text-rose-600 dark:text-rose-300">{{ playerRecord.losses }}</p>
+              </div>
+            </template>
           </div>
         </div>
 
@@ -129,7 +199,10 @@ onMounted(async () => {
               <div class="flex-1 min-w-0">
                 <p class="truncate text-sm font-medium text-slate-800 dark:text-white">{{ entry.username }}</p>
               </div>
-              <span class="text-sm font-bold text-violet-600 dark:text-cyan-400">{{ Number(entry.high_score).toLocaleString() }}</span>
+              <span v-if="isChess" class="text-[11px] sm:text-xs font-bold text-violet-600 dark:text-cyan-400 text-right">
+                {{ Number(entry.wins ?? 0) }}V · {{ Number(entry.draws ?? 0) }}E · {{ Number(entry.losses ?? 0) }}D
+              </span>
+              <span v-else class="text-sm font-bold text-violet-600 dark:text-cyan-400">{{ Number(entry.high_score).toLocaleString() }}</span>
             </div>
             <p v-if="leaderboard.length === 0" class="text-xs text-slate-400 dark:text-slate-500">Aún no hay puntuaciones.</p>
           </div>

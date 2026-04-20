@@ -18,6 +18,9 @@ class GameStatResource extends JsonResource
             'game_id' => $this->game_id,
             'high_score' => $this->high_score,
             'time_played' => $this->time_played,
+            'wins' => $this->wins,
+            'draws' => $this->draws,
+            'losses' => $this->losses,
             'last_played_at' => $this->last_played_at,
             'game' => new GameResource($this->whenLoaded('game')),
         ];

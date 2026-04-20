@@ -5,6 +5,7 @@ import api from '../lib/axios'
 
 const route = useRoute()
 const slug  = route.params.slug
+const isChess = slug === 'chess'
 
 const entries  = ref([])
 const gameName = ref('')
@@ -67,8 +68,11 @@ onMounted(async () => {
           <p class="truncate font-semibold text-slate-800 dark:text-white">{{ entry.username }}</p>
         </div>
         <div class="text-right shrink-0">
-          <p class="text-lg font-bold text-violet-600 dark:text-cyan-300">{{ Number(entry.high_score).toLocaleString() }}</p>
-          <p v-if="entry.time_played" class="text-xs text-slate-400 dark:text-slate-500">
+          <p v-if="isChess" class="text-sm font-bold text-violet-600 dark:text-cyan-300">
+            {{ Number(entry.wins ?? 0) }}V · {{ Number(entry.draws ?? 0) }}E · {{ Number(entry.losses ?? 0) }}D
+          </p>
+          <p v-else class="text-lg font-bold text-violet-600 dark:text-cyan-300">{{ Number(entry.high_score).toLocaleString() }}</p>
+          <p v-if="!isChess && entry.time_played" class="text-xs text-slate-400 dark:text-slate-500">
             {{ Math.floor(entry.time_played / 60) }}m jugadas
           </p>
         </div>
