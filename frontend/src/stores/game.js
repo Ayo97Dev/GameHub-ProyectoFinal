@@ -13,10 +13,10 @@ export const useGameStore = defineStore('game', () => {
   const DEFAULT_COVERS = {
     'space-invaders': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
     'cookie-clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
-    'rpg': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
+    'rpg': '/assets/legendPath/LegendPathLogo.png',
     'clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
     'quiz': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
-    'battleship': 'https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1200&q=80',
+    'battleship': '/assets/fleetStrategy/fleetStrategyLogo.png',
     'chess': '/assets/boardKing/boardKingLogo.png',
   
   }

@@ -179,7 +179,13 @@ function startDragFromBoard(e, shipId) {
 
 // 🔥 FIX PRINCIPAL también aquí
 function startDragFromDock(e, shipDef) {
-  dragOrientation.value = 'horizontal'
+  const placed = placedShips.value[shipDef.id]
+  dragOrientation.value = placed?.horizontal === false ? 'vertical' : 'horizontal'
+
+  if (placed) {
+    removePlacedShip(shipDef.id)
+  }
+
   dragShip.value = {
     id: shipDef.id,
     size: shipDef.size,
@@ -921,25 +927,8 @@ onUnmounted(() => {
                 :class="placementCellClass(x, y)"
                 @dragover.prevent="handleCellDragOver($event, x, y)"
                 @drop.prevent="handleCellDrop($event, x, y)"
-                @dragleave="handleCellDragLeave"
                 @click="cell.shipId ? toggleOrientation(cell.shipId) : null"
               />
-            </template>
-
-            <!-- Overlay ship tokens on the placed ships (for drag-back) -->
-            <template v-for="ship in SHIP_DEFS" :key="`overlay-${ship.id}`">
-              <div
-                v-if="placedShips[ship.id]"
-                class="ship-token-overlay"
-                :class="placedShips[ship.id].horizontal ? 'horizontal' : 'vertical'"
-                :style="getPlacedShipStyle(ship.id)"
-                draggable="true"
-                :title="`${ship.name} (${ship.size} celdas) — clic para girar`"
-                @dragstart="startDragFromBoard($event, ship.id)"
-                @dragend="handleBoardDragEnd"
-              >
-                <span class="ship-label">{{ ship.name[0] }}</span>
-              </div>
             </template>
           </div>
         </article>
@@ -956,8 +945,8 @@ onUnmounted(() => {
                 :key="`dock-${ship.id}`"
                 class="dock-ship"
                 :class="placedShips[ship.id] ? 'dock-ship--placed' : 'dock-ship--available'"
-                :draggable="!placedShips[ship.id]"
-                @dragstart="!placedShips[ship.id] && startDragFromDock($event, ship)"
+                draggable="true"
+                @dragstart="startDragFromDock($event, ship)"
               >
                 <div class="flex items-center justify-between gap-2">
                   <span class="text-xs font-bold">{{ ship.name }}</span>
@@ -971,7 +960,7 @@ onUnmounted(() => {
                     :class="placedShips[ship.id] ? 'ship-pip--placed' : 'ship-pip--available'"
                   />
                 </div>
-                <span v-if="placedShips[ship.id]" class="mt-1 block text-[10px] font-semibold text-emerald-300">✓ Colocado — clic en tablero para girar</span>
+                <span v-if="placedShips[ship.id]" class="mt-1 block text-[10px] font-semibold text-emerald-300">✓ Colocado — arrastra para recolocar o clic en tablero para girar</span>
               </div>
             </div>
           </div>
