@@ -6,6 +6,10 @@ export const useGameStore = defineStore('game', () => {
   const games = ref([])
   const isLoading = ref(false)
 
+  const TITLE_OVERRIDES_BY_SLUG = {
+    chess: 'Board King',
+  }
+
   const DEFAULT_COVERS = {
     'space-invaders': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
     'cookie-clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
@@ -13,7 +17,6 @@ export const useGameStore = defineStore('game', () => {
     'clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
     'quiz': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
     'battleship': 'https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1200&q=80',
-    //'chess': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
     'chess': '/assets/boardKing/boardKingLogo.png',
   
   }
@@ -42,26 +45,33 @@ export const useGameStore = defineStore('game', () => {
     },
     {
       slug: 'battleship',
-      title: 'Hundir la Flota',
-      description: 'Encuentra la posicion de la escuadra enemiga y destruye todos sus barcos.',
+      title: 'Fleet Strategy',
+      description: 'Comanda tu flota de barcos para ser el mejor en el mar.',
       cover: DEFAULT_COVERS['battleship'],
       route: '/play/battleship',
     },
     {
       slug: 'chess',
       title: 'Board King',
-      description: 'Enfréntate a oponentes en partidas de ajedrez rápidas y emocionantes.',
+      description: 'Sé el rey del tablero y sé el primero del ranking.',
       cover: DEFAULT_COVERS['chess'],
       route: '/play/chess',
     },
   ]
 
   function normalizeGame(game) {
-    return {
+    const normalizedGame = {
       ...game,
       cover: game.cover || DEFAULT_COVERS[game.slug] || DEFAULT_COVERS['quiz'],
       route: game.route || `/play/${game.slug}`,
     }
+
+    const forcedTitle = TITLE_OVERRIDES_BY_SLUG[normalizedGame.slug]
+    if (forcedTitle) {
+      normalizedGame.title = forcedTitle
+    }
+
+    return normalizedGame
   }
 
   async function fetchGames() {

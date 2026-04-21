@@ -131,6 +131,12 @@ const formattedGameDuration = computed(() => {
   return `${paddedMinutes}:${paddedSeconds}`
 })
 
+const playerColorLabel = computed(() => {
+  if (playerColor.value === 'white') return 'Blancas'
+  if (playerColor.value === 'black') return 'Negras'
+  return 'Sin seleccionar'
+})
+
 const clearGameTimer = () => {
   if (!gameTimer.value) return
   clearInterval(gameTimer.value)
@@ -536,6 +542,40 @@ const moveRows = computed(() => {
   }
   return rows
 })
+
+const downloadMoveLog = () => {
+  if (!gameOver.value || moveHistory.value.length === 0) return
+
+  const now = new Date()
+  const fileStamp = now.toISOString().replace(/[:.]/g, '-')
+  const playerLabel = playerColor.value === 'white' ? 'Blancas' : 'Negras'
+
+  const lines = [
+    'Board King - Registro de jugadas',
+    `Fecha: ${now.toLocaleString()}`,
+    `Jugador: ${playerLabel}`,
+    `Resultado: ${resultLabel.value ?? 'Sin resultado'}`,
+    ''
+  ]
+
+  for (const row of moveRows.value) {
+    const whiteMove = row.white || '-'
+    const blackMove = row.black || '-'
+    lines.push(`${row.round}. ${whiteMove} ${blackMove}`)
+  }
+
+  const textContent = `${lines.join('\n')}\n`
+  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+
+  anchor.href = url
+  anchor.download = `board-king-registro-${fileStamp}.txt`
+  document.body.appendChild(anchor)
+  anchor.click()
+  document.body.removeChild(anchor)
+  URL.revokeObjectURL(url)
+}
 
 // ────── Movimiento ──────
 const movePiece = (targetCell, options = {}) => {
@@ -1099,6 +1139,16 @@ const getLegalMoves = (cell) => {
   return getLegalMovesForColor(cell, currentTurn.value)
 }
 
+const legalMovesForSelected = computed(() => {
+  if (!selected.value?.piece) return []
+  if (promotionCell.value || gameOver.value || isAiTurn.value) return []
+  return getLegalMoves(selected.value)
+})
+
+const isPossibleMove = (cell) => {
+  return legalMovesForSelected.value.some(move => move.row === cell.row && move.col === cell.col)
+}
+
 const getAllLegalMovesForColor = (color) => {
   const legalMoves = []
 
@@ -1217,11 +1267,6 @@ updateCheckState()
       </div>
     </div>
     
-    <div class="turn">
-      Turno: {{ currentTurn === 'white' ? 'Blancas' : 'Negras' }} · Ronda: {{ roundNumber }}
-      <span v-if="gameStarted"> · Tú: {{ playerColor === 'white' ? 'Blancas' : 'Negras' }}</span>
-      <span v-if="gameStarted"> · Tiempo: {{ formattedGameDuration }}</span>
-    </div>
     <div v-if="canAiPlay" class="ai-status">La IA está pensando...</div>
     <div v-if="checkmateState.isMate" class="mate-alert">
       Jaque Mate a {{ checkmateState.targetColor === 'white' ? 'Blancas' : 'Negras' }}
@@ -1236,6 +1281,13 @@ updateCheckState()
     <div v-if="gameOver" class="result-actions">
       <p v-if="resultLabel" class="result-label">Resultado: {{ resultLabel }}</p>
       <button
+        class="download-button"
+        :disabled="moveHistory.length === 0"
+        @click="downloadMoveLog"
+      >
+        Descargar registro de jugadas
+      </button>
+      <button
         class="restart-button"
         :disabled="resultReportPending"
         @click="restartGame"
@@ -1244,52 +1296,65 @@ updateCheckState()
       </button>
     </div>
 
-    <div class="board">
-      <div 
-        v-for="(row, rowIndex) in board" 
-        :key="rowIndex" 
-        class="row"
-      >
-        <div 
-          v-for="(cell, colIndex) in row" 
-          :key="colIndex" 
-          class="cell"
-          :class="[
-            (rowIndex + colIndex) % 2 === 0 ? 'white' : 'black',
-            selected?.row === cell.row && selected?.col === cell.col ? 'selected' : '',
-            isCheckingAttacker(cell) ? 'checking-attacker' : ''
-          ]"
-          @click="handleClick(cell)"
-        >
-          <img
-            v-if="cell.piece"
-            :src="getPieceImage(cell.piece)"
-            class="piece"
-          /> 
+    <div class="game-columns">
+      <div class="board-column">
+        <div class="turn turn-panel">
+          Turno: {{ currentTurn === 'white' ? 'Blancas' : 'Negras' }} · Ronda: {{ roundNumber }}
+        </div>
+
+        <div class="board">
+          <div 
+            v-for="(row, rowIndex) in board" 
+            :key="rowIndex" 
+            class="row"
+          >
+            <div 
+              v-for="(cell, colIndex) in row" 
+              :key="colIndex" 
+              class="cell"
+              :class="[
+                (rowIndex + colIndex) % 2 === 0 ? 'white' : 'black',
+                selected?.row === cell.row && selected?.col === cell.col ? 'selected' : '',
+                isPossibleMove(cell) ? 'possible-move' : '',
+                isCheckingAttacker(cell) ? 'checking-attacker' : ''
+              ]"
+              @click="handleClick(cell)"
+            >
+              <img
+                v-if="cell.piece"
+                :src="getPieceImage(cell.piece)"
+                class="piece"
+              /> 
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <section class="move-log">
-      <h3 class="move-log-title">Registro de jugadas</h3>
-      <p v-if="moveRows.length === 0" class="move-log-empty">Sin jugadas todavía.</p>
-      <table v-else class="move-log-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Blancas</th>
-            <th>Negras</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="entry in moveRows" :key="entry.round">
-            <td>{{ entry.round }}.</td>
-            <td>{{ entry.white }}</td>
-            <td>{{ entry.black || '—' }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+      <section class="move-log">
+        <h3 class="move-log-title">Registro de jugadas</h3>
+        <div class="move-log-meta">
+          <p class="move-log-player">Estas jugando con: {{ playerColorLabel }}</p>
+          <div class="digital-clock" role="timer" aria-live="polite">{{ formattedGameDuration }}</div>
+        </div>
+        <p v-if="moveRows.length === 0" class="move-log-empty">Sin jugadas todavía.</p>
+        <table v-else class="move-log-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Blancas</th>
+              <th>Negras</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="entry in moveRows" :key="entry.round">
+              <td>{{ entry.round }}.</td>
+              <td>{{ entry.white }}</td>
+              <td>{{ entry.black || '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
 
     <!-- PROMOCIÓN -->
     <div v-if="promotionCell !== null" class="promotion-modal">
@@ -1381,8 +1446,18 @@ updateCheckState()
 }
 
 .turn {
-  margin-bottom: 10px;
-  font-weight: bold;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  color: #0f172a;
+}
+
+.turn-panel {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 10px 12px;
 }
 
 .ai-status {
@@ -1460,14 +1535,52 @@ updateCheckState()
   cursor: not-allowed;
 }
 
-.move-log {
-  margin-top: 14px;
+.download-button {
+  border: 1px solid #1d4ed8;
+  border-radius: 8px;
+  background: #1d4ed8;
+  color: #ffffff;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.download-button:hover:not(:disabled) {
+  background: #1e40af;
+}
+
+.download-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.game-columns {
+  display: grid;
+  grid-template-columns: 480px minmax(280px, 340px);
+  align-items: start;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.board-column {
   width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.move-log {
+  margin-top: 0;
+  width: 100%;
   border: 1px solid #d6d3d1;
   border-radius: 8px;
   background: #ffffff;
   color: #000000;
   padding: 10px;
+  max-height: 480px;
+  overflow: auto;
 }
 
 .move-log-title {
@@ -1475,6 +1588,38 @@ updateCheckState()
   font-size: 16px;
   font-weight: 700;
   color: #000000;
+}
+
+.move-log-meta {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.move-log-player {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.digital-clock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #0f172a;
+  background: linear-gradient(180deg, #0b1220 0%, #020617 100%);
+  color: #86efac;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
 }
 
 .move-log-empty {
@@ -1535,6 +1680,10 @@ updateCheckState()
   background-color: #90ee90;
 }
 
+.possible-move {
+  background-color: #60a5fa;
+}
+
 .checking-attacker {
   background-color: #fca5a5 !important;
 }
@@ -1568,5 +1717,17 @@ updateCheckState()
   padding:10px;
   cursor:pointer;
   font-size:18px;
+}
+
+@media (max-width: 980px) {
+  .game-columns {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .move-log {
+    max-height: none;
+    width: 480px;
+  }
 }
 </style>

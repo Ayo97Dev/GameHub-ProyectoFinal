@@ -17,8 +17,8 @@ return new class extends Migration
 
         DB::table('games')->insert([
             'slug' => 'chess',
-            'title' => 'Ajedrez',
-            'description' => 'Juega partidas de ajedrez contra la IA y mejora tu ranking.',
+            'title' => 'Board King',
+            'description' => 'Sé el rey del tablero y sé el primero del ranking.',
             'config' => json_encode([
                 'allowed_actions' => ['move', 'promote', 'restart'],
                 'rate_limit_per_minute' => 90,

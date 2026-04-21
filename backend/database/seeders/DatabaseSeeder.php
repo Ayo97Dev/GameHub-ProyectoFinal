@@ -53,8 +53,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Game::firstOrCreate(['slug' => 'battleship'], [
-            'title'       => 'Hundir la Flota',
-            'description' => 'Encuentra y hunde la escuadra enemiga en un combate naval por turnos.',
+            'title'       => 'Fleet Strategy',
+            'description' => 'Comanda tu flota para ser el mejor en el mar.',
             'is_active'   => true,
             'config'      => [
                 'allowed_actions'       => ['fire', 'scan', 'restart'],
@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
 
         $chess = Game::firstOrCreate(['slug' => 'chess'], [
             'title'       => 'Board King',
-            'description' => 'Juega partidas de ajedrez contra la IA y mejora tu ranking.',
+            'description' => 'Sé el rey del tablero y sé el primero del ranking.',
             'is_active'   => true,
             'config'      => [
                 'allowed_actions'       => ['move', 'promote', 'restart'],

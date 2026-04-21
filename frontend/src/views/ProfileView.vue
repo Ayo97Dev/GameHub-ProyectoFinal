@@ -8,6 +8,10 @@ const authStore = useAuthStore()
 const router    = useRouter()
 const isLoading = ref(true)
 
+const GAME_TITLE_OVERRIDES_BY_SLUG = {
+  chess: 'Board King',
+}
+
 const achievements     = ref([])
 const achievementsByGame = computed(() => {
   const map = {}
@@ -33,7 +37,7 @@ const resetTarget   = ref(null)   // { slug, title }
 const isResetting   = ref(false)
 
 function confirmReset(stat) {
-  resetTarget.value = { slug: stat.game.slug, title: stat.game.title }
+  resetTarget.value = { slug: stat.game.slug, title: getGameTitle(stat.game) }
 }
 
 async function executeReset() {
@@ -82,6 +86,11 @@ function formatDate(isoDate) {
 function isChessStat(stat) {
   return stat?.game?.slug === 'chess'
 }
+
+function getGameTitle(game) {
+  if (!game) return ''
+  return GAME_TITLE_OVERRIDES_BY_SLUG[game.slug] ?? game.title
+}
 </script>
 
 <template>
@@ -117,7 +126,7 @@ function isChessStat(stat) {
             :key="stat.game_id" 
             class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-zinc-900 p-5 shrink-0 shadow-lg shadow-slate-200/50 dark:shadow-black/20 transition-colors flex flex-col gap-4"
           >
-            <h3 class="text-lg font-bold text-cyan-600 dark:text-cyan-300 transition-colors">{{ stat.game.title }}</h3>
+            <h3 class="text-lg font-bold text-cyan-600 dark:text-cyan-300 transition-colors">{{ getGameTitle(stat.game) }}</h3>
 
             <!-- Stats -->
             <div class="space-y-3">
