@@ -5,17 +5,19 @@ import gameEngine from '../../lib/gameEngineService'
 const emit = defineEmits(['score-change', 'game-completed'])
 
 const GAME_SLUG = 'battleship'
-const BOARD_SIZE = 10
+const BOARD_SIZE = 8
 const SHIP_DEFS = [
-  { id: 'carrier', name: 'Portaaviones', size: 5 },
-  { id: 'battleship', name: 'Acorazado', size: 4 },
-  { id: 'crucero', name: 'Crucero', size: 3 },
+  { id: 'carrier', name: 'Portaaviones', size: 4 },
+  { id: 'destroyer', name: 'Destructor', size: 3 },
   { id: 'submarine', name: 'Submarino', size: 3 },
-  { id: 'destroyer', name: 'Destructor', size: 2 },
+  { id: 'frigate', name: 'Fragata', size: 2 },
+  { id: 'patrol', name: 'Patrullero', size: 2 },
 ]
 const TOTAL_SHIP_CELLS = SHIP_DEFS.reduce((sum, ship) => sum + ship.size, 0)
 const ROW_LABELS = Array.from({ length: BOARD_SIZE }, (_, i) => String.fromCharCode(65 + i))
 const COL_LABELS = Array.from({ length: BOARD_SIZE }, (_, i) => i + 1)
+
+// Datos globales de referencia usados por UI, validaciones y calculos.
 
 // ─── Placement phase state ───────────────────────────────────────────────────
 const phase = ref('placement')
@@ -63,12 +65,14 @@ let enemyTimer = null
 let autosaveInterval = null
 
 // ─── Placement helpers ────────────────────────────────────────────────────────
+// Crea el tablero temporal de preparacion (fase de colocar barcos).
 function createPlacementBoard() {
   return Array.from({ length: BOARD_SIZE }, () =>
     Array.from({ length: BOARD_SIZE }, () => ({ shipId: null }))
   )
 }
 
+// Devuelve las celdas consecutivas que ocupa un barco desde un punto inicial.
 function getShipCells(x, y, size, horizontal) {
   const cells = []
   for (let i = 0; i < size; i++) {
@@ -77,10 +81,12 @@ function getShipCells(x, y, size, horizontal) {
   return cells
 }
 
+// Verifica que todas las celdas propuestas esten dentro del tablero.
 function cellsInBounds(cells) {
   return cells.every(c => c.x >= 0 && c.x < BOARD_SIZE && c.y >= 0 && c.y < BOARD_SIZE)
 }
 
+// Verifica si una posicion propuesta colisiona con otro barco ya colocado.
 function cellsCollide(cells, excludeShipId = null) {
   for (const c of cells) {
     const cell = placementBoard.value[c.y][c.x]
@@ -89,6 +95,7 @@ function cellsCollide(cells, excludeShipId = null) {
   return false
 }
 
+// Limpia del tablero todas las celdas ocupadas por un barco especifico.
 function removePlacedShip(shipId) {
   const ship = placedShips.value[shipId]
   if (!ship) return
@@ -98,6 +105,7 @@ function removePlacedShip(shipId) {
   delete placedShips.value[shipId]
 }
 
+// Coloca un barco en sus nuevas celdas y guarda su orientacion actual.
 function placeShip(shipId, cells) {
   removePlacedShip(shipId)
   for (const c of cells) {
@@ -106,11 +114,13 @@ function placeShip(shipId, cells) {
   placedShips.value[shipId] = { cells, horizontal: dragOrientation.value === 'horizontal' }
 }
 
+// Ordena las celdas de un barco segun su orientacion para calcular offsets.
 function getOrderedShipCells(ship) {
   if (!ship) return []
   return [...ship.cells].sort((a, b) => (ship.horizontal ? a.x - b.x : a.y - b.y))
 }
 
+// Resetea todo el estado temporal relacionado con arrastre/preview.
 function clearPlacementDragState() {
   hoverPreview.value = []
   dragShip.value = null
@@ -119,6 +129,7 @@ function clearPlacementDragState() {
   lastHoverCell.value = null
 }
 
+// Inicializa el movimiento de un barco ya colocado desde una celda concreta.
 function beginMovePlacedShip(shipId, x, y) {
   const placed = placedShips.value[shipId]
   const shipDef = SHIP_DEFS.find(s => s.id === shipId)
@@ -138,6 +149,7 @@ function beginMovePlacedShip(shipId, x, y) {
   return true
 }
 
+// Calcula la previsualizacion de destino segun celda actual, offset y orientacion.
 function computeHoverPreview(x, y) {
   if (!dragShip.value) return { cells: [], valid: false }
   lastHoverCell.value = { x, y }
@@ -155,11 +167,13 @@ function computeHoverPreview(x, y) {
   return { cells, valid }
 }
 
+// Actualiza preview durante drag en desktop.
 function handleCellDragOver(e, x, y) {
   e.preventDefault()
   computeHoverPreview(x, y)
 }
 
+// Confirma posicion al soltar el barco sobre una celda valida.
 function handleCellDrop(e, x, y) {
   e.preventDefault()
   if (!dragShip.value) return
@@ -172,11 +186,12 @@ function handleCellDrop(e, x, y) {
   clearPlacementDragState()
 }
 
+// Limpieza de estado al terminar drag fuera del drop esperado.
 function handleBoardDragEnd() {
   clearPlacementDragState()
 }
 
-// 🔥 FIX PRINCIPAL también aquí
+// Inicia arrastre desde el panel de barcos (dock).
 function startDragFromDock(e, shipDef) {
   const placed = placedShips.value[shipDef.id]
   dragOrientation.value = placed?.horizontal === false ? 'vertical' : 'horizontal'
@@ -202,6 +217,7 @@ function startDragFromDock(e, shipDef) {
   }
 }
 
+// Inicia arrastre directamente desde una celda de un barco ya colocado.
 function startDragFromPlacedCell(e, x, y) {
   const shipId = getShipIdAt(x, y)
   if (!shipId) return
@@ -217,6 +233,7 @@ function startDragFromPlacedCell(e, x, y) {
   }
 }
 
+// Alterna orientacion del barco actualmente en arrastre/previsualizacion.
 function rotateDragOrientation() {
   if (!dragShip.value) return
   dragOrientation.value = dragOrientation.value === 'horizontal' ? 'vertical' : 'horizontal'
@@ -226,6 +243,7 @@ function rotateDragOrientation() {
   }
 }
 
+// Atajo de teclado para rotar barco durante fase de colocacion.
 function handlePlacementKeydown(event) {
   if (phase.value !== 'placement' || !dragShip.value) return
   if (String(event.key).toLowerCase() !== 'r') return
@@ -233,6 +251,7 @@ function handlePlacementKeydown(event) {
   rotateDragOrientation()
 }
 
+// Gira un barco ya colocado usando su celda ancla.
 function toggleOrientation(shipId) {
   const placed = placedShips.value[shipId]
   if (!placed) return
@@ -246,6 +265,7 @@ function toggleOrientation(shipId) {
   placedShips.value[shipId].horizontal = newHorizontal
 }
 
+// Coloca automaticamente toda la flota en posiciones validas aleatorias.
 function randomizePlacement() {
   placementBoard.value = createPlacementBoard()
   placedShips.value = {}
@@ -268,11 +288,13 @@ function randomizePlacement() {
   placementBoard.value = board
 }
 
+// Limpia toda la fase de colocacion para empezar de nuevo.
 function resetPlacement() {
   placementBoard.value = createPlacementBoard()
   placedShips.value = {}
 }
 
+// Convierte la colocacion actual al estado de batalla y arranca la partida.
 function confirmPlacement() {
   if (!placementComplete.value) return
   // Build player board from placement
@@ -318,6 +340,7 @@ function confirmPlacement() {
 }
 
 // Placement cell display helpers
+// Resuelve la clase visual de cada celda en fase de colocacion.
 function placementCellClass(x, y) {
   const cell = placementBoard.value[y]?.[x]
   const inPreview = hoverPreview.value.some(c => c.x === x && c.y === y)
@@ -327,11 +350,13 @@ function placementCellClass(x, y) {
   return 'cell-water'
 }
 
+// Lista de barcos aun pendientes de colocar.
 function unplacedShips() {
   return SHIP_DEFS.filter(s => !placedShips.value[s.id])
 }
 
 // Touch drag support
+// Inicia arrastre tactil desde el dock.
 function handleTouchStart(e, shipDef) {
   e.preventDefault()
   const placed = placedShips.value[shipDef.id]
@@ -347,6 +372,7 @@ function handleTouchStart(e, shipDef) {
   lastHoverCell.value = null
 }
 
+// Inicia o continua arrastre tactil desde una celda del tablero.
 function handleCellTouchStart(e, x, y, shipId) {
   e.preventDefault()
   if (touchDragging.value) {
@@ -362,12 +388,14 @@ function handleCellTouchStart(e, x, y, shipId) {
   touchShipId.value = shipId
 }
 
+// Actualiza la previsualizacion durante el movimiento tactil.
 function handleCellTouchOver(e, x, y) {
   if (!touchDragging.value) return
   e.preventDefault()
   computeHoverPreview(x, y)
 }
 
+// Confirma la posicion final al levantar el dedo.
 function handleCellTouchDrop(e, x, y) {
   if (!touchDragging.value) return
   e.preventDefault()
@@ -378,6 +406,7 @@ function handleCellTouchDrop(e, x, y) {
   clearPlacementDragState()
 }
 
+// Gestiona modo click-to-move: seleccion y destino en dos clics.
 function handlePlacementCellClick(x, y, shipId, event) {
   if (phase.value !== 'placement') return
 
@@ -401,30 +430,37 @@ function handlePlacementCellClick(x, y, shipId, event) {
 }
 
 // ─── Core helpers ─────────────────────────────────────────────────────────────
+// Crea el objeto base de una celda de tablero de batalla.
 function createCell() {
   return { hasShip: false, shipId: null, state: 'unknown' }
 }
 
+// Genera un tablero cuadrado vacio para jugador o enemigo.
 function createBoard() {
   return Array.from({ length: BOARD_SIZE }, () =>
     Array.from({ length: BOARD_SIZE }, () => createCell())
   )
 }
 
+// Entero aleatorio inclusivo entre min y max.
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+// Comprueba si una coordenada existe dentro del tablero.
 function inBounds(x, y) {
   return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE
 }
 
+// Determina si una celda ya fue atacada previamente.
 function isTargeted(cell) {
   return cell.state === 'hit' || cell.state === 'miss'
 }
 
+// Clave unica de coordenadas para estructuras Set/cola.
 function queueKey(x, y) { return `${x}:${y}` }
 
+// Valida formato de clave de cola enemiga para evitar datos corruptos.
 function isQueueKeyValid(value) {
   if (typeof value !== 'string') return false
   const [xRaw, yRaw] = value.split(':')
@@ -432,18 +468,23 @@ function isQueueKeyValid(value) {
   return Number.isInteger(x) && Number.isInteger(y) && inBounds(x, y)
 }
 
+// Pasa coordenadas internas a formato humano (ej: A1).
 function formatCoordinate(x, y) { return `${ROW_LABELS[y]}${x + 1}` }
 
+// ID simple para entradas de bitacora.
 function makeLogId() { return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}` }
 
+// Crea una entrada de bitacora con tono visual.
 function makeLogEntry(text, tone = 'neutral') { return { id: makeLogId(), text, tone } }
 
+// Convierte y limita valores numericos dentro de un rango seguro.
 function clampInt(value, min, max) {
   const n = Number(value)
   if (!Number.isFinite(n)) return min
   return Math.max(min, Math.min(Math.round(n), max))
 }
 
+// Construye flota y tablero enemigo/jugador con posicionamiento aleatorio valido.
 function buildRandomFleet() {
   const board = createBoard()
   const fleet = {}
@@ -475,6 +516,7 @@ function buildRandomFleet() {
   return { board, fleet }
 }
 
+// Aplica un disparo en tablero y devuelve resultado detallado del impacto.
 function applyShot(board, fleet, x, y) {
   const cell = board[y][x]
   if (isTargeted(cell)) return { repeated: true, hit: false, sunk: false, shipName: null, allSunk: false }
@@ -488,16 +530,19 @@ function applyShot(board, fleet, x, y) {
   return { repeated: false, hit: true, sunk, shipName: ship.name, allSunk }
 }
 
+// Cancela temporizador de turno enemigo para evitar dobles ejecuciones.
 function clearEnemyTimer() {
   if (enemyTimer) { window.clearTimeout(enemyTimer); enemyTimer = null }
 }
 
+// Inserta mensaje en bitacora y limita longitud visible.
 function pushLog(text, tone = 'neutral') {
   battleLog.value.unshift(makeLogEntry(text, tone))
   battleLog.value = battleLog.value.slice(0, 10)
 }
 
 // ─── Snapshot / persistence ───────────────────────────────────────────────────
+// Estado inicial por defecto usado al crear o recuperar partida.
 function buildInitialSnapshot() {
   const own = buildRandomFleet()
   const foe = buildRandomFleet()
@@ -512,11 +557,13 @@ function buildInitialSnapshot() {
   }
 }
 
+// Normaliza una celda proveniente de backend o almacenamiento.
 function normalizeCell(raw) {
   const state = raw?.state === 'hit' || raw?.state === 'miss' ? raw.state : 'unknown'
   return { hasShip: Boolean(raw?.hasShip), shipId: typeof raw?.shipId === 'string' ? raw.shipId : null, state }
 }
 
+// Normaliza tablero completo y valida dimensiones.
 function normalizeBoard(rawBoard, fallbackBoard) {
   if (!Array.isArray(rawBoard) || rawBoard.length !== BOARD_SIZE) return fallbackBoard
   return rawBoard.map((rawRow, y) => {
@@ -525,6 +572,7 @@ function normalizeBoard(rawBoard, fallbackBoard) {
   })
 }
 
+// Normaliza lista de coordenadas para celdas de un barco.
 function normalizeCells(rawCells, fallbackCells) {
   if (!Array.isArray(rawCells)) return fallbackCells
   const cells = rawCells.map(raw => ({ x: Number(raw?.x), y: Number(raw?.y) }))
@@ -532,6 +580,7 @@ function normalizeCells(rawCells, fallbackCells) {
   return cells.length > 0 ? cells : fallbackCells
 }
 
+// Normaliza estructura de flota con sus celdas, golpes y estado hundido.
 function normalizeFleet(rawFleet, fallbackFleet) {
   const normalized = {}
   for (const shipDef of SHIP_DEFS) {
@@ -547,12 +596,14 @@ function normalizeFleet(rawFleet, fallbackFleet) {
   return normalized
 }
 
+// Normaliza cola de objetivos pendientes de IA enemiga.
 function normalizeQueue(rawQueue) {
   if (!Array.isArray(rawQueue)) return []
   return rawQueue.map(raw => ({ x: Number(raw?.x), y: Number(raw?.y) }))
     .filter(cell => Number.isInteger(cell.x) && Number.isInteger(cell.y) && inBounds(cell.x, cell.y))
 }
 
+// Normaliza bitacora para asegurar formato y limite de entradas.
 function normalizeLog(rawLog, fallbackLog) {
   if (!Array.isArray(rawLog)) return fallbackLog
   const normalized = rawLog.slice(0, 10)
@@ -561,6 +612,7 @@ function normalizeLog(rawLog, fallbackLog) {
   return normalized.length > 0 ? normalized : fallbackLog
 }
 
+// Aplica snapshot normalizado al estado reactivo del juego.
 function applySnapshot(rawSnapshot) {
   clearEnemyTimer()
   const fallback = buildInitialSnapshot()
@@ -611,6 +663,7 @@ function applySnapshot(rawSnapshot) {
   phase.value = 'playing'
 }
 
+// Serializa estado actual en formato seguro para persistencia.
 function serializeState() {
   return JSON.parse(JSON.stringify({
     playerBoard: playerBoard.value, enemyBoard: enemyBoard.value,
@@ -625,16 +678,19 @@ function serializeState() {
   }))
 }
 
+// Resetea cola y conjunto de objetivos de IA.
 function resetEnemyQueue() {
   enemyTargetQueue.value = []
   enemyTargetSet.value = new Set()
 }
 
+// Tiempo de sesion en segundos desde el inicio de la partida.
 function getSessionDurationSeconds() {
   if (!sessionStartedAt.value) return 0
   return Math.max(Math.floor((Date.now() - sessionStartedAt.value) / 1000), 0)
 }
 
+// Guarda progreso incremental y playtime pendiente en backend.
 async function saveProgress({ silent = true } = {}) {
   if (!sessionId.value) return false
   try {
@@ -650,6 +706,7 @@ async function saveProgress({ silent = true } = {}) {
   }
 }
 
+// Marca sesion como completada y emite evento final al contenedor.
 async function completeCurrentSession() {
   if (!sessionId.value || hasCompletedSession.value) return false
   try {
@@ -664,6 +721,7 @@ async function completeCurrentSession() {
 }
 
 // ─── Enemy AI ─────────────────────────────────────────────────────────────────
+// Tras impacto, encola celdas vecinas para aumentar precision de IA.
 function addEnemyTargetsAround(x, y) {
   const candidates = [{ x: x + 1, y }, { x: x - 1, y }, { x, y: y + 1 }, { x, y: y - 1 }]
   for (const candidate of candidates) {
@@ -677,6 +735,7 @@ function addEnemyTargetsAround(x, y) {
   }
 }
 
+// Elige siguiente objetivo: primero cola inteligente, luego aleatorio valido.
 function pickEnemyTarget() {
   while (enemyTargetQueue.value.length > 0) {
     const candidate = enemyTargetQueue.value.shift()
@@ -693,11 +752,13 @@ function pickEnemyTarget() {
   return fallback[randomInt(0, fallback.length - 1)]
 }
 
+// Centraliza guardado/complete al cerrar una batalla.
 function finalizeBattle() {
   void saveProgress({ silent: true })
   void completeCurrentSession()
 }
 
+// Finaliza batalla, muestra mensaje y ejecuta cierre de sesion.
 function endBattle(status) {
   gameStatus.value = status
   turn.value = 'none'
@@ -708,6 +769,7 @@ function endBattle(status) {
   finalizeBattle()
 }
 
+// Programa turno enemigo con pequena espera para feedback visual.
 function scheduleEnemyTurn() {
   if (gameStatus.value !== 'playing') return
   enemyThinking.value = true
@@ -730,6 +792,7 @@ function scheduleEnemyTurn() {
   }, 700)
 }
 
+// Maneja disparo del jugador y transicion al turno enemigo.
 function fireAtEnemy(x, y) {
   if (gameStatus.value !== 'playing') return
   if (turn.value !== 'player' || enemyThinking.value) return
@@ -747,6 +810,7 @@ function fireAtEnemy(x, y) {
   scheduleEnemyTurn()
 }
 
+// Reinicia flujo de nueva partida y solicita nueva sesion al backend.
 async function handleNewGameClick() {
   clearEnemyTimer()
   phase.value = 'placement'
@@ -764,6 +828,7 @@ async function handleNewGameClick() {
   syncError.value = null
 }
 
+// Activa guardado automatico periodico durante partida activa.
 function startAutosave() {
   if (autosaveInterval) window.clearInterval(autosaveInterval)
   autosaveInterval = window.setInterval(() => {
@@ -771,21 +836,26 @@ function startAutosave() {
   }, 20000)
 }
 
+// Detiene el intervalo de autosave al salir del componente.
 function stopAutosave() {
   if (!autosaveInterval) return
   window.clearInterval(autosaveInterval)
   autosaveInterval = null
 }
 
+// Guarda rapido cuando la pestaña pasa a segundo plano.
 function handleVisibilityChange() {
   if (document.visibilityState === 'hidden') void saveProgress({ silent: true })
 }
 
+// Guarda rapido antes de cerrar/recargar la pagina.
 function handleBeforeUnload() { void saveProgress({ silent: true }) }
 
 // ─── Computed ─────────────────────────────────────────────────────────────────
+// Permite disparar solo cuando es turno jugador y no hay animacion enemiga.
 const canShoot = computed(() => gameStatus.value === 'playing' && turn.value === 'player' && !enemyThinking.value)
 
+// Estado de barcos propios para panel lateral.
 const playerShipStatus = computed(() =>
   SHIP_DEFS.map(ship => {
     const runtime = playerFleet.value[ship.id]
@@ -793,6 +863,7 @@ const playerShipStatus = computed(() =>
   })
 )
 
+// Estado de barcos enemigos para panel lateral.
 const enemyShipStatus = computed(() =>
   SHIP_DEFS.map(ship => {
     const runtime = enemyFleet.value[ship.id]
@@ -800,31 +871,24 @@ const enemyShipStatus = computed(() =>
   })
 )
 
+// Precision del jugador en porcentaje.
 const playerAccuracy = computed(() => {
   if (playerShots.value === 0) return 0
   return Math.round((playerHits.value / playerShots.value) * 100)
 })
 
+// Formula de puntuacion final durante/fin de batalla.
 const score = computed(() => {
   const baseScore = 1200
   const precisionBonus = playerHits.value * 95
   const sunkBonus = enemyShipsSunk.value * 220
   const extraShotsPenalty = Math.max(playerShots.value - TOTAL_SHIP_CELLS, 0) * 28
   const damagePenalty = enemyHits.value * 45
-  const performanceScore = Math.round(baseScore + precisionBonus + sunkBonus - extraShotsPenalty - damagePenalty)
-
-  if (gameStatus.value === 'won') {
-    // Toda victoria queda por encima de cualquier derrota en el ranking.
-    return Math.max(3000, performanceScore + 1300)
-  }
-
-  if (gameStatus.value === 'lost') {
-    return Math.max(0, Math.min(2999, performanceScore))
-  }
-
-  return Math.max(0, performanceScore)
+  const winBonus = gameStatus.value === 'won' ? 1300 : 0
+  return Math.max(0, Math.round(baseScore + precisionBonus + sunkBonus + winBonus - extraShotsPenalty - damagePenalty))
 })
 
+// Mensaje contextual de estado para cabecera de batalla.
 const statusText = computed(() => {
   if (gameStatus.value === 'won') return 'Mision completada: victoria naval.'
   if (gameStatus.value === 'lost') return 'Flota perdida. Reagrupa y vuelve a intentarlo.'
@@ -834,6 +898,7 @@ const statusText = computed(() => {
 })
 
 // ─── Cell display helpers ─────────────────────────────────────────────────────
+// Clase visual de celdas del tablero del jugador.
 function playerCellClass(cell) {
   if (cell.state === 'hit') return 'cell-hit'
   if (cell.state === 'miss') return 'cell-miss'
@@ -841,12 +906,14 @@ function playerCellClass(cell) {
   return 'cell-water'
 }
 
+// Clase visual de celdas del radar enemigo.
 function enemyCellClass(cell) {
   if (cell.state === 'hit') return 'cell-hit'
   if (cell.state === 'miss') return 'cell-miss'
   return 'cell-fog'
 }
 
+// Simbolo mostrado en celdas del tablero propio.
 function playerCellMarker(cell) {
   if (cell.state === 'hit') return 'X'
   if (cell.state === 'miss') return '•'
@@ -854,12 +921,14 @@ function playerCellMarker(cell) {
   return ''
 }
 
+// Simbolo mostrado en celdas del tablero enemigo.
 function enemyCellMarker(cell) {
   if (cell.state === 'hit') return 'X'
   if (cell.state === 'miss') return '•'
   return ''
 }
 
+// Devuelve clases de color segun tono de entrada en bitacora.
 function logToneClass(tone) {
   if (tone === 'good') return 'border-emerald-300/60 bg-emerald-500/10 text-emerald-100'
   if (tone === 'bad') return 'border-rose-300/60 bg-rose-500/10 text-rose-100'
@@ -867,16 +936,20 @@ function logToneClass(tone) {
 }
 
 // ─── Placement grid helper ────────────────────────────────────────────────────
+// Indica si una celda de preparacion tiene barco asignado.
 function placementCellHasShip(x, y) {
   return placementBoard.value[y]?.[x]?.shipId != null
 }
 
+// Devuelve ID de barco presente en coordenada de preparacion.
 function getShipIdAt(x, y) {
   return placementBoard.value[y]?.[x]?.shipId
 }
 
+// Sincroniza puntuacion en vivo con el componente padre.
 watch(score, (value) => emit('score-change', value), { immediate: true })
 
+// Inicializa o recupera sesion y estado guardado desde backend.
 async function initializeGame(loadSave = true) {
   isSyncing.value = true
   syncError.value = null
@@ -904,6 +977,7 @@ async function initializeGame(loadSave = true) {
   }
 }
 
+// Configura listeners globales y carga inicial del juego.
 onMounted(() => {
   placementBoard.value = createPlacementBoard()
   startAutosave()
@@ -913,6 +987,7 @@ onMounted(() => {
   void initializeGame(true)
 })
 
+// Limpia timers/listeners y guarda antes de desmontar componente.
 onUnmounted(() => {
   clearEnemyTimer()
   stopAutosave()
@@ -932,11 +1007,11 @@ onUnmounted(() => {
     <!-- Header -->
     <header class="relative z-10 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-cyan-300">Conquista de los Océanos</p>
-        <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Fleet Strategy</h2>
+        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-cyan-300">Operacion Atlantico</p>
+        <h2 class="mt-1 text-2xl font-black text-white sm:text-3xl">Hundir la Flota</h2>
         <p class="mt-1 max-w-2xl text-sm text-cyan-100/90">
           <template v-if="phase === 'placement'">Coloca tu flota arrastrando los barcos al tablero para de iniciar la batalla.</template>
-          <template v-else>Descubre la posicion enemiga y hunde sus barcos antes de que derriben tu flota.</template>
+          <template v-else>Descubre la posicion enemiga y hunde sus cinco barcos antes de que derriben tu escuadron.</template>
         </p>
       </div>
 
@@ -976,7 +1051,7 @@ onUnmounted(() => {
           </div>
 
           <p class="mt-2 text-[11px] text-cyan-200/70">
-            Selecciona un barco y pulse R para cambiar su orientación
+            Arrastra los barcos del panel derecho al tablero • Tambien puedes arrastrar o seleccionar un barco del tablero y hacer clic en destino • Presiona R para girar durante el arrastre
           </p>
 
           <div v-if="dragShip" class="mt-2 flex flex-wrap items-center gap-2">
@@ -985,8 +1060,9 @@ onUnmounted(() => {
               class="rounded-lg border border-amber-300/60 bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-100 transition hover:bg-amber-500/25"
               @click="rotateDragOrientation"
             >
-              Girar barco ({{ dragOrientation === 'horizontal' ? 'Horizontal' : 'Vertical' }}) o Tecla R
+              Girar barco ({{ dragOrientation === 'horizontal' ? 'Horizontal' : 'Vertical' }})
             </button>
+            <span class="text-[10px] text-cyan-200/70">Atajo: tecla R</span>
           </div>
 
           <!-- Grid -->
@@ -1051,7 +1127,7 @@ onUnmounted(() => {
                     :class="placedShips[ship.id] ? 'ship-pip--placed' : 'ship-pip--available'"
                   />
                 </div>
-                <span v-if="placedShips[ship.id]" class="mt-1 block text-[10px] font-semibold text-emerald-300">✓ Colocado</span>
+                <span v-if="placedShips[ship.id]" class="mt-1 block text-[10px] font-semibold text-emerald-300">✓ Colocado — arrastra para recolocar o clic en tablero para girar</span>
               </div>
             </div>
           </div>
@@ -1149,7 +1225,7 @@ onUnmounted(() => {
                 :key="`e-cell-${x}-${y}`"
                 type="button"
                 class="battle-cell"
-                :class="[enemyCellClass(cell), canShoot && !isTargeted(cell) ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-not-allowed']"
+                :class="[enemyCellClass(cell), canShoot && !isTargeted(cell) ? 'cursor-crosshair hover:scale-[1.02]' : 'cursor-not-allowed']"
                 :disabled="!canShoot || isTargeted(cell)"
                 @click="fireAtEnemy(x, y)"
               >{{ enemyCellMarker(cell) }}</button>
@@ -1211,7 +1287,7 @@ onUnmounted(() => {
 .battle-grid,
 .placement-grid {
   display: grid;
-  grid-template-columns: repeat(11, minmax(0, 1fr));
+  grid-template-columns: repeat(9, minmax(0, 1fr));
   gap: 0.3rem;
 }
 
@@ -1246,7 +1322,7 @@ onUnmounted(() => {
   border-radius: 0.45rem;
   border: 1px solid rgba(165, 243, 252, 0.2);
   transition: background-color 80ms ease, border-color 80ms ease;
-  cursor: pointer;
+  cursor: crosshair;
   position: relative;
 }
 
