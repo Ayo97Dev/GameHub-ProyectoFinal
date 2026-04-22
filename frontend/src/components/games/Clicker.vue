@@ -1,24 +1,27 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClickerStore } from '../../stores/games/clicker'
+import { useInventoryStore } from '../../stores/inventory'
+import { Icon } from '@iconify/vue'
 
 const emit = defineEmits(['live-score'])
 
 const clicker = useClickerStore()
+const inventory = useInventoryStore()
 
 const UPGRADES = [
-  { id: 1,  name: 'AUTO_CLICK.BAT',   description: '+0.1 DPS',         icon: '🤖', tier: 1, type: 'dps'   },
-  { id: 2,  name: 'FAST_FINGERS.EXE', description: '+1 clic',          icon: '✋', tier: 1, type: 'click' },
-  { id: 3,  name: 'CLICK_BOT_v1',     description: '+2 DPS',           icon: '🦾', tier: 1, type: 'dps'   },
-  { id: 4,  name: 'AGILE_HANDS.DLL',  description: '+4 clic',          icon: '👌', tier: 1, type: 'click' },
-  { id: 5,  name: 'TURBO_ENGINE.SYS', description: '+20 DPS',          icon: '🚀', tier: 2, type: 'dps'   },
-  { id: 6,  name: 'POWER_GLOVE.CFG',  description: '+25 clic',         icon: '💪', tier: 2, type: 'click' },
-  { id: 7,  name: 'NEURAL_NET.BIN',   description: '+200 DPS',         icon: '🧠', tier: 2, type: 'dps'   },
-  { id: 8,  name: 'TURBO_REFLEX.SO',  description: '+100 clic',        icon: '⚡', tier: 2, type: 'click' },
-  { id: 9,  name: 'QUANTUM_DRIVE',    description: '+800 DPS',         icon: '🌀', tier: 3, type: 'dps'   },
-  { id: 10, name: 'DARK_PULSE',       description: '+600 clic',        icon: '🌑', tier: 3, type: 'click' },
-  { id: 11, name: 'UNIV_CORE.INF',    description: '+6.000 DPS',       icon: '🌟', tier: 3, type: 'dps'   },
-  { id: 12, name: 'COSMIC_HAND',      description: '+2.500 clic',      icon: '✨', tier: 3, type: 'click' },
+  { id: 1,  name: 'AUTO_CLICK.BAT',   description: '+0.1 DPS',         icon: 'lucide:bot', tier: 1, type: 'dps'   },
+  { id: 2,  name: 'FAST_FINGERS.EXE', description: '+1 clic',          icon: 'lucide:hand', tier: 1, type: 'click' },
+  { id: 3,  name: 'CLICK_BOT_v1',     description: '+2 DPS',           icon: 'lucide:cpu', tier: 1, type: 'dps'   },
+  { id: 4,  name: 'AGILE_HANDS.DLL',  description: '+4 clic',          icon: 'lucide:mouse-pointer-2', tier: 1, type: 'click' },
+  { id: 5,  name: 'TURBO_ENGINE.SYS', description: '+20 DPS',          icon: 'lucide:rocket', tier: 2, type: 'dps'   },
+  { id: 6,  name: 'POWER_GLOVE.CFG',  description: '+25 clic',         icon: 'lucide:zap', tier: 2, type: 'click' },
+  { id: 7,  name: 'NEURAL_NET.BIN',   description: '+200 DPS',         icon: 'lucide:brain', tier: 2, type: 'dps'   },
+  { id: 8,  name: 'TURBO_REFLEX.SO',  description: '+100 clic',        icon: 'lucide:activity', tier: 2, type: 'click' },
+  { id: 9,  name: 'QUANTUM_DRIVE',    description: '+800 DPS',         icon: 'lucide:atom', tier: 3, type: 'dps'   },
+  { id: 10, name: 'DARK_PULSE',       description: '+600 clic',        icon: 'lucide:moon', tier: 3, type: 'click' },
+  { id: 11, name: 'UNIV_CORE.INF',    description: '+6.000 DPS',       icon: 'lucide:sun', tier: 3, type: 'dps'   },
+  { id: 12, name: 'COSMIC_HAND',      description: '+2.500 clic',      icon: 'lucide:sparkles', tier: 3, type: 'click' },
 ]
 
 const TIERS = [
@@ -48,6 +51,34 @@ let sessionClockInterval = null
 let componentMountedAt = 0
 let lastPlayerAction  = 0
 let _isUnmounted = false
+
+const autoClickActive = ref(false)
+const autoClickTimeLeft = ref(0)
+let autoClickIntervalId = null
+let autoClickTimerId = null
+
+function activateAutoClick() {
+  if (autoClickActive.value || !inventory.hasItem('clicker_autoclick')) return
+  inventory.useItem('clicker_autoclick')
+  
+  autoClickActive.value = true
+  autoClickTimeLeft.value = 10
+  pushCombatEvent('AUTO-CLICK ACTIVADO', 'neutral')
+  
+  autoClickIntervalId = setInterval(() => {
+    doClick(true)
+  }, 100) // 10 clicks per second
+  
+  autoClickTimerId = setInterval(() => {
+    autoClickTimeLeft.value--
+    if (autoClickTimeLeft.value <= 0) {
+      clearInterval(autoClickIntervalId)
+      clearInterval(autoClickTimerId)
+      autoClickActive.value = false
+      pushCombatEvent('AUTO-CLICK DESACTIVADO', 'neutral')
+    }
+  }, 1000)
+}
 
 const COMBO_TIERS = [
   { threshold: 50, label: 'IMPULSO', multiplier: 1.05, critBonus: 0.02 },
@@ -103,6 +134,10 @@ onUnmounted(() => {
 })
 
 function handleClick(event) {
+  doClick(false, event)
+}
+
+function doClick(isAuto = false, event = null) {
   const now = Date.now(); comboCount.value = now - lastClickAt.value <= 650 ? comboCount.value + 1 : 1; lastClickAt.value = now
   isClicking.value = true; hitFlash.value = true
   const isCritical = Math.random() < critChance.value; const gained = clicker.click(comboMultiplier.value * (isCritical ? 2 : 1))
@@ -112,8 +147,19 @@ function handleClick(event) {
     setTimeout(() => { critPulse.value = false }, 220)
   }
 
-  const rect = event.currentTarget.getBoundingClientRect(); const id = ++particleId
-  clickParticles.value.push({ id, x: rect.left + rect.width / 2 + (Math.random() - 0.5) * 60, y: rect.top + rect.height / 3, value: Math.round(gained), critical: isCritical })
+  const id = ++particleId
+  let x, y;
+  if (event && event.currentTarget) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    x = rect.left + rect.width / 2 + (Math.random() - 0.5) * 60;
+    y = rect.top + rect.height / 3;
+  } else {
+    // Fallback for auto-clicks
+    x = window.innerWidth / 2 + (Math.random() - 0.5) * 60;
+    y = window.innerHeight / 2 - 50;
+  }
+
+  clickParticles.value.push({ id, x, y, value: Math.round(gained), critical: isCritical })
   setTimeout(() => { clickParticles.value = clickParticles.value.filter(p => p.id !== id) }, 900)
   setTimeout(() => { hitFlash.value = false; isClicking.value = false }, 130); lastPlayerAction = Date.now()
 }
@@ -201,6 +247,29 @@ function toggleTier(tierId) {
             <div class="absolute inset-0 flex items-center justify-center mix-blend-difference pointer-events-none">
                <span class="font-pixel text-xs text-white/60 uppercase tracking-[0.4em]">{{ comboLabel }}</span>
             </div>
+          </div>
+
+          <!-- ABILITY DOCK -->
+          <div class="flex items-center justify-center gap-3 mt-4">
+             <div class="group relative">
+               <button 
+                 @click="activateAutoClick" 
+                 :disabled="autoClickActive || !inventory.hasItem('clicker_autoclick')"
+                 class="relative border border-white/10 bg-black/60 flex flex-col items-center justify-center min-w-[110px] h-14 px-3 disabled:opacity-30 disabled:grayscale transition-all hover:border-neon-cyan/50 hover:bg-white/5 active:scale-95 overflow-hidden"
+               >
+                 <div v-if="autoClickActive" class="absolute inset-0 bg-neon-cyan/20 animate-pulse"></div>
+                 
+                 <span v-if="!inventory.hasItem('clicker_autoclick') && !autoClickActive" class="absolute inset-0 flex items-center justify-center bg-black/80 font-pixel text-[8px] text-neon-pink uppercase z-20">0 USOS - TIENDA</span>
+                 <span v-else-if="autoClickActive" class="absolute inset-0 flex items-center justify-center bg-black/80 font-pixel text-[10px] text-neon-cyan uppercase z-20">{{ autoClickTimeLeft }}s</span>
+                 
+                 <span class="font-display text-[9px] font-black uppercase text-white/60 group-hover:text-white relative z-10 text-center leading-tight">
+                   AUTO-CLICK
+                 </span>
+                 <span class="font-pixel text-[8px] text-white/40 mt-0.5 relative z-10">{{ inventory.items['clicker_autoclick'] || 0 }} USOS</span>
+                 
+                 <div class="absolute inset-0 border border-transparent group-hover:border-neon-cyan/30 pointer-events-none"></div>
+               </button>
+             </div>
           </div>
 
           <!-- THE REACTOR CORE -->
@@ -309,7 +378,7 @@ function toggleTier(tierId) {
                             : 'border-transparent opacity-40 cursor-not-allowed grayscale'"
                         >
                            <div class="size-10 rounded shadow-inner bg-black/50 border border-white/5 flex items-center justify-center text-xl mr-3 shrink-0 group-hover:scale-110 transition-transform">
-                              {{ upgrade.icon }}
+                              <Icon :icon="upgrade.icon" class="text-neon-cyan" />
                            </div>
                            
                            <div class="flex-1 min-w-0 pr-1">
@@ -363,7 +432,9 @@ function toggleTier(tierId) {
         <TransitionGroup name="toast">
           <div v-for="toast in toastQueue" :key="toast.id" class="gh-glass p-5 bg-black/80 border-neon-cyan/50 pointer-events-auto">
              <div class="flex items-center gap-3 mb-3">
-                <div class="size-8  bg-neon-cyan/10 flex items-center justify-center text-neon-cyan">🌟</div>
+                <div class="size-8  bg-neon-cyan/10 flex items-center justify-center text-neon-cyan">
+                   <Icon icon="lucide:trophy" />
+                </div>
                 <div class="flex-1">
                    <p class="font-pixel text-xs uppercase tracking-[0.2em] opacity-40">ACHIEVEMENT</p>
                    <h4 class="font-display text-xs font-black text-white uppercase">{{ toast.title }}</h4>

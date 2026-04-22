@@ -6,7 +6,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
   const SAVE_COOLDOWN_MS = 5_000 // Mínimo 5 segundos entre saves
   
   const gameState = reactive({
-    lives: 20,
+    lives: 100,
     gold: 150,
     wave: 1,
     waveActive: false,

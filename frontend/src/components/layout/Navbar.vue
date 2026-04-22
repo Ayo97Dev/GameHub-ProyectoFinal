@@ -3,13 +3,12 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useGameStore } from '../../stores/game'
-import { useTheme } from '../../composables/useTheme'
+import { Icon } from '@iconify/vue'
 import BaseButton from '../ui/BaseButton.vue'
 
 const authStore = useAuthStore()
 const gameStore = useGameStore()
 const router = useRouter()
-const { isDark, toggleTheme } = useTheme()
 const navGames = computed(() => gameStore.games)
 const isLoggingOut = ref(false)
 
@@ -37,62 +36,74 @@ async function handleLogout() {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 border-b-4 border-retro-black bg-retro-cream dark:border-b-4 dark:border-neon-cyan dark:bg-retro-dark transition-colors duration-300">
-    <nav class="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex items-center justify-between gap-4">
-        <RouterLink to="/" class="text-3xl font-display font-black tracking-widest uppercase gh-title-gradient hover:-translate-y-0.5 active:translate-y-0 transition-transform">
-          GameHub
+  <header class="sticky top-0 z-[100] border-b-4 border-retro-black bg-black transition-all">
+    <nav class="mx-auto flex w-full max-w-[100rem] flex-col gap-6 px-6 py-4 sm:flex-row sm:items-center sm:justify-between relative overflow-hidden">
+      <!-- Decorator Line -->
+      <div class="absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
+
+      <div class="flex items-center justify-between gap-6 relative">
+        <RouterLink to="/" class="group flex items-center gap-4">
+           <div class="size-10 bg-neon-cyan border-2 border-black shadow-[4px_4px_0px_#fff200] flex items-center justify-center group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] group-hover:shadow-[6px_6px_0px_#fff200] transition-all">
+              <Icon icon="lucide:zap" class="text-2xl text-black" />
+           </div>
+           <span class="text-4xl font-display font-black tracking-tighter uppercase text-white gh-title-glow group-hover:text-neon-cyan transition-colors">
+             GameHub
+           </span>
         </RouterLink>
-        <span class="border-2 border-retro-black bg-neon-yellow px-2 py-0.5 text-xs font-bold uppercase tracking-widest text-retro-black shadow-[2px_2px_0px_#09090b] dark:border-neon-pink dark:bg-neon-pink/20 dark:text-neon-pink dark:shadow-[2px_2px_0px_#f472b6]">
-          Arcade
-        </span>
+        <div class="flex items-center gap-2">
+           <span class="size-2 bg-neon-green shadow-[0_0_8px_#22c55e] animate-pulse"></span>
+           <span class="font-pixel text-[10px] text-white/40 uppercase tracking-[0.2em]">SYS_OK</span>
+        </div>
       </div>
 
-      <div class="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-        <button 
-          @click="toggleTheme" 
-          class="flex items-center justify-center p-2 gh-surface gh-surface-hover w-10 h-10 text-retro-black dark:text-neon-cyan border-2 border-retro-black dark:border-neon-cyan dark:bg-transparent"
-          title="Alternar Tema"
-        >
-          <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <!-- Moon icon -->
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <!-- Sun icon -->
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-        </button>
-
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-4 sm:gap-8">
+        <div class="flex flex-wrap items-center gap-4">
           <RouterLink
-            v-for="game in navGames"
-            :key="game.slug"
-            :to="game.route || `/play/${game.slug}`"
-            class="gh-surface gh-surface-hover px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wider text-retro-black dark:text-retro-white dark:bg-transparent"
-            active-class="bg-retro-black text-white dark:bg-neon-cyan dark:text-retro-black !shadow-none translate-x-[4px] translate-y-[4px] border-retro-black dark:border-neon-cyan"
+            to="/"
+            class="px-4 py-2 font-display text-xs font-black uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all border-b-2 border-transparent relative group"
+            active-class="!text-neon-cyan !border-neon-cyan"
           >
-            {{ game.title.split(' ')[0] }}
+            Terminal
+            <div class="absolute -top-1 -right-1 size-1 bg-neon-cyan opacity-0 group-hover:opacity-100"></div>
           </RouterLink>
+
+          <RouterLink
+            to="/store"
+            class="px-4 py-2 font-display text-xs font-black uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all border-b-2 border-transparent relative group"
+            active-class="!text-neon-yellow !border-neon-yellow"
+          >
+            Arsenal
+            <div class="absolute -top-1 -right-1 size-1 bg-neon-yellow opacity-0 group-hover:opacity-100"></div>
+          </RouterLink>
+
+          <div class="h-6 w-px bg-white/10 mx-2"></div>
 
           <template v-if="authStore.isLoggedIn">
             <RouterLink
               to="/profile"
-              class="gh-surface gh-surface-hover px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wider text-retro-black dark:text-retro-white dark:bg-transparent"
-              active-class="bg-retro-black text-white dark:bg-neon-cyan dark:text-retro-black !shadow-none translate-x-[4px] translate-y-[4px] border-retro-black dark:border-neon-cyan"
+              class="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/5 hover:border-neon-cyan hover:bg-neon-cyan/5 transition-all group"
+              active-class="!bg-neon-cyan/10 !border-neon-cyan !text-neon-cyan"
             >
-              Perfil
+              <Icon icon="lucide:user" class="text-lg text-white/40 group-hover:text-neon-cyan transition-colors" />
+              <span class="font-display text-xs font-black uppercase tracking-widest text-white">{{ authStore.user.name }}</span>
             </RouterLink>
-            <BaseButton size="sm" @click="handleLogout" :disabled="isLoggingOut" variant="danger">
-              {{ isLoggingOut ? 'Cerrando' : 'Salir' }}
-            </BaseButton>
+            
+            <button 
+              @click="handleLogout" 
+              :disabled="isLoggingOut" 
+              class="size-10 flex items-center justify-center bg-white/5 border border-white/5 text-white/40 hover:text-neon-pink hover:border-neon-pink hover:bg-neon-pink/10 transition-all shadow-[4px_4px_0px_#000]"
+            >
+              <Icon v-if="isLoggingOut" icon="lucide:loader-2" class="animate-spin text-xl" />
+              <Icon v-else icon="lucide:log-out" class="text-xl" />
+            </button>
           </template>
+          
           <template v-else>
-            <RouterLink to="/login">
-              <BaseButton size="sm" variant="ghost">Entrar</BaseButton>
+            <RouterLink to="/login" class="px-6 py-2 border-2 border-white/10 font-display text-xs font-black text-white/60 hover:text-white hover:border-white/20 transition-all uppercase tracking-widest">
+              Conectar
             </RouterLink>
-            <RouterLink to="/register">
-              <BaseButton size="sm" variant="primary">Registro</BaseButton>
+            <RouterLink to="/register" class="px-6 py-2 bg-neon-pink text-black font-display text-xs font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all">
+              Registrar
             </RouterLink>
           </template>
         </div>

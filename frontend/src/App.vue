@@ -24,9 +24,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col bg-retro-deep selection:bg-neon-cyan selection:text-black">
     <Navbar />
-    <main class="flex-1">
+    <main class="flex-1 relative">
       <RouterView />
     </main>
     <Footer />

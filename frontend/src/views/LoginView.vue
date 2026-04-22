@@ -33,35 +33,58 @@ async function submitLogin() {
 </script>
 
 <template>
-  <section class="mx-auto flex w-full max-w-7xl justify-center px-4 py-16 lg:py-24">
-    <div class="gh-panel relative w-full max-w-md p-6 sm:p-10 border-[4px] border-retro-black dark:border-neon-cyan shadow-[8px_8px_0px_#09090b] dark:shadow-[8px_8px_0px_#22d3ee] bg-retro-cream dark:bg-black">
-      <div class="gh-scanlines absolute inset-0 opacity-20 pointer-events-none"></div>
+  <section class="mx-auto flex w-full max-w-7xl justify-center px-4 py-16 lg:py-32 relative z-10">
+    <!-- AMBIENT EFFECTS -->
+    <div class="gh-scanlines fixed inset-0 opacity-[0.15] pointer-events-none -z-10"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,242,255,0.05),transparent_70%)] pointer-events-none -z-10"></div>
 
-      <p class="relative z-10 font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-blue dark:text-neon-yellow mb-2 border-b-2 border-retro-black dark:border-neon-cyan pb-1 inline-block">AUTH_MODULE</p>
-      <h1 class="relative z-10 mt-2 text-4xl font-display font-black uppercase tracking-widest text-retro-black dark:text-retro-white">LOGIN</h1>
+    <div class="relative w-full max-w-lg p-12 sm:p-16 border-4 border-retro-black bg-black shadow-[24px_24px_0px_#000] overflow-hidden">
+      <!-- Corner Ornaments -->
+      <div class="absolute -top-1 -left-1 size-12 border-t-4 border-l-4 border-neon-cyan"></div>
+      <div class="absolute -bottom-1 -right-1 size-12 border-b-4 border-r-4 border-neon-cyan"></div>
       
-      <div v-if="errorMsg" class="relative z-10 mt-6 border-[3px] border-neon-pink bg-retro-black p-3 font-pixel text-xs text-neon-pink uppercase blink shadow-[4px_4px_0px_#f472b6]">
-        ERR: {{ errorMsg }}
+      <div class="absolute inset-0 bg-[linear-gradient(rgba(0,242,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,242,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+
+      <header class="relative z-10 mb-12">
+        <p class="font-pixel text-[10px] font-black uppercase tracking-[0.5em] text-neon-yellow mb-4 border-b-2 border-white/5 pb-2 inline-block">TERMINAL_AUTORIZACIÓN_V1.2</p>
+        <h1 class="text-6xl font-display font-black uppercase tracking-tighter text-white leading-none gh-title-glow">Acceso_Sistema</h1>
+      </header>
+      
+      <div v-if="errorMsg" class="relative z-10 mb-10 border-l-4 border-neon-pink bg-neon-pink/10 p-5 font-pixel text-xs text-neon-pink uppercase blink shadow-[4px_4px_0px_rgba(0,0,0,0.5)]">
+        CRIT_ERR: {{ errorMsg }}
       </div>
       
-      <form class="relative z-10 mt-8 space-y-6" @submit.prevent="submitLogin">
-        <div>
-          <label class="mb-2 block font-pixel text-xs font-bold uppercase tracking-widest text-retro-black dark:text-retro-white">USER_ID [EMAIL]</label>
-          <input v-model="form.email" type="email" required class="w-full border-4 border-retro-black bg-white dark:bg-retro-dark px-4 py-3 font-sans font-bold text-retro-black dark:text-retro-white outline-none transition focus:border-neon-cyan focus:shadow-[inset_4px_4px_0px_#22d3ee] dark:border-neon-cyan dark:focus:shadow-[inset_4px_4px_0px_#22d3ee]" />
+      <form class="relative z-10 space-y-10" @submit.prevent="submitLogin">
+        <div class="space-y-4">
+          <label class="block font-pixel text-[10px] font-black uppercase tracking-[0.4em] text-white/40">USER_ID [EMAIL_PROTOCOL]</label>
+          <div class="relative group">
+             <div class="absolute left-0 top-0 h-full w-[2px] bg-white/10 group-focus-within:bg-neon-cyan transition-colors"></div>
+             <input v-model="form.email" type="email" required placeholder="name@domain.node" class="w-full bg-white/5 border border-white/5 px-6 py-5 font-sans font-bold text-white outline-none transition focus:bg-white/10 focus:border-white/20" />
+          </div>
         </div>
-        <div>
-          <label class="mb-2 block font-pixel text-xs font-bold uppercase tracking-widest text-retro-black dark:text-retro-white">PASSWORD</label>
-          <input v-model="form.password" type="password" required class="w-full border-4 border-retro-black bg-white dark:bg-retro-dark px-4 py-3 font-sans font-bold text-retro-black dark:text-retro-white outline-none transition focus:border-neon-cyan focus:shadow-[inset_4px_4px_0px_#22d3ee] dark:border-neon-cyan dark:focus:shadow-[inset_4px_4px_0px_#22d3ee]" />
+        <div class="space-y-4">
+          <label class="block font-pixel text-[10px] font-black uppercase tracking-[0.4em] text-white/40">AUTH_KEY [PASSWORD]</label>
+          <div class="relative group">
+             <div class="absolute left-0 top-0 h-full w-[2px] bg-white/10 group-focus-within:bg-neon-cyan transition-colors"></div>
+             <input v-model="form.password" type="password" required placeholder="********" class="w-full bg-white/5 border border-white/5 px-6 py-5 font-sans font-bold text-white outline-none transition focus:bg-white/10 focus:border-white/20" />
+          </div>
         </div>
-        <BaseButton type="submit" class="w-full mt-4 py-4 text-xl">
-          {{ isLoading ? 'CONNECTING...' : 'LOGIN' }}
-        </BaseButton>
+        
+        <button 
+          type="submit" 
+          :disabled="isLoading"
+          class="w-full py-6 bg-neon-cyan text-black font-display text-lg font-black uppercase tracking-widest shadow-[8px_8px_0px_#000] hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[12px_12px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center justify-center gap-4 group"
+        >
+          <Icon v-if="isLoading" icon="lucide:loader-2" class="animate-spin text-2xl" />
+          <Icon v-else icon="lucide:log-in" class="text-2xl group-hover:translate-x-1 transition-transform" />
+          {{ isLoading ? 'CONNECTING...' : 'INICIAR_SESIÓN' }}
+        </button>
       </form>
 
-      <p class="relative z-10 mt-8 text-center font-sans font-bold text-sm text-retro-black dark:text-retro-white">
-        NO ACCOUNT? 
-        <RouterLink to="/register" class="font-pixel text-neon-blue dark:text-neon-pink underline underline-offset-4 ml-2">REGISTER_NOW</RouterLink>
-      </p>
+      <div class="relative z-10 mt-12 pt-8 border-t border-white/5 flex flex-col items-center gap-4">
+        <p class="font-sans font-bold text-xs text-white/30 uppercase tracking-widest">¿NUEVO_OPERADOR?</p>
+        <RouterLink to="/register" class="w-full py-4 border-2 border-white/10 text-center font-display text-xs font-black text-white hover:bg-white/5 hover:border-white/20 transition-all uppercase tracking-[0.2em]">Registrar_Nueva_Terminal</RouterLink>
+      </div>
     </div>
   </section>
 </template>

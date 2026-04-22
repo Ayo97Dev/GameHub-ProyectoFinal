@@ -27,11 +27,13 @@
   }
 
   html {
+    font-size: 16px; /* Base normativa estándar */
     scroll-behavior: smooth;
+    @apply antialiased;
   }
 
   body {
-    @apply font-sans antialiased text-retro-black bg-retro-cream transition-colors duration-300;
+    @apply text-base font-sans leading-relaxed text-retro-black bg-retro-cream transition-colors duration-300;
     /* Grid Paper Effect */
     background-image:
       linear-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px),

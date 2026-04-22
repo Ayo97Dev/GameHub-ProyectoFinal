@@ -7,6 +7,7 @@ import ProfileView from '../views/ProfileView.vue'
 import PlayView from '../views/PlayView.vue'
 import LeaderboardView from '../views/LeaderboardView.vue'
 import AchievementsView from '../views/AchievementsView.vue'
+import StoreView from '../views/StoreView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -18,6 +19,7 @@ const router = createRouter({
     { path: '/play/:slug',     name: 'play',          component: PlayView,         meta: { requiresAuth: true }, props: true },
     { path: '/leaderboard/:slug', name: 'leaderboard', component: LeaderboardView },
     { path: '/achievements',   name: 'achievements',  component: AchievementsView, meta: { requiresAuth: true } },
+    { path: '/store',          name: 'store',         component: StoreView },
   ],
 })
 

@@ -34,55 +34,93 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-4xl px-4 py-16">
-    <header class="mb-10 flex flex-col items-center border-[4px] border-retro-black dark:border-neon-yellow bg-white dark:bg-black p-6 shadow-[8px_8px_0px_#09090b] dark:shadow-[8px_8px_0px_#fef08a] relative overflow-hidden">
-      <div class="gh-scanlines absolute inset-0 opacity-20 pointer-events-none"></div>
-      <p class="relative z-10 font-pixel text-xs font-bold uppercase tracking-widest text-neon-pink dark:text-neon-pink">>> NETWORK_RANKINGS</p>
-      <h1 class="relative z-10 mt-3 text-4xl sm:text-5xl font-display font-black uppercase text-retro-black dark:text-retro-white text-center">
-        LEADERBOARD <!--{{ gameName }}-->
+  <section class="mx-auto w-full max-w-5xl px-4 py-16 relative z-10 space-y-12">
+    <!-- AMBIENT EFFECTS -->
+    <div class="gh-scanlines fixed inset-0 opacity-[0.15] pointer-events-none -z-10"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,242,255,0.05),transparent_70%)] pointer-events-none -z-10"></div>
+
+    <header class="mb-10 flex flex-col items-center border-4 border-retro-black bg-black p-10 shadow-[16px_16px_0px_#000] relative overflow-hidden">
+      <!-- Corner Ornaments -->
+      <div class="absolute -top-1 -left-1 size-8 border-t-4 border-l-4 border-neon-yellow"></div>
+      <div class="absolute -bottom-1 -right-1 size-8 border-b-4 border-r-4 border-neon-yellow"></div>
+      
+      <div class="absolute inset-0 bg-[linear-gradient(rgba(255,252,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,252,0,0.02)_1px,transparent_1px)] bg-[size:30px_30px]"></div>
+
+      <p class="relative z-10 font-pixel text-xs font-bold uppercase tracking-[0.5em] text-neon-pink">>> NETWORK_RANKINGS_V.2.4</p>
+      <h1 class="relative z-10 mt-4 text-5xl sm:text-7xl font-display font-black uppercase text-white text-center tracking-tighter leading-[0.8] gh-title-glow">
+        Hall_Of_Fame
       </h1>
-      <h2 class="relative z-10 mt-1 text-2xl font-display font-black uppercase text-neon-blue dark:text-neon-cyan">
-        [{{ gameName }}]
-      </h2>
-      <p class="relative z-10 mt-4 bg-retro-black text-white dark:bg-neon-yellow dark:text-black font-pixel text-[10px] px-2 py-1 uppercase">{{ leaderboardSubtitle }}</p>
+      <div class="relative z-10 mt-6 flex items-center gap-4">
+         <div class="h-[2px] w-8 bg-neon-cyan shadow-[0_0_8px_#00f2ff]"></div>
+         <h2 class="text-2xl font-display font-black uppercase text-neon-cyan tracking-widest">
+           [{{ gameName }}]
+         </h2>
+         <div class="h-[2px] w-8 bg-neon-cyan shadow-[0_0_8px_#00f2ff]"></div>
+      </div>
+      <p class="relative z-10 mt-8 bg-neon-yellow text-black font-pixel text-[10px] px-4 py-1.5 uppercase tracking-[0.2em] font-black shadow-[4px_4px_0px_rgba(0,0,0,0.5)]">{{ leaderboardSubtitle }}</p>
     </header>
 
-    <div v-if="isLoading" class="flex justify-center py-16 text-retro-black dark:text-neon-yellow font-pixel text-2xl uppercase blink gh-panel">
-      FETCHING_RECORDS...
+    <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 bg-retro-black/40 border-4 border-dashed border-white/5 space-y-6">
+      <div class="relative size-16">
+         <div class="absolute inset-0 border-4 border-neon-yellow/20"></div>
+         <div class="absolute inset-0 border-t-4 border-neon-yellow animate-spin"></div>
+      </div>
+      <p class="text-neon-yellow font-pixel text-xl uppercase tracking-[0.5em] blink">FETCHING_RECORDS_FROM_NODE...</p>
     </div>
 
-    <div v-else-if="entries.length === 0" class="gh-panel flex justify-center py-16 text-retro-black dark:text-retro-white font-pixel text-xl uppercase">
-      SERVER DB IS EMPTY. BE THE FIRST.
+    <div v-else-if="entries.length === 0" class="flex flex-col items-center justify-center py-24 bg-retro-black/40 border-4 border-white/5">
+      <Icon icon="lucide:database-zap" class="text-6xl text-white/10 mb-6" />
+      <p class="text-white/40 font-pixel text-xl uppercase tracking-[0.4em]">SERVER DB IS EMPTY. BE THE FIRST.</p>
     </div>
 
-    <ol v-else class="space-y-4">
+    <ol v-else class="space-y-6">
       <li
         v-for="(entry, i) in entries"
         :key="entry.user_id"
-        class="flex flex-col sm:flex-row sm:items-center gap-4 gh-panel p-4 transition-all"
-        :class="i === 0 ? '!border-neon-yellow !shadow-[6px_6px_0px_#fef08a]'
-               : i === 1 ? '!border-retro-black dark:!border-retro-white !shadow-[6px_6px_0px_#09090b] dark:!shadow-[6px_6px_0px_#fafafa]'
-               : i === 2 ? '!border-neon-pink !shadow-[6px_6px_0px_#f472b6] dark:!shadow-[6px_6px_0px_#f472b6]'
-               : ''"
+        class="flex flex-col sm:flex-row sm:items-center gap-6 bg-black border-4 p-6 transition-all relative overflow-hidden group"
+        :class="i === 0 ? 'border-neon-yellow shadow-[12px_12px_0px_#000] bg-neon-yellow/5'
+               : i === 1 ? 'border-white/20 shadow-[10px_10px_0px_#000]'
+               : i === 2 ? 'border-neon-pink shadow-[8px_8px_0px_#000] bg-neon-pink/5'
+               : 'border-retro-black shadow-[8px_8px_0px_#000] opacity-80 hover:opacity-100 hover:border-white/10'"
       >
-        <span class="w-16 text-center font-pixel text-4xl sm:text-3xl font-black text-retro-black dark:text-retro-white"
-          :class="i === 0 ? '!text-neon-yellow' : i === 2 ? '!text-neon-pink' : ''"
-        >
-          {{ ['1P', '2P', '3P'][i] ?? `${i + 1}P` }}
-        </span>
-        <div class="flex flex-1 items-center gap-4 min-w-0 border-l-[3px] border-retro-black dark:border-retro-white pl-4 sm:border-r-[3px] sm:pr-4">
-          <div class="size-12 border-[3px] border-retro-black dark:border-neon-cyan bg-neon-cyan flex items-center justify-center shrink-0 shadow-[2px_2px_0px_#09090b]">
-            <span class="font-pixel text-xl font-bold text-retro-black">{{ entry.username?.[0]?.toUpperCase() }}</span>
-          </div>
-          <p class="truncate font-display text-2xl font-black text-retro-black dark:text-retro-white uppercase">{{ entry.username }}</p>
+        <!-- Background rank text -->
+        <div class="absolute -right-4 -bottom-8 font-display text-[120px] font-black text-white/[0.03] select-none group-hover:text-white/[0.05] transition-colors">
+           #{{ i + 1 }}
         </div>
-        <div class="sm:text-right shrink-0 mt-4 sm:mt-0 border-t-2 sm:border-0 border-retro-black dark:border-retro-white pt-2 sm:pt-0">
-          <p class="font-sans text-3xl font-black text-neon-blue dark:text-neon-yellow leading-none">{{ Number(entry.high_score).toLocaleString() }}</p>
-          <div class="flex sm:flex-col justify-between items-center sm:items-end mt-1">
-            <p class="font-pixel text-[10px] uppercase tracking-widest text-retro-black dark:text-retro-white">{{ scoreLabel }}</p>
-            <p v-if="entry.time_played" class="font-pixel text-[10px] text-slate-500 dark:text-slate-400 mt-1">
-              {{ Math.floor(entry.time_played / 60) }}m_PLAYED
-            </p>
+
+        <div class="flex items-center gap-6 flex-1 min-w-0">
+           <div class="size-16 shrink-0 flex items-center justify-center font-display text-4xl font-black relative"
+             :class="i === 0 ? 'text-neon-yellow' : i === 1 ? 'text-white' : i === 2 ? 'text-neon-pink' : 'text-white/20'"
+           >
+             {{ i + 1 }}
+             <div v-if="i < 3" class="absolute -top-1 -left-1 size-4 border-t-2 border-l-2" :class="i === 0 ? 'border-neon-yellow' : i === 1 ? 'border-white' : 'border-neon-pink'"></div>
+           </div>
+
+           <div class="flex items-center gap-6 flex-1 min-w-0 border-l-2 border-white/5 pl-6">
+             <div class="size-14 border-2 flex items-center justify-center shrink-0 shadow-[4px_4px_0px_#000] transition-transform group-hover:scale-105"
+               :class="i === 0 ? 'border-neon-yellow bg-neon-yellow/10 text-neon-yellow' : 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan'"
+             >
+               <span class="font-pixel text-2xl font-black">{{ entry.username?.[0]?.toUpperCase() }}</span>
+             </div>
+             <div class="flex flex-col min-w-0">
+                <p class="truncate font-display text-3xl font-black text-white uppercase tracking-tighter leading-none mb-1">{{ entry.username }}</p>
+                <div class="flex items-center gap-3">
+                   <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.2em]">USER_ID: {{ entry.user_id }}</span>
+                   <div v-if="entry.time_played" class="h-1 w-1 bg-white/20"></div>
+                   <p v-if="entry.time_played" class="font-pixel text-[10px] text-neon-cyan/50 uppercase tracking-[0.2em]">
+                     {{ Math.floor(entry.time_played / 60) }}m_SESIÓN
+                   </p>
+                </div>
+             </div>
+           </div>
+        </div>
+
+        <div class="sm:text-right shrink-0 mt-4 sm:mt-0 border-t-2 sm:border-0 border-white/5 pt-4 sm:pt-0 relative z-10">
+          <p class="font-display text-4xl font-black leading-none tracking-tighter" :class="i === 0 ? 'text-neon-yellow gh-title-glow' : 'text-white'">
+            {{ Number(entry.high_score).toLocaleString() }}
+          </p>
+          <div class="flex sm:flex-col justify-between items-center sm:items-end mt-2">
+            <p class="font-pixel text-[11px] uppercase tracking-[0.3em] font-black" :class="i === 0 ? 'text-neon-yellow/70' : 'text-white/40'">{{ scoreLabel }}_ACUMULADOS</p>
           </div>
         </div>
       </li>

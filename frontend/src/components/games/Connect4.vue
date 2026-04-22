@@ -96,10 +96,10 @@
         <Transition name="scale-up">
           <div v-if="gameState === 'won' || gameState === 'draw'" class="absolute inset-x-4 inset-y-8 z-[100] gh-glass border-neon-cyan/40 flex flex-col items-center justify-center text-center p-8 border-2">
              <div class="mb-6 relative">
-                <div class="size-24 border-2 border-neon-cyan rounded-full flex items-center justify-center bg-black/40 backdrop-blur-3xl">
-                   <span v-if="gameState === 'draw'" class="text-5xl">⚖️</span>
-                   <span v-else-if="winner === 'player'" class="text-5xl animate-bounce">🏆</span>
-                   <span v-else class="text-5xl opacity-80">🤖</span>
+                <div class="size-24 border-2 border-neon-cyan rounded-full flex items-center justify-center bg-black/40 backdrop-blur-3xl text-5xl">
+                   <Icon v-if="gameState === 'draw'" icon="lucide:scale" class="text-white" />
+                   <Icon v-else-if="winner === 'player'" icon="lucide:trophy" class="text-neon-yellow animate-bounce" />
+                   <Icon v-else icon="lucide:bot" class="text-neon-pink opacity-80" />
                 </div>
                 <div class="absolute inset-0 rounded-full bg-neon-cyan/20 blur-xl animate-pulse"></div>
              </div>
@@ -133,7 +133,9 @@
          <TransitionGroup name="toast">
            <div v-for="toast in toastQueue" :key="toast.id" class="gh-glass p-5 bg-black/80 border-neon-cyan/50 pointer-events-auto">
               <div class="flex items-center gap-3 mb-3">
-                 <div class="size-8  bg-neon-cyan/10 flex items-center justify-center text-neon-cyan">🌟</div>
+                 <div class="size-8  bg-neon-cyan/10 flex items-center justify-center text-neon-cyan">
+                    <Icon icon="lucide:sparkles" />
+                 </div>
                  <div class="flex-1">
                     <p class="font-pixel text-xs uppercase tracking-[0.2em] opacity-40">LOGRO_DESBLOQUEADO</p>
                     <h4 class="font-display text-xs font-black text-white uppercase">{{ toast.title }}</h4>
@@ -150,6 +152,7 @@
 
 <script setup>
 import { ref, computed, reactive, onMounted, onUnmounted, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useConnect4Store } from '../../stores/games/connect4'
 
 const ROWS = 6; const COLS = 7; const AI_DEPTH = 5; const AI_RESPONSE_DELAY_MS = 600
