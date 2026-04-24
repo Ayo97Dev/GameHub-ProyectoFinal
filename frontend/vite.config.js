@@ -7,6 +7,10 @@ export default defineConfig({
   plugins: [vue(), tailwindcss()],
   server: {
     host: true,
+    allowedHosts: true,
+    hmr: {
+      clientPort: 443
+    },
     watch: {
       usePolling: true
     }

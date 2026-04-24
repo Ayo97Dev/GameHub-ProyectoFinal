@@ -3,18 +3,18 @@ import { ref } from 'vue'
 const isDark = ref(true)
 
 function applyTheme() {
-  if (typeof window !== 'undefined') {
+  if (typeof document !== 'undefined') {
     document.documentElement.classList.add('dark')
-    localStorage.setItem('theme', 'dark')
   }
 }
 
 // Initial apply
-applyTheme()
+if (typeof window !== 'undefined') {
+  applyTheme()
+}
 
 export function useTheme() {
   return {
-    isDark,
-    toggleTheme: () => {} // No-op
+    isDark
   }
 }

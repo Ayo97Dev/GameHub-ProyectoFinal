@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
             'game.throttle' => \App\Http\Middleware\RateLimitGame::class,
             'connect4.leaderboard.auth' => \App\Http\Middleware\RequireConnect4LeaderboardAuth::class,

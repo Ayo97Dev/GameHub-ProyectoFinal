@@ -135,115 +135,104 @@ const checkout = async (method) => {
 
 <template>
   <div class="store-view min-h-[calc(100vh-64px)] bg-retro-deep text-retro-white font-sans relative overflow-hidden flex flex-col py-10 px-4">
-    <!-- AMBIENT EFFECTS -->
-    <div class="gh-scanlines fixed inset-0 opacity-[0.15] pointer-events-none z-10"></div>
-    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,242,255,0.05),transparent_70%)] pointer-events-none"></div>
+    <div class="gh-scanlines absolute inset-0 opacity-10 pointer-events-none z-10"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-neon-cyan/5 via-transparent to-neon-pink/5 pointer-events-none"></div>
 
     <!-- CART TOGGLE BUTTON -->
     <button 
       @click="isCartOpen = !isCartOpen"
-      class="fixed bottom-8 right-8 z-[60] size-16 bg-neon-yellow text-black shadow-[8px_8px_0px_#000] flex items-center justify-center transition-all hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[12px_12px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none group"
+      class="fixed bottom-8 right-8 z-[60] size-16 bg-neon-yellow text-black shadow-[6px_6px_0px_#000] border-2 border-black flex items-center justify-center transition-all hover:scale-110 active:scale-95 group"
     >
-       <Icon icon="lucide:shopping-cart" class="text-3xl" />
-       <div v-if="cartCount > 0" class="absolute -top-1 -right-1 size-6 bg-neon-pink text-white text-[10px] font-black flex items-center justify-center border-2 border-retro-black animate-pulse">
+       <Icon icon="lucide:shopping-cart" class="text-3xl group-hover:animate-bounce" />
+       <div v-if="cartCount > 0" class="absolute -top-1 -right-1 size-6 bg-neon-pink text-white text-[10px] font-black flex items-center justify-center border-2 border-retro-deep animate-pulse">
          {{ cartCount }}
        </div>
     </button>
 
     <!-- CART SIDEBAR -->
     <Transition name="slide">
-      <aside v-if="isCartOpen" class="fixed inset-y-0 right-0 w-full sm:w-[450px] bg-retro-black/95 backdrop-blur-2xl border-l-4 border-retro-black z-[70] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] flex flex-col">
-         <header class="p-8 border-b border-white/5 flex items-center justify-between bg-black/40">
-            <div class="flex flex-col">
-               <span class="font-pixel text-[10px] text-neon-cyan tracking-[0.4em] uppercase mb-1">TERMINAL_PEDIDO</span>
-               <h2 class="font-display text-2xl font-black text-white uppercase tracking-tighter">Carrito_De_Compra</h2>
-            </div>
-            <button @click="isCartOpen = false" class="size-10 flex items-center justify-center border border-white/10 text-white/40 hover:text-white hover:border-white/20 transition-all">✕</button>
+      <aside v-if="isCartOpen" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-black border-l-4 border-neon-cyan z-[70] shadow-[-20px_0_50px_rgba(0,0,0,0.8)] flex flex-col">
+         <header class="p-6 border-b-2 border-neon-cyan/20 flex items-center justify-between bg-retro-dark">
+            <h2 class="font-display text-xl font-black text-white uppercase tracking-widest">Carrito_De_Compra</h2>
+            <button @click="isCartOpen = false" class="text-white/40 hover:text-white transition-colors text-2xl">✕</button>
          </header>
 
-         <div class="flex-1 overflow-y-auto p-8 space-y-6 custom-scroll">
-            <div v-if="cart.length === 0" class="h-full flex flex-col items-center justify-center opacity-10 text-center">
-               <Icon icon="lucide:shopping-cart" class="text-8xl mb-6" />
-               <p class="font-pixel text-sm uppercase tracking-[0.5em]">SISTEMA_VACÍO</p>
+         <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scroll">
+            <div v-if="cart.length === 0" class="h-full flex flex-col items-center justify-center opacity-20 text-center">
+               <Icon icon="lucide:shopping-cart" class="text-6xl mb-4" />
+               <p class="font-pixel text-xs uppercase tracking-widest">Carrito_Vacio</p>
             </div>
             
             <div 
               v-for="item in cart" 
               :key="item.id" 
-              class="bg-white/5 border border-white/5 p-5 flex gap-5 items-center group relative overflow-hidden"
+              class="gh-glass bg-white/5 border-white/5 p-4 flex gap-4 items-center group relative overflow-hidden"
             >
-               <div class="size-14 shrink-0 flex items-center justify-center text-3xl border-2 border-white/5 bg-black/40" :class="`text-${item.color}`">
+               <div class="size-12 shrink-0 flex items-center justify-center text-2xl border border-white/10 bg-black/40" :class="`text-${item.color}`">
                  <Icon :icon="item.icon" />
                </div>
                <div class="flex-1 min-w-0">
-                  <h4 class="font-display text-sm font-black text-white uppercase truncate">{{ item.name }}</h4>
-                  <p class="font-pixel text-[10px] text-white/40 uppercase tracking-widest">{{ item.price.toFixed(2) }} € / UNIDAD</p>
+                  <h4 class="font-display text-xs font-black text-white uppercase truncate">{{ item.name }}</h4>
+                  <p class="font-pixel text-[10px] text-white/40 uppercase">{{ item.price.toFixed(2) }} € / UNIDAD</p>
                </div>
-               <div class="flex flex-col items-end gap-2">
-                  <div class="flex items-center bg-black/60 border border-white/10 p-1">
-                     <button @click="removeFromCart(item.id)" class="size-7 flex items-center justify-center text-white/40 hover:text-neon-pink hover:bg-neon-pink/10 transition-colors">－</button>
-                     <span class="font-display text-xs font-bold text-white w-8 text-center">{{ item.quantity }}</span>
-                     <button @click="addToCart(item)" class="size-7 flex items-center justify-center text-white/40 hover:text-neon-cyan hover:bg-neon-cyan/10 transition-colors">＋</button>
+               <div class="flex flex-col items-center gap-1">
+                  <div class="flex items-center gap-2 bg-black/60 border border-white/10 rounded px-2 py-1">
+                     <button @click="removeFromCart(item.id)" class="text-white/40 hover:text-neon-pink">－</button>
+                     <span class="font-display text-xs font-bold text-white w-4 text-center">{{ item.quantity }}</span>
+                     <button @click="addToCart(item)" class="text-white/40 hover:text-neon-cyan">＋</button>
                   </div>
                </div>
             </div>
          </div>
 
-         <footer v-if="cart.length > 0" class="p-8 border-t border-white/5 bg-black/40 space-y-6">
+         <footer v-if="cart.length > 0" class="p-6 border-t-2 border-neon-cyan/20 bg-retro-dark space-y-4">
             <div class="flex justify-between items-end">
-               <div class="flex flex-col">
-                  <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.4em] mb-1">TOTAL_RECURSOS</span>
-                  <span class="font-display text-4xl font-black text-neon-yellow tracking-tighter">{{ cartTotal.toFixed(2) }} €</span>
-               </div>
+               <span class="font-pixel text-[10px] text-white/40 uppercase tracking-widest">TOTAL_ESTIMADO</span>
+               <span class="font-display text-3xl font-black text-neon-yellow">{{ cartTotal.toFixed(2) }} €</span>
             </div>
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-2 gap-3">
+               <button @click="clearCart" class="py-3 border-2 border-white/10 font-pixel text-[10px] text-white/40 hover:bg-white/5 uppercase transition-all">Limpiar</button>
                <button 
                  @click="startPayment" 
-                 class="w-full py-5 bg-neon-cyan text-black font-display text-sm font-black uppercase tracking-widest shadow-[6px_6px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[9px_9px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center justify-center gap-3"
+                 class="py-3 bg-neon-cyan text-black font-display text-xs font-black uppercase tracking-widest shadow-[4px_4px_0_#000] border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
                >
-                 <Icon icon="lucide:credit-card" class="text-xl" />
-                 PROCESAR_TRANSACCIÓN
+                 Proceder_al_Pago
                </button>
-               <button @click="clearCart" class="py-3 border border-white/5 font-pixel text-[10px] text-white/30 hover:text-white hover:bg-white/5 uppercase transition-all tracking-[0.3em]">Abortar_Operación</button>
             </div>
          </footer>
       </aside>
     </Transition>
 
-    <div class="max-w-7xl w-full mx-auto relative z-20">
+    <div class="max-w-6xl w-full mx-auto relative z-20">
       
       <!-- HEADER -->
-      <header class="text-center mb-24 relative">
-        <div class="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent -z-10"></div>
-        <div class="bg-retro-deep inline-block px-12 relative z-10">
-           <div class="flex items-center justify-center gap-6 mb-6">
-              <div class="h-[2px] w-12 bg-neon-cyan shadow-[0_0_8px_#00f2ff]"></div>
-              <p class="font-pixel text-neon-cyan text-sm tracking-[0.5em] uppercase animate-pulse">SISTEMA_SUMINISTROS_ACTIVO</p>
-              <div class="h-[2px] w-12 bg-neon-cyan shadow-[0_0_8px_#00f2ff]"></div>
-           </div>
-           <h1 class="font-display text-6xl sm:text-8xl font-black text-white mb-6 gh-title-glow tracking-tighter uppercase leading-[0.8]">
-             Arsenal Global
-           </h1>
-           <p class="font-sans text-xs font-bold uppercase text-white/30 tracking-[0.2em] max-w-xl mx-auto leading-relaxed">
-             ADQUIERE MEJORAS Y HABILIDADES LIMITADAS PARA TUS SISTEMAS. LAS CARGAS SE SINCRONIZARÁN DIRECTAMENTE CON TU INVENTARIO DE TERMINAL.
-           </p>
+      <header class="text-center mb-16">
+        <div class="flex items-center justify-center gap-4 mb-4">
+           <div class="h-px w-16 bg-neon-cyan"></div>
+           <p class="font-pixel text-neon-cyan text-sm tracking-[0.4em] uppercase">MERCADO_NEGRO_DIGITAL</p>
+           <div class="h-px w-16 bg-neon-cyan"></div>
         </div>
+        <h1 class="font-display text-5xl sm:text-6xl font-black text-white mb-6 gh-title-glow tracking-[-0.02em] uppercase">
+          Arsenal Global
+        </h1>
+        <p class="font-sans text-sm font-medium uppercase text-white/50 max-w-2xl mx-auto leading-relaxed">
+          Adquiere mejoras y habilidades limitadas para tus sistemas. Las cargas se sincronizarán directamente con tu inventario local.
+        </p>
       </header>
 
       <!-- CATALOG -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 relative">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
         
         <!-- PAYMENT METHODS MODAL -->
-        <div v-if="showPaymentMethods" class="fixed inset-0 z-[100] flex items-center justify-center bg-retro-deep/95 backdrop-blur-md p-4">
-           <div class="max-w-md w-full bg-black border-4 border-retro-black p-10 shadow-[24px_24px_0px_#000] relative overflow-hidden">
-              <div class="absolute top-0 left-0 w-full h-1 bg-neon-cyan"></div>
-              <div class="absolute -top-1 -left-1 size-6 border-t-4 border-l-4 border-neon-cyan"></div>
+        <div v-if="showPaymentMethods" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4">
+           <div class="max-w-md w-full bg-retro-dark border-4 border-neon-cyan p-8 shadow-[12px_12px_0px_#000] relative overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-tr from-neon-cyan/5 to-transparent pointer-events-none"></div>
               
-              <button @click="showPaymentMethods = false" class="absolute top-6 right-6 size-10 flex items-center justify-center border border-white/10 text-white/40 hover:text-white transition-all">✕</button>
+              <button @click="showPaymentMethods = false" class="absolute top-6 right-6 text-white/40 hover:text-white transition-colors">✕</button>
 
-              <header class="text-center mb-10">
-                 <p class="font-pixel text-neon-cyan text-[10px] uppercase tracking-[0.5em] mb-3">TERMINAL_PAGO_V2.0</p>
-                 <h3 class="font-display text-3xl font-black text-white uppercase tracking-tighter">MÉTODO_AUTORIZACIÓN</h3>
+              <header class="text-center mb-8">
+                 <p class="font-pixel text-neon-cyan text-[10px] uppercase tracking-[0.4em] mb-2">Checkout_Terminal</p>
+                 <h3 class="font-display text-2xl font-black text-white uppercase tracking-tighter">Selecciona_Metodo</h3>
               </header>
 
               <div class="grid grid-cols-1 gap-4">
@@ -251,51 +240,47 @@ const checkout = async (method) => {
                    v-for="method in paymentMethods" 
                    :key="method.id"
                    @click="checkout(method)"
-                   class="flex items-center gap-6 p-5 bg-white/5 border border-white/5 hover:border-neon-cyan hover:bg-neon-cyan/5 transition-all text-left group relative overflow-hidden"
+                   class="flex items-center gap-5 p-4 bg-black border-2 border-white/10 hover:border-neon-cyan hover:bg-neon-cyan/5 transition-all text-left group"
                  >
-                    <div class="size-14 shrink-0 flex items-center justify-center group-hover:scale-110 transition-transform bg-black/40 border border-white/5">
-                       <Icon v-if="method.icon" :icon="method.icon" class="text-4xl" />
+                    <div class="size-12 shrink-0 flex items-center justify-center group-hover:scale-110 transition-transform">
+                       <Icon v-if="method.icon" :icon="method.icon" class="text-3xl" />
                        <div v-else-if="method.customSvg" v-html="method.customSvg" class="size-10"></div>
                     </div>
                     <span class="font-display text-sm font-black text-white uppercase tracking-widest">{{ method.name }}</span>
-                    <Icon icon="lucide:chevron-right" class="ml-auto text-white/20 group-hover:text-neon-cyan group-hover:translate-x-1 transition-all" />
+                    <span class="ml-auto opacity-0 group-hover:opacity-100 text-neon-cyan">>></span>
                  </button>
               </div>
 
-              <div class="mt-10 pt-8 border-t border-white/5 flex flex-col items-center">
-                 <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.4em] mb-2">CRÉDITOS_A_TRANSFERIR</span>
-                 <span class="font-display text-3xl font-black text-neon-yellow tracking-tighter">{{ cartTotal.toFixed(2) }} €</span>
+              <div class="mt-8 pt-6 border-t-2 border-neon-cyan/20 flex justify-between items-center">
+                 <span class="font-pixel text-[10px] text-white/30 uppercase">Importe_Total</span>
+                 <span class="font-display text-xl font-black text-neon-yellow">{{ cartTotal.toFixed(2) }} €</span>
               </div>
            </div>
         </div>
 
         <!-- PROCESSING OVERLAY -->
-        <div v-if="isProcessing" class="fixed inset-0 z-[110] flex items-center justify-center bg-retro-deep/90 backdrop-blur-sm">
-          <div class="flex flex-col items-center p-16 bg-black border-4 border-neon-cyan shadow-[0_0_100px_rgba(0,242,255,0.2)]">
-            <div class="relative size-24 mb-10">
-               <div class="absolute inset-0 border-4 border-neon-cyan/20"></div>
-               <div class="absolute inset-0 border-t-4 border-neon-cyan animate-spin"></div>
+        <div v-if="isProcessing" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md">
+          <div class="flex flex-col items-center p-12 bg-black border-4 border-neon-cyan shadow-[0_0_100px_rgba(0,242,255,0.2)]">
+            <div class="size-20 border-4 border-neon-cyan border-t-transparent animate-spin mb-8"></div>
+            <p class="font-pixel text-neon-cyan text-xl animate-pulse tracking-[0.4em] uppercase">PROCESANDO_PAGO</p>
+            <p v-if="selectedMethod" class="font-sans text-xs text-white/60 mt-2 uppercase tracking-widest">Via {{ selectedMethod.name }}</p>
+            <div class="w-64 h-2 bg-retro-dark mt-8 overflow-hidden border border-white/10">
+               <div class="h-full bg-neon-cyan animate-[loading_2s_ease-in-out_infinite]"></div>
             </div>
-            <p class="font-pixel text-neon-cyan text-2xl animate-pulse tracking-[0.6em] uppercase mb-4">CIFRANDO_PAGO</p>
-            <p v-if="selectedMethod" class="font-display text-xs text-white/40 uppercase tracking-widest">GATEWAY: {{ selectedMethod.name }}</p>
-            <div class="w-80 h-1 bg-white/5 mt-12 overflow-hidden relative">
-               <div class="absolute inset-y-0 left-0 bg-neon-cyan w-1/3 animate-[loading_1.5s_linear_infinite]"></div>
-            </div>
-            <p class="font-pixel text-[10px] text-white/20 mt-6 uppercase tracking-[0.4em]">SYNCING_WITH_BANK_NODE_741...</p>
+            <p class="font-sans text-[10px] text-white/30 mt-4 uppercase tracking-[0.2em]">Cifrando transacción de terminal...</p>
           </div>
         </div>
 
         <!-- SUCCESS TOAST -->
         <Transition name="bounce">
-          <div v-if="purchaseSuccess" class="fixed top-32 left-1/2 -translate-x-1/2 z-[120]">
-             <div class="p-8 px-12 border-l-8 border-neon-green bg-black shadow-[24px_24px_0px_#000] flex items-center gap-8 relative overflow-hidden">
-                <div class="absolute -top-1 -right-1 size-6 border-t-4 border-r-4 border-neon-green"></div>
-                <div class="size-16 bg-neon-green/10 text-neon-green flex items-center justify-center text-4xl border border-neon-green/30">
-                  ✓
+          <div v-if="purchaseSuccess" class="fixed top-24 left-1/2 -translate-x-1/2 z-[120]">
+             <div class="gh-panel p-6 px-10 border-4 border-neon-green bg-black shadow-[8px_8px_0_#000] flex items-center gap-6">
+                <div class="size-14 bg-neon-green/20 text-neon-green flex items-center justify-center text-3xl border-2 border-neon-green shadow-[0_0_20px_rgba(34,197,94,0.2)]">
+                   <Icon icon="lucide:check" />
                 </div>
                 <div class="flex flex-col">
-                  <span class="font-pixel text-[10px] text-neon-green uppercase tracking-[0.5em] mb-2">AUTORIZACIÓN_CONCEDIDA</span>
-                  <span class="font-display text-xl font-black text-white uppercase tracking-tighter">INVENTARIO_ACTUALIZADO</span>
+                  <span class="font-pixel text-xs text-neon-green uppercase tracking-[0.3em] mb-1">TRANSACCIÓN_COMPLETADA</span>
+                  <span class="font-display text-lg font-black text-white uppercase">Inventario actualizado con éxito.</span>
                 </div>
              </div>
           </div>
@@ -304,72 +289,66 @@ const checkout = async (method) => {
         <div 
           v-for="item in items" 
           :key="item.id"
-          class="bg-black border-4 border-retro-black p-8 sm:p-10 flex flex-col sm:flex-row gap-10 transition-all duration-500 hover:border-white/10 hover:shadow-[16px_16px_0px_#000] shadow-[12px_12px_0px_#000] group relative overflow-hidden"
+          class="gh-panel border-4 border-retro-black bg-black p-6 sm:p-8 flex flex-col sm:flex-row gap-6 transition-all duration-300 hover:border-neon-cyan shadow-[8px_8px_0_#000] hover:shadow-[12px_12px_0_#000] group relative overflow-hidden"
         >
-          <!-- Corner Bracket -->
-          <div class="absolute -top-1 -left-1 size-6 border-t-2 border-l-2 border-white/10 group-hover:border-neon-cyan transition-colors"></div>
+          <!-- Hover Effect Background -->
+          <div class="absolute inset-0 bg-gradient-to-tr opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none" :class="`from-${item.color} to-transparent`"></div>
 
           <!-- Icon Area -->
-          <div class="shrink-0 flex flex-col items-center gap-4">
+          <div class="shrink-0 flex flex-col items-center justify-center gap-3">
              <div 
-               class="size-32 border-2 relative overflow-hidden flex items-center justify-center text-6xl transition-all duration-500"
-               :class="`border-${item.color}/30 bg-${item.color}/5 group-hover:bg-${item.color}/20 group-hover:scale-105`"
+               class="size-24 border-4 shadow-2xl relative overflow-hidden flex items-center justify-center text-5xl transform group-hover:scale-105 transition-transform"
+               :class="`border-${item.color}/50 bg-retro-dark`"
              >
-                <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:10px_10px]"></div>
-                <Icon :icon="item.icon" class="relative z-10" />
+                <div class="absolute inset-0 bg-gradient-to-tr from-black/60 to-transparent z-0"></div>
+                <Icon :icon="item.icon" class="relative z-10" :class="`text-${item.color}`" />
              </div>
-             <div class="bg-retro-black/80 px-4 py-1.5 border border-white/5 relative">
-                <span class="font-pixel text-[10px] uppercase text-white/40 tracking-[0.3em]">{{ item.game }}</span>
+             <div class="bg-black px-3 py-1 border-2 border-white/10 shadow-[2px_2px_0_#000]">
+                <span class="font-pixel text-[10px] uppercase text-white/60 tracking-widest">{{ item.game }}</span>
              </div>
           </div>
 
           <!-- Content Area -->
-          <div class="flex-1 flex flex-col justify-between py-2">
+          <div class="flex-1 flex flex-col justify-between">
              <div>
-                <div class="flex justify-between items-start mb-4">
-                   <h3 class="font-display text-4xl font-black text-white uppercase tracking-tighter leading-none group-hover:text-neon-cyan transition-colors">{{ item.name }}</h3>
+                <div class="flex justify-between items-start mb-2">
+                   <h3 class="font-display text-2xl font-black text-white uppercase transition-colors" :class="`group-hover:text-${item.color}`">{{ item.name }}</h3>
                 </div>
-                <div class="flex items-center gap-3 mb-6">
-                  <span class="font-pixel text-[10px] px-3 py-1 bg-white/5 border border-white/5 uppercase tracking-[0.2em]" :class="`text-${item.color}`">
-                    {{ item.uses }} CARGAS_DISPONIBLES
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="font-pixel text-xs px-2 py-1 bg-retro-dark border-2 border-white/5 shadow-[2px_2px_0_#000]" :class="`text-${item.color}`">
+                    {{ item.uses }} USOS POR CARGA
                   </span>
                 </div>
-                <p class="font-sans text-[11px] font-bold uppercase text-white/30 leading-relaxed mb-8 border-l-2 border-white/5 pl-6">
+                <p class="font-sans text-sm font-bold uppercase text-white/50 leading-relaxed mb-6">
                    {{ item.description }}
                 </p>
              </div>
 
-             <div class="flex flex-wrap items-center justify-between gap-6 mt-auto">
+             <div class="flex items-center justify-between mt-auto">
                 <div class="flex flex-col">
-                   <span class="font-pixel text-[10px] text-white/20 uppercase tracking-[0.4em] mb-1">VALOR_MERCADO</span>
-                   <span class="font-display text-2xl font-black text-neon-yellow tracking-tighter">{{ item.price.toFixed(2) }} €</span>
+                   <span class="font-pixel text-[10px] text-white/40 uppercase tracking-widest mb-1">PRECIO</span>
+                   <span class="font-display text-xl font-black text-neon-yellow">{{ item.price.toFixed(2) }} €</span>
                 </div>
 
                 <button 
                   @click="addToCart(item)"
-                  class="flex-1 sm:flex-none px-8 py-4 bg-neon-cyan text-black font-display text-xs font-black uppercase tracking-widest shadow-[6px_6px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[9px_9px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center justify-center gap-3"
+                  class="px-6 py-3 bg-retro-dark border-2 border-white/10 font-display text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center gap-2"
+                  :class="`hover:border-${item.color} hover:text-${item.color}`"
                 >
-                  <Icon icon="lucide:shopping-bag" class="text-lg" />
-                  ADQUIRIR
+                  <Icon icon="lucide:shopping-cart" />
+                  Añadir_al_Carrito
                 </button>
              </div>
           </div>
 
           <!-- Inventory Status Badge -->
-          <div class="absolute top-6 right-6 text-right">
-             <span class="font-pixel text-[9px] text-white/20 uppercase tracking-[0.4em] block mb-1">STOCK_LOCAL</span>
-             <div class="flex items-center justify-end gap-2">
-                <span class="font-display text-2xl font-black" :class="inventory.items[item.id] > 0 ? 'text-neon-green' : 'text-white/10'">
-                  {{ inventory.items[item.id] || 0 }}
-                </span>
-                <div v-if="inventory.items[item.id] > 0" class="size-2 bg-neon-green shadow-[0_0_8px_#22c55e]"></div>
-             </div>
+          <div class="absolute top-4 right-4 text-right">
+             <span class="font-pixel text-[10px] text-white/30 uppercase tracking-widest block mb-1">EN INVENTARIO</span>
+             <span class="font-display text-lg font-bold" :class="inventory.items[item.id] > 0 ? 'text-neon-cyan' : 'text-white/10'">
+               {{ inventory.items[item.id] || 0 }}
+             </span>
           </div>
         </div>
-
-      </div>
-    </div>
-  </div>
 
       </div>
     </div>

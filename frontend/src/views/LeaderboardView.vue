@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { Icon } from '@iconify/vue'
 import { useLeaderboardStore } from '../stores/leaderboard'
 import { useGameStore } from '../stores/game'
 
@@ -11,122 +12,200 @@ const route = useRoute()
 const slug  = route.params.slug
 
 const entries = computed(() => leaderboardStore.getEntries(slug))
+const top3 = computed(() => entries.value.slice(0, 3))
+const remainingEntries = computed(() => entries.value.slice(3))
 const gameName = computed(() => gameStore.gamesBySlug[slug]?.title ?? slug)
 const isLoading = computed(() => leaderboardStore.isLoading(slug) && entries.value.length === 0)
 const isConnect4 = computed(() => slug === 'connect4')
-const leaderboardSubtitle = computed(() => {
-  if (isConnect4.value) return 'TOP_PLAYERS // WINS'
-  return 'ALL-TIME_HIGH_SCORES'
-})
+
 const scoreLabel = computed(() => {
-  if (isConnect4.value) return 'WINS'
-  return 'PTS'
+  if (isConnect4.value) return 'VICTORIAS'
+  return 'PUNTUACIÓN'
 })
 
 onMounted(async () => {
-  // Ensure games are loaded to get the proper title
   if (gameStore.games.length === 0) {
     gameStore.fetchGames()
   }
-  
   leaderboardStore.fetchLeaderboard(slug)
 })
 </script>
 
 <template>
-  <section class="mx-auto w-full max-w-5xl px-4 py-16 relative z-10 space-y-12">
-    <!-- AMBIENT EFFECTS -->
-    <div class="gh-scanlines fixed inset-0 opacity-[0.15] pointer-events-none -z-10"></div>
-    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,242,255,0.05),transparent_70%)] pointer-events-none -z-10"></div>
-
-    <header class="mb-10 flex flex-col items-center border-4 border-retro-black bg-black p-10 shadow-[16px_16px_0px_#000] relative overflow-hidden">
-      <!-- Corner Ornaments -->
-      <div class="absolute -top-1 -left-1 size-8 border-t-4 border-l-4 border-neon-yellow"></div>
-      <div class="absolute -bottom-1 -right-1 size-8 border-b-4 border-r-4 border-neon-yellow"></div>
-      
-      <div class="absolute inset-0 bg-[linear-gradient(rgba(255,252,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,252,0,0.02)_1px,transparent_1px)] bg-[size:30px_30px]"></div>
-
-      <p class="relative z-10 font-pixel text-xs font-bold uppercase tracking-[0.5em] text-neon-pink">>> NETWORK_RANKINGS_V.2.4</p>
-      <h1 class="relative z-10 mt-4 text-5xl sm:text-7xl font-display font-black uppercase text-white text-center tracking-tighter leading-[0.8] gh-title-glow">
-        Hall_Of_Fame
-      </h1>
-      <div class="relative z-10 mt-6 flex items-center gap-4">
-         <div class="h-[2px] w-8 bg-neon-cyan shadow-[0_0_8px_#00f2ff]"></div>
-         <h2 class="text-2xl font-display font-black uppercase text-neon-cyan tracking-widest">
-           [{{ gameName }}]
-         </h2>
-         <div class="h-[2px] w-8 bg-neon-cyan shadow-[0_0_8px_#00f2ff]"></div>
-      </div>
-      <p class="relative z-10 mt-8 bg-neon-yellow text-black font-pixel text-[10px] px-4 py-1.5 uppercase tracking-[0.2em] font-black shadow-[4px_4px_0px_rgba(0,0,0,0.5)]">{{ leaderboardSubtitle }}</p>
-    </header>
-
-    <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 bg-retro-black/40 border-4 border-dashed border-white/5 space-y-6">
-      <div class="relative size-16">
-         <div class="absolute inset-0 border-4 border-neon-yellow/20"></div>
-         <div class="absolute inset-0 border-t-4 border-neon-yellow animate-spin"></div>
-      </div>
-      <p class="text-neon-yellow font-pixel text-xl uppercase tracking-[0.5em] blink">FETCHING_RECORDS_FROM_NODE...</p>
-    </div>
-
-    <div v-else-if="entries.length === 0" class="flex flex-col items-center justify-center py-24 bg-retro-black/40 border-4 border-white/5">
-      <Icon icon="lucide:database-zap" class="text-6xl text-white/10 mb-6" />
-      <p class="text-white/40 font-pixel text-xl uppercase tracking-[0.4em]">SERVER DB IS EMPTY. BE THE FIRST.</p>
-    </div>
-
-    <ol v-else class="space-y-6">
-      <li
-        v-for="(entry, i) in entries"
-        :key="entry.user_id"
-        class="flex flex-col sm:flex-row sm:items-center gap-6 bg-black border-4 p-6 transition-all relative overflow-hidden group"
-        :class="i === 0 ? 'border-neon-yellow shadow-[12px_12px_0px_#000] bg-neon-yellow/5'
-               : i === 1 ? 'border-white/20 shadow-[10px_10px_0px_#000]'
-               : i === 2 ? 'border-neon-pink shadow-[8px_8px_0px_#000] bg-neon-pink/5'
-               : 'border-retro-black shadow-[8px_8px_0px_#000] opacity-80 hover:opacity-100 hover:border-white/10'"
-      >
-        <!-- Background rank text -->
-        <div class="absolute -right-4 -bottom-8 font-display text-[120px] font-black text-white/[0.03] select-none group-hover:text-white/[0.05] transition-colors">
-           #{{ i + 1 }}
-        </div>
-
-        <div class="flex items-center gap-6 flex-1 min-w-0">
-           <div class="size-16 shrink-0 flex items-center justify-center font-display text-4xl font-black relative"
-             :class="i === 0 ? 'text-neon-yellow' : i === 1 ? 'text-white' : i === 2 ? 'text-neon-pink' : 'text-white/20'"
-           >
-             {{ i + 1 }}
-             <div v-if="i < 3" class="absolute -top-1 -left-1 size-4 border-t-2 border-l-2" :class="i === 0 ? 'border-neon-yellow' : i === 1 ? 'border-white' : 'border-neon-pink'"></div>
-           </div>
-
-           <div class="flex items-center gap-6 flex-1 min-w-0 border-l-2 border-white/5 pl-6">
-             <div class="size-14 border-2 flex items-center justify-center shrink-0 shadow-[4px_4px_0px_#000] transition-transform group-hover:scale-105"
-               :class="i === 0 ? 'border-neon-yellow bg-neon-yellow/10 text-neon-yellow' : 'border-neon-cyan bg-neon-cyan/10 text-neon-cyan'"
-             >
-               <span class="font-pixel text-2xl font-black">{{ entry.username?.[0]?.toUpperCase() }}</span>
-             </div>
-             <div class="flex flex-col min-w-0">
-                <p class="truncate font-display text-3xl font-black text-white uppercase tracking-tighter leading-none mb-1">{{ entry.username }}</p>
-                <div class="flex items-center gap-3">
-                   <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.2em]">USER_ID: {{ entry.user_id }}</span>
-                   <div v-if="entry.time_played" class="h-1 w-1 bg-white/20"></div>
-                   <p v-if="entry.time_played" class="font-pixel text-[10px] text-neon-cyan/50 uppercase tracking-[0.2em]">
-                     {{ Math.floor(entry.time_played / 60) }}m_SESIÓN
-                   </p>
-                </div>
-             </div>
-           </div>
-        </div>
-
-        <div class="sm:text-right shrink-0 mt-4 sm:mt-0 border-t-2 sm:border-0 border-white/5 pt-4 sm:pt-0 relative z-10">
-          <p class="font-display text-4xl font-black leading-none tracking-tighter" :class="i === 0 ? 'text-neon-yellow gh-title-glow' : 'text-white'">
-            {{ Number(entry.high_score).toLocaleString() }}
-          </p>
-          <div class="flex sm:flex-col justify-between items-center sm:items-end mt-2">
-            <p class="font-pixel text-[11px] uppercase tracking-[0.3em] font-black" :class="i === 0 ? 'text-neon-yellow/70' : 'text-white/40'">{{ scoreLabel }}_ACUMULADOS</p>
+  <section class="mx-auto w-full max-w-6xl px-4 py-16">
+    <!-- MODULE HEADER -->
+    <header class="mb-16 relative">
+      <div class="gh-panel p-8 bg-black border-4 border-neon-yellow shadow-[10px_10px_0px_#000] flex flex-col md:flex-row items-center justify-between gap-8 overflow-hidden">
+        <div class="gh-scanlines absolute inset-0 opacity-20 pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col items-center md:items-start text-center md:text-left">
+          <div class="flex items-center gap-3 mb-2">
+            <Icon icon="lucide:globe" class="text-neon-yellow animate-spin-slow" />
+            <p class="font-pixel text-xs font-bold uppercase tracking-[0.3em] text-neon-yellow">NETWORK_RANKINGS // GLOBAL_DATA</p>
+          </div>
+          <h1 class="text-5xl md:text-7xl font-display font-black uppercase text-retro-white tracking-tighter leading-none gh-title-glow">RANKING</h1>
+          <div class="mt-4 flex items-center gap-4 bg-retro-dark px-4 py-2 border-2 border-white/10 shadow-[4px_4px_0px_#000]">
+            <span class="font-pixel text-xs text-white/40 uppercase">MÓDULO:</span>
+            <span class="font-display text-2xl font-black text-neon-cyan uppercase tracking-widest">{{ gameName }}</span>
           </div>
         </div>
-      </li>
-    </ol>
+
+        <div class="relative z-10 hidden lg:block">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="gh-panel p-4 bg-retro-dark border-2 border-white/5">
+              <p class="font-pixel text-[9px] text-white/30 uppercase">ESTADO_SERVIDOR</p>
+              <p class="font-pixel text-xs text-neon-green uppercase animate-pulse">ONLINE_STABLE</p>
+            </div>
+            <div class="gh-panel p-4 bg-retro-dark border-2 border-white/5">
+              <p class="font-pixel text-[9px] text-white/30 uppercase">TOTAL_PLAYERS</p>
+              <p class="font-pixel text-xs text-neon-cyan uppercase">{{ entries.length }}_REGISTERED</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 gh-panel bg-black/40">
+      <Icon icon="lucide:loader-2" class="text-6xl text-neon-yellow animate-spin mb-4" />
+      <p class="font-pixel text-2xl text-neon-yellow uppercase blink tracking-widest">ACCEDIENDO_AL_REGISTRO...</p>
+    </div>
+
+    <div v-else-if="entries.length === 0" class="gh-panel p-16 text-center bg-black border-4 border-dashed border-white/10">
+      <Icon icon="lucide:database-zap" class="text-6xl text-white/10 mx-auto mb-4" />
+      <p class="font-pixel text-xl text-white/20 uppercase tracking-widest">
+        SERVER DB IS EMPTY // BE THE FIRST TO RANK
+      </p>
+    </div>
+
+    <div v-else class="space-y-12">
+      <!-- PODIUM SECTION -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+        <!-- 2nd Place -->
+        <div v-if="top3[1]" class="order-2 md:order-1">
+          <div class="gh-panel bg-black border-4 border-slate-400 p-6 shadow-[8px_8px_0px_#000] relative group">
+             <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-400 text-black font-display font-black text-xl px-4 py-1 shadow-[4px_4px_0px_#000]">2ND</div>
+             <div class="flex flex-col items-center text-center mt-4">
+                <div class="size-20 bg-retro-dark border-4 border-slate-400 flex items-center justify-center text-3xl font-black mb-4">
+                  {{ top3[1].username?.[0]?.toUpperCase() }}
+                </div>
+                <h3 class="font-display text-xl font-black text-retro-white uppercase truncate w-full mb-1">{{ top3[1].username }}</h3>
+                <p class="font-display text-2xl font-black text-neon-cyan">{{ Number(top3[1].high_score).toLocaleString() }}</p>
+                <p class="font-pixel text-[10px] text-white/30 uppercase mt-2">{{ scoreLabel }}</p>
+             </div>
+          </div>
+        </div>
+
+        <!-- 1st Place -->
+        <div v-if="top3[0]" class="order-1 md:order-2">
+          <div class="gh-panel bg-retro-dark border-4 border-neon-yellow p-8 shadow-[12px_12px_0px_#000] relative group animate-glow-yellow">
+             <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-neon-yellow text-black font-display font-black text-3xl px-6 py-2 shadow-[6px_6px_0px_#000] animate-bounce-slow">1ST</div>
+             <div class="flex flex-col items-center text-center mt-6">
+                <div class="size-28 bg-black border-4 border-neon-yellow flex items-center justify-center text-5xl font-black mb-6 text-neon-yellow shadow-[0_0_20px_rgba(255,242,0,0.3)]">
+                  {{ top3[0].username?.[0]?.toUpperCase() }}
+                </div>
+                <h3 class="font-display text-2xl font-black text-retro-white uppercase truncate w-full mb-1">{{ top3[0].username }}</h3>
+                <p class="font-display text-4xl font-black text-neon-yellow">{{ Number(top3[0].high_score).toLocaleString() }}</p>
+                <p class="font-pixel text-[11px] text-neon-yellow/50 uppercase mt-2 tracking-widest">{{ scoreLabel }}</p>
+             </div>
+          </div>
+        </div>
+
+        <!-- 3rd Place -->
+        <div v-if="top3[2]" class="order-3">
+          <div class="gh-panel bg-black border-4 border-neon-pink p-6 shadow-[8px_8px_0px_#000] relative group">
+             <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-neon-pink text-black font-display font-black text-xl px-4 py-1 shadow-[4px_4px_0px_#000]">3RD</div>
+             <div class="flex flex-col items-center text-center mt-4">
+                <div class="size-20 bg-retro-dark border-4 border-neon-pink flex items-center justify-center text-3xl font-black mb-4 text-neon-pink">
+                  {{ top3[2].username?.[0]?.toUpperCase() }}
+                </div>
+                <h3 class="font-display text-xl font-black text-retro-white uppercase truncate w-full mb-1">{{ top3[2].username }}</h3>
+                <p class="font-display text-2xl font-black text-neon-pink">{{ Number(top3[2].high_score).toLocaleString() }}</p>
+                <p class="font-pixel text-[10px] text-white/30 uppercase mt-2">{{ scoreLabel }}</p>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST SECTION -->
+      <div class="relative pt-8">
+        <!-- CIRCUIT LINE -->
+        <div class="absolute left-10 top-0 bottom-0 w-1 bg-white/5 z-0"></div>
+
+        <div class="space-y-4 relative z-10">
+          <div
+            v-for="(entry, i) in remainingEntries"
+            :key="entry.user_id"
+            class="flex items-center gap-6 gh-panel p-4 bg-black border-2 border-white/5 hover:border-neon-cyan transition-all duration-300 group shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#000]"
+          >
+            <!-- Rank Circle -->
+            <div class="size-12 shrink-0 bg-retro-dark border-2 border-white/10 flex items-center justify-center font-display font-black text-xl group-hover:border-neon-cyan group-hover:text-neon-cyan">
+              {{ i + 4 }}
+            </div>
+
+            <!-- Profile Info -->
+            <div class="flex-1 flex items-center gap-4 min-w-0">
+               <div class="size-10 bg-white/5 flex items-center justify-center font-pixel text-lg text-white/20 border border-white/10 uppercase">
+                 {{ entry.username?.[0] }}
+               </div>
+               <div class="truncate">
+                  <h4 class="font-display text-lg font-black text-retro-white uppercase truncate">{{ entry.username }}</h4>
+                  <p class="font-pixel text-[9px] text-white/20 uppercase tracking-widest">PLAYER_HASH: {{ entry.user_id?.slice(0, 8) }}</p>
+               </div>
+            </div>
+
+            <!-- Score -->
+            <div class="text-right shrink-0 px-6 border-x-2 border-white/5">
+               <p class="font-display text-2xl font-black text-neon-cyan leading-none">{{ Number(entry.high_score).toLocaleString() }}</p>
+               <p class="font-pixel text-[9px] text-white/30 uppercase mt-1">{{ scoreLabel }}</p>
+            </div>
+
+            <!-- Metadata -->
+            <div class="hidden sm:flex flex-col items-end gap-1 shrink-0 w-32">
+               <div v-if="entry.time_played" class="flex items-center gap-1.5 px-2 py-0.5 bg-retro-dark border border-white/5">
+                 <Icon icon="lucide:clock" class="text-[10px] text-white/20" />
+                 <span class="font-pixel text-[9px] text-white/40 uppercase">{{ Math.floor(entry.time_played / 60) }}M</span>
+               </div>
+               <span class="font-pixel text-[9px] text-neon-green uppercase opacity-40">STABLE_SIGNAL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
+
+<style scoped>
+.gh-title-glow {
+  text-shadow: 0 0 15px rgba(255, 242, 0, 0.4);
+}
+.blink {
+  animation: blink 1.5s step-start infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-bounce-slow {
+  animation: bounce 3s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -10px); }
+}
+.animate-glow-yellow {
+  animation: glow-yellow 4s infinite;
+}
+@keyframes glow-yellow {
+  0%, 100% { box-shadow: 12px 12px 0px #000, 0 0 20px rgba(255, 242, 0, 0.1); }
+  50% { box-shadow: 12px 12px 0px #000, 0 0 40px rgba(255, 242, 0, 0.3); }
+}
+</style>
 
 <style scoped>
 .blink {

@@ -19,80 +19,67 @@ const stats = {
 </script>
 
 <template>
-  <article class="group relative flex flex-col h-full bg-black border-4 border-retro-black transition-all duration-500 hover:border-neon-cyan/40 shadow-[12px_12px_0px_#000] hover:shadow-[16px_16px_0px_#000] overflow-hidden">
+  <article class="group relative flex flex-col h-full bg-black border-4 border-retro-black transition-all duration-300 hover:border-neon-cyan shadow-[8px_8px_0px_#000] hover:shadow-[12px_12px_0px_#000] overflow-hidden">
     
     <!-- TOP HUD: Version & Online Status -->
-    <div class="flex justify-between items-center p-2.5 bg-retro-black border-b-2 border-white/5 relative overflow-hidden">
-      <!-- Decorative background line -->
-      <div class="absolute bottom-0 left-0 h-[1px] w-full bg-gradient-to-r from-neon-cyan/20 via-transparent to-transparent"></div>
-      
-      <span class="font-pixel text-[10px] text-white/40 tracking-[0.2em] uppercase relative z-10">ARCHIVE_{{ game.slug.toUpperCase() }} // {{ stats.version }}</span>
-      <div class="flex items-center gap-2 relative z-10">
-        <div class="size-2 bg-neon-green animate-pulse shadow-[0_0_8px_#22c55e]"></div>
-        <span class="font-pixel text-[10px] text-neon-green uppercase tracking-widest">{{ stats.players }}_NÚCLEOS</span>
+    <div class="flex justify-between items-center p-2 bg-retro-black/80 border-b-2 border-neon-cyan/20">
+      <span class="font-pixel text-[10px] text-white/40 tracking-widest uppercase">ID_{{ game.slug.toUpperCase() }} // {{ stats.version }}</span>
+      <div class="flex items-center gap-1.5">
+        <div class="size-1.5 bg-neon-green animate-pulse shadow-[0_0_5px_#22c55e]"></div>
+        <span class="font-pixel text-[10px] text-neon-green uppercase tracking-widest">{{ stats.players }}_ONLINE</span>
       </div>
     </div>
 
     <!-- COVER AREA: Cinematic & Gritty -->
-    <div class="relative aspect-[16/9] overflow-hidden bg-retro-deep group-hover:bg-black">
+    <div class="relative aspect-[16/10] overflow-hidden bg-retro-deep group-hover:bg-black">
       <div class="gh-scanlines absolute inset-0 z-20 opacity-30 pointer-events-none"></div>
       
-      <!-- Grid overlay -->
-      <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] z-10"></div>
-
       <img 
         :src="game.cover" 
         :alt="game.title" 
-        class="h-full w-full object-cover grayscale opacity-40 transition-all duration-1000 group-hover:grayscale-0 group-hover:opacity-60 group-hover:scale-110" 
+        class="h-full w-full object-cover grayscale opacity-60 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110" 
       />
 
       <!-- Image Overlays -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-20"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
+      <div class="absolute inset-0 border-[10px] border-black/20 group-hover:border-transparent transition-all duration-300 pointer-events-none z-30"></div>
       
       <!-- Difficulty Badge (Corner) -->
-      <div class="absolute bottom-4 left-4 z-40 bg-black/80 border-l-2 border-neon-yellow px-3 py-1 flex items-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,0.5)]">
+      <div class="absolute bottom-4 left-4 z-40 bg-black/80 border-2 border-neon-yellow px-2 py-1 flex items-center gap-2">
          <Icon icon="lucide:activity" class="text-[10px] text-neon-yellow" />
-         <span class="font-pixel text-[10px] text-white/80 tracking-[0.2em] uppercase">{{ stats.difficulty }}</span>
-      </div>
-
-      <!-- Play Icon Overlay on Hover -->
-      <div class="absolute inset-0 flex items-center justify-center z-30 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-150 group-hover:scale-100">
-         <div class="size-16 bg-neon-cyan/10 border border-neon-cyan/40 backdrop-blur-sm flex items-center justify-center text-neon-cyan">
-            <Icon icon="lucide:play" class="text-3xl" />
-         </div>
+         <span class="font-pixel text-[10px] text-white/60 tracking-widest uppercase">{{ stats.difficulty }}</span>
       </div>
     </div>
     
     <!-- CONTENT AREA: Data Density -->
-    <div class="flex flex-col flex-grow p-6 bg-[#0c0c0e] relative group-hover:bg-[#121214] transition-colors">
-      <!-- Decorative corner -->
-      <div class="absolute top-0 right-0 size-8 bg-white/5 -rotate-45 translate-x-4 -translate-y-4 pointer-events-none"></div>
+    <div class="flex flex-col flex-grow p-5 bg-retro-black relative">
+      <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
       
-      <div class="mb-6">
-        <div class="flex items-center gap-3 mb-2">
-           <div class="h-[1px] w-6 bg-neon-cyan/50"></div>
-           <p class="font-pixel text-[9px] text-neon-cyan/70 uppercase tracking-[0.4em]">MÓDULO_EJECUTABLE</p>
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-1">
+           <div class="h-px w-4 bg-neon-cyan"></div>
+           <p class="font-pixel text-[9px] text-neon-cyan uppercase tracking-[0.3em]">MÓDULO_ARCADE</p>
         </div>
-        <h3 class="font-display text-4xl font-black uppercase text-white tracking-tighter leading-none mb-4 group-hover:text-neon-cyan transition-colors">
+        <h3 class="font-display text-3xl font-black uppercase text-white tracking-tighter leading-none mb-4 group-hover:text-neon-cyan transition-colors">
           {{ game.title }}
         </h3>
-        <p class="font-sans text-[11px] font-bold uppercase leading-relaxed text-white/30 line-clamp-2 h-9 border-l border-white/5 pl-4">
+        <p class="font-sans text-[11px] font-bold uppercase leading-relaxed text-white/40 line-clamp-2 h-8">
           {{ game.description }}
         </p>
       </div>
 
       <!-- Footer Actions -->
-      <div class="mt-auto pt-6 border-t border-white/5 flex items-center gap-4">
+      <div class="mt-auto pt-6 border-t-2 border-neon-cyan/20 flex items-center gap-3">
         <RouterLink :to="game.route || `/play/${game.slug}`" class="flex-1">
-          <button class="w-full py-4 bg-neon-cyan text-black font-display text-xs font-black uppercase tracking-widest shadow-[6px_6px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[9px_9px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center justify-center gap-2 group/btn">
+          <button class="w-full py-3 bg-neon-cyan text-black font-display text-xs font-black uppercase tracking-widest shadow-[4px_4px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all border-2 border-black flex items-center justify-center gap-2 group/btn">
              <span>INICIAR_SECUENCIA</span>
-             <Icon icon="lucide:chevron-right" class="text-xl group-hover/btn:translate-x-1 transition-transform" />
+             <Icon icon="lucide:play" class="text-lg group-hover/btn:translate-x-1 transition-transform" />
           </button>
         </RouterLink>
         
         <RouterLink :to="`/leaderboard/${game.slug}`" class="shrink-0">
-          <button class="size-12 flex items-center justify-center bg-white/5 border border-white/10 hover:border-neon-yellow hover:text-neon-yellow hover:bg-neon-yellow/5 transition-all shadow-[6px_6px_0px_#000] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]" title="Leaderboard">
-            <Icon icon="lucide:bar-chart-3" class="text-xl" />
+          <button class="size-10 flex items-center justify-center bg-retro-dark border-2 border-neon-yellow text-neon-yellow hover:bg-neon-yellow/10 shadow-[4px_4px_0px_#000] transition-all" title="Leaderboard">
+            <Icon icon="lucide:trophy" class="text-lg" />
           </button>
         </RouterLink>
       </div>

@@ -3,8 +3,9 @@ import { defineStore } from 'pinia'
 import api from '../lib/axios'
 
 export const useAuthStore = defineStore('auth', () => {
+  const storedUser = localStorage.getItem('user')
   const isLoggedIn = ref(!!localStorage.getItem('token'))
-  const user = ref(null)
+  const user = ref(storedUser ? JSON.parse(storedUser) : null)
   const token = ref(localStorage.getItem('token') || null)
   const isLoggingOut = ref(false)
 
@@ -12,12 +13,14 @@ export const useAuthStore = defineStore('auth', () => {
     const { data } = await api.post('/login', credentials)
     setToken(data.access_token)
     user.value = data.user
+    localStorage.setItem('user', JSON.stringify(data.user))
   }
 
   async function register(userData) {
     const { data } = await api.post('/register', userData)
     setToken(data.access_token)
     user.value = data.user
+    localStorage.setItem('user', JSON.stringify(data.user))
   }
 
   const hasFetched = ref(false)
@@ -32,6 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
       try {
         const { data } = await api.get('/user')
         user.value = data.data
+        localStorage.setItem('user', JSON.stringify(data.data))
         isLoggedIn.value = true
         hasFetched.value = true
       } catch (error) {
@@ -64,6 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
       setToken(null)
       user.value = null
+      localStorage.removeItem('user')
     } finally {
       isLoggingOut.value = false
     }
