@@ -100,7 +100,7 @@ onMounted(async () => {
           <div class="gh-panel bg-retro-dark border-4 border-neon-yellow p-8 shadow-[12px_12px_0px_#000] relative group animate-glow-yellow">
              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-neon-yellow text-black font-display font-black text-3xl px-6 py-2 shadow-[6px_6px_0px_#000] animate-bounce-slow">1ST</div>
              <div class="flex flex-col items-center text-center mt-6">
-                <div class="size-28 bg-black border-4 border-neon-yellow flex items-center justify-center text-5xl font-black mb-6 text-neon-yellow shadow-[0_0_20px_rgba(255,242,0,0.3)]">
+                <div class="size-28 bg-black border-4 border-neon-yellow flex items-center justify-center text-5xl font-black mb-6 text-neon-yellow">
                   {{ top3[0].username?.[0]?.toUpperCase() }}
                 </div>
                 <h3 class="font-display text-2xl font-black text-retro-white uppercase truncate w-full mb-1">{{ top3[0].username }}</h3>
@@ -176,7 +176,7 @@ onMounted(async () => {
 
 <style scoped>
 .gh-title-glow {
-  text-shadow: 0 0 15px rgba(255, 242, 0, 0.4);
+  text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
 }
 .blink {
   animation: blink 1.5s step-start infinite;
@@ -202,8 +202,8 @@ onMounted(async () => {
   animation: glow-yellow 4s infinite;
 }
 @keyframes glow-yellow {
-  0%, 100% { box-shadow: 12px 12px 0px #000, 0 0 20px rgba(255, 242, 0, 0.1); }
-  50% { box-shadow: 12px 12px 0px #000, 0 0 40px rgba(255, 242, 0, 0.3); }
+  0%, 100% { box-shadow: 12px 12px 0px #000; }
+  50% { box-shadow: 12px 12px 0px #000, 0 0 0 4px var(--color-neon-yellow); }
 }
 </style>
 

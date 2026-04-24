@@ -4,7 +4,6 @@ import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useGameStore } from '../../stores/game'
 import { useTheme } from '../../composables/useTheme'
-import { Icon } from '@iconify/vue'
 import BaseButton from '../ui/BaseButton.vue'
 
 const authStore = useAuthStore()

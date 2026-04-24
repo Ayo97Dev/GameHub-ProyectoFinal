@@ -151,7 +151,7 @@ const checkout = async (method) => {
 
     <!-- CART SIDEBAR -->
     <Transition name="slide">
-      <aside v-if="isCartOpen" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-black border-l-4 border-neon-cyan z-[70] shadow-[-20px_0_50px_rgba(0,0,0,0.8)] flex flex-col">
+      <aside v-if="isCartOpen" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-black border-l-4 border-neon-cyan z-[70] shadow-[-12px_0_0_#000] flex flex-col">
          <header class="p-6 border-b-2 border-neon-cyan/20 flex items-center justify-between bg-retro-dark">
             <h2 class="font-display text-xl font-black text-white uppercase tracking-widest">Carrito_De_Compra</h2>
             <button @click="isCartOpen = false" class="text-white/40 hover:text-white transition-colors text-2xl">✕</button>
@@ -176,7 +176,7 @@ const checkout = async (method) => {
                   <p class="font-pixel text-[10px] text-white/40 uppercase">{{ item.price.toFixed(2) }} € / UNIDAD</p>
                </div>
                <div class="flex flex-col items-center gap-1">
-                  <div class="flex items-center gap-2 bg-black/60 border border-white/10 rounded px-2 py-1">
+                  <div class="flex items-center gap-2 bg-black/60 border border-white/10 px-2 py-1">
                      <button @click="removeFromCart(item.id)" class="text-white/40 hover:text-neon-pink">－</button>
                      <span class="font-display text-xs font-bold text-white w-4 text-center">{{ item.quantity }}</span>
                      <button @click="addToCart(item)" class="text-white/40 hover:text-neon-cyan">＋</button>
@@ -387,6 +387,6 @@ const checkout = async (method) => {
 
 .custom-scroll::-webkit-scrollbar { width: 4px; }
 .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-.custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+.custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
 .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0, 242, 255, 0.3); }
 </style>

@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
-import { Icon } from '@iconify/vue'
 import { useGameStore } from '../stores/game'
 import GameCard from '../components/ui/GameCard.vue'
 
@@ -85,7 +84,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
                  <!-- Big Play Button for Hero -->
                  <div class="absolute inset-0 flex items-center justify-center z-30 opacity-0 group-hover:opacity-100 transition-opacity">
                     <RouterLink :to="`/play/${featuredGame.slug}`">
-                       <button class="size-20 bg-neon-cyan/20 border-4 border-neon-cyan backdrop-blur-xl flex items-center justify-center text-neon-cyan hover:scale-110 transition-transform shadow-[0_0_50px_rgba(0,242,255,0.3)]">
+                        <button class="size-20 bg-neon-cyan/20 border-4 border-neon-cyan backdrop-blur-xl flex items-center justify-center text-neon-cyan hover:scale-110 transition-transform shadow-[6px_6px_0px_#000]">
                           <Icon icon="lucide:play" class="text-4xl translate-x-1" />
                        </button>
                     </RouterLink>
@@ -163,7 +162,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
                <Icon icon="lucide:database" class="text-2xl" />
                <span class="font-display text-sm font-black uppercase">Red_Distribuida</span>
             </div>
-            <p class="font-sans text-[10px] font-bold text-white/40 uppercase leading-relaxed">
+            <p class="font-pixel text-[10px] text-white/40 uppercase leading-relaxed tracking-widest">
                Nuestra arquitectura utiliza nodos descentralizados para garantizar una latencia inferior a 20ms en todas las regiones arcade.
             </p>
          </div>
@@ -172,7 +171,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
                <Icon icon="lucide:shield" class="text-2xl" />
                <span class="font-display text-sm font-black uppercase">Protocolo_Seguro</span>
             </div>
-            <p class="font-sans text-[10px] font-bold text-white/40 uppercase leading-relaxed">
+            <p class="font-pixel text-[10px] text-white/40 uppercase leading-relaxed tracking-widest">
                Todas las transacciones en el mercado digital están cifradas mediante algoritmos cuánticos de 512 bits.
             </p>
          </div>
@@ -181,7 +180,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
                <Icon icon="lucide:zap" class="text-2xl" />
                <span class="font-display text-sm font-black uppercase">Alto_Rendimiento</span>
             </div>
-            <p class="font-sans text-[10px] font-bold text-white/40 uppercase leading-relaxed">
+            <p class="font-pixel text-[10px] text-white/40 uppercase leading-relaxed tracking-widest">
                Sistema optimizado para núcleos de procesamiento de última generación. FPS estables garantizados.
             </p>
          </div>
