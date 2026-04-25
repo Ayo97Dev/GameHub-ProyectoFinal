@@ -41,11 +41,11 @@ onMounted(async () => {
         <div class="relative z-10 flex flex-col items-center md:items-start text-center md:text-left">
           <div class="flex items-center gap-3 mb-2">
             <Icon icon="lucide:globe" class="text-neon-yellow animate-spin-slow" />
-            <p class="font-pixel text-xs font-bold uppercase tracking-[0.3em] text-neon-yellow">NETWORK_RANKINGS // GLOBAL_DATA</p>
+            <p class="font-pixel text-xs font-bold uppercase tracking-[0.3em] text-neon-yellow">Clasificación global</p>
           </div>
-          <h1 class="text-5xl md:text-7xl font-display font-black uppercase text-retro-white tracking-tighter leading-none gh-title-glow">RANKING</h1>
+          <h1 class="text-5xl md:text-7xl font-display font-black uppercase text-retro-white tracking-tighter leading-none gh-title-glow">Clasificación</h1>
           <div class="mt-4 flex items-center gap-4 bg-retro-dark px-4 py-2 border-2 border-white/10 shadow-[4px_4px_0px_#000]">
-            <span class="font-pixel text-xs text-white/40 uppercase">MÓDULO:</span>
+            <span class="font-pixel text-xs text-white/40 uppercase">Juego:</span>
             <span class="font-display text-2xl font-black text-neon-cyan uppercase tracking-widest">{{ gameName }}</span>
           </div>
         </div>
@@ -53,12 +53,12 @@ onMounted(async () => {
         <div class="relative z-10 hidden lg:block">
           <div class="grid grid-cols-2 gap-4">
             <div class="gh-panel p-4 bg-retro-dark border-2 border-white/5">
-              <p class="font-pixel text-[9px] text-white/30 uppercase">ESTADO_SERVIDOR</p>
-              <p class="font-pixel text-xs text-neon-green uppercase animate-pulse">ONLINE_STABLE</p>
+              <p class="font-pixel text-[9px] text-white/30 uppercase">Estado del servidor</p>
+              <p class="font-pixel text-xs text-neon-green uppercase animate-pulse">En línea</p>
             </div>
             <div class="gh-panel p-4 bg-retro-dark border-2 border-white/5">
-              <p class="font-pixel text-[9px] text-white/30 uppercase">TOTAL_PLAYERS</p>
-              <p class="font-pixel text-xs text-neon-cyan uppercase">{{ entries.length }}_REGISTERED</p>
+              <p class="font-pixel text-[9px] text-white/30 uppercase">Jugadores registrados</p>
+              <p class="font-pixel text-xs text-neon-cyan uppercase">{{ entries.length }} Registrados</p>
             </div>
           </div>
         </div>
@@ -67,13 +67,13 @@ onMounted(async () => {
 
     <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 gh-panel bg-black/40">
       <Icon icon="lucide:loader-2" class="text-6xl text-neon-yellow animate-spin mb-4" />
-      <p class="font-pixel text-2xl text-neon-yellow uppercase blink tracking-widest">ACCEDIENDO_AL_REGISTRO...</p>
+      <p class="font-pixel text-2xl text-neon-yellow uppercase blink tracking-widest">Cargando datos...</p>
     </div>
 
     <div v-else-if="entries.length === 0" class="gh-panel p-16 text-center bg-black border-4 border-dashed border-white/10">
       <Icon icon="lucide:database-zap" class="text-6xl text-white/10 mx-auto mb-4" />
       <p class="font-pixel text-xl text-white/20 uppercase tracking-widest">
-        SERVER DB IS EMPTY // BE THE FIRST TO RANK
+        Aún no hay puntuaciones registradas. ¡Sé el primero!
       </p>
     </div>
 
@@ -149,7 +149,7 @@ onMounted(async () => {
                </div>
                <div class="truncate">
                   <h4 class="font-display text-lg font-black text-retro-white uppercase truncate">{{ entry.username }}</h4>
-                  <p class="font-pixel text-[9px] text-white/20 uppercase tracking-widest">PLAYER_HASH: {{ entry.user_id?.slice(0, 8) }}</p>
+                  <p class="font-pixel text-[9px] text-white/20 uppercase tracking-widest">ID de usuario: {{ entry.user_id?.slice(0, 8) }}</p>
                </div>
             </div>
 
@@ -165,7 +165,7 @@ onMounted(async () => {
                  <Icon icon="lucide:clock" class="text-[10px] text-white/20" />
                  <span class="font-pixel text-[9px] text-white/40 uppercase">{{ Math.floor(entry.time_played / 60) }}M</span>
                </div>
-               <span class="font-pixel text-[9px] text-neon-green uppercase opacity-40">STABLE_SIGNAL</span>
+               <span class="font-pixel text-[9px] text-neon-green uppercase opacity-40">Conexión estable</span>
             </div>
           </div>
         </div>
@@ -175,43 +175,5 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.gh-title-glow {
-  text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
-}
-.blink {
-  animation: blink 1.5s step-start infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
-}
-.animate-spin-slow {
-  animation: spin 8s linear infinite;
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.animate-bounce-slow {
-  animation: bounce 3s ease-in-out infinite;
-}
-@keyframes bounce {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -10px); }
-}
-.animate-glow-yellow {
-  animation: glow-yellow 4s infinite;
-}
-@keyframes glow-yellow {
-  0%, 100% { box-shadow: 12px 12px 0px #000; }
-  50% { box-shadow: 12px 12px 0px #000, 0 0 0 4px var(--color-neon-yellow); }
-}
-</style>
-
-<style scoped>
-.blink {
-  animation: blink 1s step-start infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
-}
+/* Estilos globales en style.css */
 </style>

@@ -5,7 +5,10 @@ import { useInventoryStore } from '../stores/inventory'
 
 const inventory = useInventoryStore()
 
+const selectedCategory = ref('todos')
+
 const items = [
+  // Tower Defense
   { 
     id: 'td_purge', 
     name: 'Rayo Destructor', 
@@ -36,6 +39,7 @@ const items = [
     icon: 'lucide:flame',
     color: 'neon-yellow'
   },
+  // Clicker
   { 
     id: 'clicker_autoclick', 
     name: 'Auto-click x10s', 
@@ -45,8 +49,60 @@ const items = [
     description: 'Automatiza tus clics a máxima velocidad durante 10 segundos.', 
     icon: 'lucide:bot',
     color: 'neon-cyan'
+  },
+  { 
+    id: 'clicker_multiplier', 
+    name: 'Multiplicador x2', 
+    game: 'Clicker', 
+    uses: 1, 
+    price: 1.99, 
+    description: 'Duplica permanentemente el valor de tus clics en la sesión actual.', 
+    icon: 'lucide:trending-up',
+    color: 'neon-green'
+  },
+  // RPG
+  { 
+    id: 'rpg_potion', 
+    name: 'Poción de Vida', 
+    game: 'Dungeon RPG', 
+    uses: 1, 
+    price: 0.50, 
+    description: 'Restaura instantáneamente el 50% de la vitalidad de tu héroe.', 
+    icon: 'lucide:heart',
+    color: 'neon-pink'
+  },
+  { 
+    id: 'rpg_scroll', 
+    name: 'Pergamino Ígneo', 
+    game: 'Dungeon RPG', 
+    uses: 1, 
+    price: 1.25, 
+    description: 'Lanza una bola de fuego devastadora que calcina a los enemigos cercanos.', 
+    icon: 'lucide:scroll',
+    color: 'neon-yellow'
+  },
+  // Quiz
+  { 
+    id: 'quiz_hint', 
+    name: 'Pista de IA', 
+    game: 'Quiz', 
+    uses: 2, 
+    price: 0.75, 
+    description: 'Elimina dos respuestas incorrectas de la pregunta actual.', 
+    icon: 'lucide:lightbulb',
+    color: 'neon-cyan'
   }
 ]
+
+const categories = computed(() => {
+  const cats = ['todos', ...new Set(items.map(item => item.game))]
+  return cats
+})
+
+const filteredItems = computed(() => {
+  if (selectedCategory.value === 'todos') return items
+  return items.filter(item => item.game === selectedCategory.value)
+})
 
 const cart = ref([])
 const isCartOpen = ref(false)
@@ -153,14 +209,14 @@ const checkout = async (method) => {
     <Transition name="slide">
       <aside v-if="isCartOpen" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-black border-l-4 border-neon-cyan z-[70] shadow-[-12px_0_0_#000] flex flex-col">
          <header class="p-6 border-b-2 border-neon-cyan/20 flex items-center justify-between bg-retro-dark">
-            <h2 class="font-display text-xl font-black text-white uppercase tracking-widest">Carrito_De_Compra</h2>
+            <h2 class="font-display text-xl font-black text-white uppercase tracking-widest">Carrito de compra</h2>
             <button @click="isCartOpen = false" class="text-white/40 hover:text-white transition-colors text-2xl">✕</button>
          </header>
 
          <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scroll">
             <div v-if="cart.length === 0" class="h-full flex flex-col items-center justify-center opacity-20 text-center">
                <Icon icon="lucide:shopping-cart" class="text-6xl mb-4" />
-               <p class="font-pixel text-xs uppercase tracking-widest">Carrito_Vacio</p>
+               <p class="font-pixel text-xs uppercase tracking-widest">Tu carrito está vacío</p>
             </div>
             
             <div 
@@ -187,16 +243,16 @@ const checkout = async (method) => {
 
          <footer v-if="cart.length > 0" class="p-6 border-t-2 border-neon-cyan/20 bg-retro-dark space-y-4">
             <div class="flex justify-between items-end">
-               <span class="font-pixel text-[10px] text-white/40 uppercase tracking-widest">TOTAL_ESTIMADO</span>
+               <span class="font-pixel text-[10px] text-white/40 uppercase tracking-widest">Total</span>
                <span class="font-display text-3xl font-black text-neon-yellow">{{ cartTotal.toFixed(2) }} €</span>
             </div>
             <div class="grid grid-cols-2 gap-3">
-               <button @click="clearCart" class="py-3 border-2 border-white/10 font-pixel text-[10px] text-white/40 hover:bg-white/5 uppercase transition-all">Limpiar</button>
+               <button @click="clearCart" class="py-3 border-2 border-white/10 font-pixel text-[10px] text-white/40 hover:bg-white/5 uppercase transition-all">Vaciar carrito</button>
                <button 
                  @click="startPayment" 
                  class="py-3 bg-neon-cyan text-black font-display text-xs font-black uppercase tracking-widest shadow-[4px_4px_0_#000] border-2 border-black hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all"
                >
-                 Proceder_al_Pago
+                 Pagar ahora
                </button>
             </div>
          </footer>
@@ -209,16 +265,31 @@ const checkout = async (method) => {
       <header class="text-center mb-16">
         <div class="flex items-center justify-center gap-4 mb-4">
            <div class="h-px w-16 bg-neon-cyan"></div>
-           <p class="font-pixel text-neon-cyan text-sm tracking-[0.4em] uppercase">MERCADO_NEGRO_DIGITAL</p>
+           <p class="font-pixel text-neon-cyan text-sm tracking-[0.4em] uppercase">Tienda</p>
            <div class="h-px w-16 bg-neon-cyan"></div>
         </div>
         <h1 class="font-display text-5xl sm:text-6xl font-black text-white mb-6 gh-title-glow tracking-[-0.02em] uppercase">
-          Arsenal Global
+          Tienda Global
         </h1>
         <p class="font-sans text-sm font-medium uppercase text-white/50 max-w-2xl mx-auto leading-relaxed">
           Adquiere mejoras y habilidades limitadas para tus sistemas. Las cargas se sincronizarán directamente con tu inventario local.
         </p>
       </header>
+
+      <!-- CATEGORIES -->
+      <div class="mb-12 flex flex-wrap justify-center gap-3">
+        <button 
+          v-for="cat in categories" 
+          :key="cat"
+          @click="selectedCategory = cat"
+          class="px-6 py-2 border-2 font-display text-xs font-black uppercase tracking-widest transition-all"
+          :class="selectedCategory === cat 
+            ? 'bg-neon-cyan text-black border-black shadow-[4px_4px_0_#000]' 
+            : 'bg-retro-dark text-white/40 border-white/5 hover:border-white/20 hover:text-white'"
+        >
+          {{ cat }}
+        </button>
+      </div>
 
       <!-- CATALOG -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
@@ -231,8 +302,8 @@ const checkout = async (method) => {
               <button @click="showPaymentMethods = false" class="absolute top-6 right-6 text-white/40 hover:text-white transition-colors">✕</button>
 
               <header class="text-center mb-8">
-                 <p class="font-pixel text-neon-cyan text-[10px] uppercase tracking-[0.4em] mb-2">Checkout_Terminal</p>
-                 <h3 class="font-display text-2xl font-black text-white uppercase tracking-tighter">Selecciona_Metodo</h3>
+                  <p class="font-pixel text-neon-cyan text-[10px] uppercase tracking-[0.4em] mb-2">Pago</p>
+                  <h3 class="font-display text-2xl font-black text-white uppercase tracking-tighter">Método de pago</h3>
               </header>
 
               <div class="grid grid-cols-1 gap-4">
@@ -252,7 +323,7 @@ const checkout = async (method) => {
               </div>
 
               <div class="mt-8 pt-6 border-t-2 border-neon-cyan/20 flex justify-between items-center">
-                 <span class="font-pixel text-[10px] text-white/30 uppercase">Importe_Total</span>
+                 <span class="font-pixel text-[10px] text-white/30 uppercase">Total</span>
                  <span class="font-display text-xl font-black text-neon-yellow">{{ cartTotal.toFixed(2) }} €</span>
               </div>
            </div>
@@ -262,12 +333,12 @@ const checkout = async (method) => {
         <div v-if="isProcessing" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md">
           <div class="flex flex-col items-center p-12 bg-black border-4 border-neon-cyan shadow-[0_0_100px_rgba(0,242,255,0.2)]">
             <div class="size-20 border-4 border-neon-cyan border-t-transparent animate-spin mb-8"></div>
-            <p class="font-pixel text-neon-cyan text-xl animate-pulse tracking-[0.4em] uppercase">PROCESANDO_PAGO</p>
+            <p class="font-pixel text-neon-cyan text-xl animate-pulse tracking-[0.4em] uppercase">Procesando pago...</p>
             <p v-if="selectedMethod" class="font-sans text-xs text-white/60 mt-2 uppercase tracking-widest">Via {{ selectedMethod.name }}</p>
             <div class="w-64 h-2 bg-retro-dark mt-8 overflow-hidden border border-white/10">
                <div class="h-full bg-neon-cyan animate-[loading_2s_ease-in-out_infinite]"></div>
             </div>
-            <p class="font-sans text-[10px] text-white/30 mt-4 uppercase tracking-[0.2em]">Cifrando transacción de terminal...</p>
+            <p class="font-sans text-[10px] text-white/30 mt-4 uppercase tracking-[0.2em]">Encriptando datos de transferencia...</p>
           </div>
         </div>
 
@@ -279,15 +350,15 @@ const checkout = async (method) => {
                    <Icon icon="lucide:check" />
                 </div>
                 <div class="flex flex-col">
-                  <span class="font-pixel text-xs text-neon-green uppercase tracking-[0.3em] mb-1">TRANSACCIÓN_COMPLETADA</span>
-                  <span class="font-display text-lg font-black text-white uppercase">Inventario actualizado con éxito.</span>
+                  <span class="font-pixel text-xs text-neon-green uppercase tracking-[0.3em] mb-1">¡Pago completado!</span>
+                  <span class="font-display text-lg font-black text-white uppercase">Los objetos han sido añadidos a tu inventario.</span>
                 </div>
              </div>
           </div>
         </Transition>
 
         <div 
-          v-for="item in items" 
+          v-for="item in filteredItems" 
           :key="item.id"
           class="gh-panel border-4 border-retro-black bg-black p-6 sm:p-8 flex flex-col sm:flex-row gap-6 transition-all duration-300 hover:border-neon-cyan shadow-[8px_8px_0_#000] hover:shadow-[12px_12px_0_#000] group relative overflow-hidden"
         >
@@ -326,7 +397,7 @@ const checkout = async (method) => {
 
              <div class="flex items-center justify-between mt-auto">
                 <div class="flex flex-col">
-                   <span class="font-pixel text-[10px] text-white/40 uppercase tracking-widest mb-1">PRECIO</span>
+                   <span class="font-pixel text-[10px] text-white/40 uppercase tracking-widest mb-1">Precio</span>
                    <span class="font-display text-xl font-black text-neon-yellow">{{ item.price.toFixed(2) }} €</span>
                 </div>
 
@@ -336,14 +407,14 @@ const checkout = async (method) => {
                   :class="`hover:border-${item.color} hover:text-${item.color}`"
                 >
                   <Icon icon="lucide:shopping-cart" />
-                  Añadir_al_Carrito
+                   Añadir al carrito
                 </button>
              </div>
           </div>
 
           <!-- Inventory Status Badge -->
           <div class="absolute top-4 right-4 text-right">
-             <span class="font-pixel text-[10px] text-white/30 uppercase tracking-widest block mb-1">EN INVENTARIO</span>
+             <span class="font-pixel text-[10px] text-white/30 uppercase tracking-widest block mb-1">En inventario</span>
              <span class="font-display text-lg font-bold" :class="inventory.items[item.id] > 0 ? 'text-neon-cyan' : 'text-white/10'">
                {{ inventory.items[item.id] || 0 }}
              </span>
@@ -356,36 +427,8 @@ const checkout = async (method) => {
 </template>
 
 <style scoped>
-.gh-glass {
-  backdrop-filter: blur(10px);
-}
-
-.slide-enter-active, .slide-leave-active {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.slide-enter-from, .slide-leave-to {
-  transform: translateX(100%);
-}
-
-.bounce-enter-active {
-  animation: bounce-in 0.5s;
-}
-.bounce-leave-active {
-  animation: bounce-in 0.5s reverse;
-}
-@keyframes bounce-in {
-  0% { transform: translate(-50%, -100%); opacity: 0; }
-  60% { transform: translate(-50%, 10%); opacity: 1; }
-  100% { transform: translate(-50%, 0); }
-}
-
-@keyframes loading {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(0); }
-  100% { transform: translateX(100%); }
-}
-
-.custom-scroll::-webkit-scrollbar { width: 4px; }
+/* Transiciones globales en style.css — aquí solo estilos exclusivos del carrito */
+.custom-scroll::-webkit-scrollbar       { width: 4px; }
 .custom-scroll::-webkit-scrollbar-track { background: transparent; }
 .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
 .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0, 242, 255, 0.3); }

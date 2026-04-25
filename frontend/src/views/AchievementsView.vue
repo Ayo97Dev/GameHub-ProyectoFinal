@@ -1,24 +1,51 @@
 <script setup>
-import { onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useAchievementStore } from '../stores/achievement'
+import { useGameStore } from '../stores/game'
 
 const achievementStore = useAchievementStore()
+const gameStore = useGameStore()
+
+const selectedGame = ref('all')
+const sortBy = ref('recent') // recent, old, rarity
 
 const RARITY_STYLES = {
-  common:    { label: 'LVL_1 // COMMON',    color: 'text-retro-white', border: 'border-white/20', bg: 'bg-retro-dark' },
-  uncommon:  { label: 'LVL_2 // UNCOMMON',  color: 'text-neon-cyan',  border: 'border-neon-cyan', bg: 'bg-neon-cyan/5' },
-  rare:      { label: 'LVL_3 // RARE',      color: 'text-neon-blue',  border: 'border-neon-blue', bg: 'bg-neon-blue/5' },
-  epic:      { label: 'LVL_4 // EPIC',      color: 'text-neon-pink',  border: 'border-neon-pink', bg: 'bg-neon-pink/5' },
-  legendary: { label: 'LVL_5 // LEGENDARY', color: 'text-neon-yellow', border: 'border-neon-yellow', bg: 'bg-neon-yellow/5' },
+  common:    { label: 'Nivel 1 // Común',    color: 'text-retro-white', border: 'border-white/20', bg: 'bg-retro-dark' },
+  uncommon:  { label: 'Nivel 2 // Poco común',  color: 'text-neon-cyan',  border: 'border-neon-cyan', bg: 'bg-neon-cyan/5' },
+  rare:      { label: 'Nivel 3 // Raro',      color: 'text-neon-blue',  border: 'border-neon-blue', bg: 'bg-neon-blue/5' },
+  epic:      { label: 'Nivel 4 // Épico',      color: 'text-neon-pink',  border: 'border-neon-pink', bg: 'bg-neon-pink/5' },
+  legendary: { label: 'Nivel 5 // Legendario', color: 'text-neon-yellow', border: 'border-neon-yellow', bg: 'bg-neon-yellow/5' },
 }
 
 const unlockedCount = computed(() => achievementStore.achievements.filter(a => a.unlocked).length)
 const totalCount = computed(() => achievementStore.achievements.length)
 const progressPercent = computed(() => totalCount.value > 0 ? (unlockedCount.value / totalCount.value) * 100 : 0)
 
+const filteredAchievements = computed(() => {
+  let list = [...achievementStore.achievements]
+  
+  if (selectedGame.value !== 'all') {
+    list = list.filter(a => a.game_id === Number(selectedGame.value))
+  }
+  
+  if (sortBy.value === 'recent') {
+    list.sort((a, b) => new Date(b.earned_at || 0) - new Date(a.earned_at || 0))
+  } else if (sortBy.value === 'old') {
+    list.sort((a, b) => new Date(a.earned_at || 0) - new Date(b.earned_at || 0))
+  } else if (sortBy.value === 'rarity') {
+    const rarityOrder = { legendary: 0, epic: 1, rare: 2, uncommon: 3, common: 4 }
+    list.sort((a, b) => rarityOrder[a.rarity] - rarityOrder[b.rarity])
+  }
+  
+  return list
+})
+
 onMounted(() => {
   achievementStore.fetchAchievements()
+  if (gameStore.games.length === 0) {
+    gameStore.fetchGames()
+  }
 })
 </script>
 
@@ -35,18 +62,18 @@ onMounted(() => {
         <div class="relative z-10">
           <div class="flex items-center gap-3 mb-2">
             <span class="size-2 bg-neon-cyan animate-pulse"></span>
-            <p class="font-pixel text-xs font-bold uppercase tracking-[0.3em] text-neon-cyan">DB_MODULE // ACHIEVEMENTS_LOG</p>
+            <p class="font-pixel text-xs font-bold uppercase tracking-[0.3em] text-neon-cyan">Logros</p>
           </div>
           
           <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <h1 class="text-5xl md:text-6xl font-display font-black uppercase text-retro-white tracking-tighter gh-title-glow">SISTEMA_LOGROS</h1>
+              <h1 class="text-5xl md:text-6xl font-display font-black uppercase text-retro-white tracking-tighter gh-title-glow">Mis logros</h1>
               <p class="font-sans text-sm font-bold text-white/40 uppercase mt-2 tracking-widest">Sincronización de hitos históricos de la red.</p>
             </div>
             
             <div class="w-full md:w-80">
               <div class="flex justify-between items-end mb-2">
-                <span class="font-pixel text-[10px] text-neon-yellow uppercase">INTEGRIDAD_PERFIL</span>
+                <span class="font-pixel text-[10px] text-neon-yellow uppercase">Progreso</span>
                 <span class="font-display text-xl font-black text-neon-yellow">{{ progressPercent.toFixed(0) }}%</span>
               </div>
               <div class="h-6 w-full bg-retro-dark border-2 border-white/10 p-0.5 relative">
@@ -60,22 +87,46 @@ onMounted(() => {
                 </div>
               </div>
               <p class="mt-2 font-pixel text-[10px] text-right text-white/40 uppercase">
-                ARCHIVOS_ENCONTRADOS: {{ unlockedCount }} / {{ totalCount }}
+                Logros conseguidos: {{ unlockedCount }} / {{ totalCount }}
               </p>
             </div>
           </div>
         </div>
       </div>
     </header>
+    
+    <!-- FILTERS -->
+    <div class="mb-10 flex flex-wrap items-center gap-6 p-6 bg-retro-dark/50 border-2 border-white/5 shadow-[4px_4px_0px_#000]">
+      <div class="flex items-center gap-3">
+        <span class="font-pixel text-[10px] text-white/30 uppercase tracking-widest">Filtrar por juego:</span>
+        <select v-model="selectedGame" class="bg-black border-2 border-neon-cyan px-3 py-1.5 font-display text-xs text-retro-white outline-none focus:shadow-[0_0_10px_rgba(0,242,255,0.3)] uppercase cursor-pointer">
+          <option value="all">Todos los juegos</option>
+          <option v-for="g in gameStore.games" :key="g.id" :value="g.id">{{ g.title }}</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="font-pixel text-[10px] text-white/30 uppercase tracking-widest">Ordenar por:</span>
+        <select v-model="sortBy" class="bg-black border-2 border-neon-pink px-3 py-1.5 font-display text-xs text-retro-white outline-none focus:shadow-[0_0_10px_rgba(255,45,85,0.3)] uppercase cursor-pointer">
+          <option value="recent">Más recientes</option>
+          <option value="old">Más antiguos</option>
+          <option value="rarity">Rareza (Mayor a menor)</option>
+        </select>
+      </div>
+      
+      <div class="ml-auto hidden md:block">
+        <p class="font-pixel text-[9px] text-white/20 uppercase tracking-widest">Resultados: {{ filteredAchievements.length }} / {{ totalCount }}</p>
+      </div>
+    </div>
 
     <div v-if="achievementStore.isLoading && achievementStore.achievements.length === 0" class="flex flex-col items-center justify-center py-24 gh-panel bg-black/40">
       <Icon icon="lucide:loader-2" class="text-6xl text-neon-pink animate-spin mb-4" />
-      <p class="font-pixel text-2xl text-neon-pink uppercase blink tracking-widest">DESENCRIPTANDO_ARCHIVOS...</p>
+      <p class="font-pixel text-2xl text-neon-pink uppercase blink tracking-widest">Cargando registros...</p>
     </div>
 
     <div v-else class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       <article
-        v-for="a in achievementStore.achievements"
+        v-for="a in filteredAchievements"
         :key="a.id"
         class="gh-panel group relative flex flex-col p-6 transition-all duration-300 bg-black border-4 shadow-[8px_8px_0px_#000] hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[12px_12px_0px_#000]"
         :class="[
@@ -89,7 +140,7 @@ onMounted(() => {
               class="font-pixel text-[9px] px-2 py-0.5 uppercase tracking-tighter"
               :class="a.unlocked ? 'bg-neon-cyan text-black' : 'bg-retro-black text-white/30'"
             >
-              {{ a.unlocked ? '[ACCESO_CONCEDIDO]' : '[DATOS_RESTRINGIDOS]' }}
+              {{ a.unlocked ? '[Conseguido]' : '[Bloqueado]' }}
             </span>
             <span class="font-pixel text-[10px] font-bold uppercase tracking-widest" :class="a.unlocked ? RARITY_STYLES[a.rarity]?.color : 'text-white/20'">
               {{ RARITY_STYLES[a.rarity]?.label ?? a.rarity }}
@@ -123,7 +174,7 @@ onMounted(() => {
                 {{ a.unlocked ? a.title : '??_??_??' }}
               </h3>
               <p class="font-sans text-[11px] font-bold leading-tight uppercase" :class="a.unlocked ? 'text-white/40' : 'text-white/10'">
-                {{ a.unlocked ? a.description : 'Sincronización requerida para visualizar descripción del hito.' }}
+                {{ a.unlocked ? a.description : 'Consigue este logro para ver su descripción.' }}
               </p>
             </div>
           </div>
@@ -132,7 +183,7 @@ onMounted(() => {
         <!-- Footer: Points & Date -->
         <div class="mt-6 pt-4 border-t-2 border-dashed flex items-center justify-between" :class="a.unlocked ? 'border-white/10' : 'border-white/5'">
           <div class="flex flex-col">
-            <span class="font-pixel text-[9px] text-white/30 uppercase">FECHA_OBTENCIÓN</span>
+            <span class="font-pixel text-[9px] text-white/30 uppercase">Fecha</span>
             <span class="font-pixel text-xs font-bold" :class="a.unlocked ? 'text-neon-cyan' : 'text-white/10'">
               {{ a.unlocked && a.earned_at ? new Date(a.earned_at).toLocaleDateString() : 'XX/XX/XXXX' }}
             </span>
@@ -152,7 +203,7 @@ onMounted(() => {
       <div v-if="achievementStore.achievements.length === 0" class="col-span-full gh-panel p-12 text-center bg-black/40 border-dashed border-4 border-white/10">
         <Icon icon="lucide:alert-triangle" class="text-6xl text-white/10 mx-auto mb-4" />
         <p class="font-pixel text-xl text-white/20 uppercase tracking-widest">
-          NO_ACHIEVEMENTS_REGISTERED // SERVIDOR_VACIO
+          Aún no tienes logros registrados.
         </p>
       </div>
     </div>
@@ -160,13 +211,5 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.gh-title-glow {
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-.blink {
-  animation: blink 1.5s step-start infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
-}
+/* Estilos globales en style.css */
 </style>

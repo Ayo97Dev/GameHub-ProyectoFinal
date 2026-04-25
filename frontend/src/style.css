@@ -1,144 +1,221 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap');
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
+/* =============================================
+   GAMEHUB — BLOCKY RETRO-FUTURISTA
+   Design System v2.0
+   ============================================= */
 
+/* ------------- 1. DESIGN TOKENS ------------- */
 @theme {
   --font-sans: "Space Mono", monospace;
   --font-display: "Orbitron", sans-serif;
   --font-pixel: "VT323", monospace;
 
-  --color-neon-pink: #ff2d55;
+  /* Neon Accents */
+  --color-neon-cyan:    #00f2ff;
+  --color-neon-pink:    #ff2d55;
+  --color-neon-yellow:  #fff200;
   --color-neon-fuchsia: #e02fe8;
-  --color-neon-cyan: #00f2ff;
-  --color-neon-blue: #007aff;
-  --color-neon-yellow: #fff200;
+  --color-neon-blue:    #007aff;
+  --color-neon-green:   #00ff88;
 
-  --color-retro-white: #f8fafc;
-  --color-retro-cream: #f1f5f9;
-  --color-retro-black: #0c0c0e;
-  --color-retro-dark: #121214;
-  --color-retro-deep: #08080a;
+  /* Neutral Dark Palette */
+  --color-retro-white:  #f8fafc;
+  --color-retro-cream:  #f1f5f9;
+  --color-retro-black:  #0c0c0e;
+  --color-retro-dark:   #121214;
+  --color-retro-deep:   #08080a;
 }
 
+/* ------------- 2. BASE LAYER ------------- */
 @layer base {
   html, body, #app {
     min-height: 100%;
   }
 
   html {
-    font-size: 16px; /* Base normativa estándar */
+    font-size: 16px;
     scroll-behavior: smooth;
     @apply antialiased;
   }
 
+  /* ► ARCADE DARK MODE — único modo soportado */
   body {
-    @apply text-base font-sans leading-relaxed text-retro-black bg-retro-cream transition-colors duration-300;
-    /* Grid Paper Effect */
+    @apply text-base font-sans leading-relaxed text-retro-white bg-retro-deep;
+    /* Scanline grid sutil como textura de fondo */
     background-image:
-      linear-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px),
-      linear-gradient(to right, rgba(148, 163, 184, 0.2) 1px, transparent 1px);
-    background-size: 20px 20px;
+      linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to right, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
     background-attachment: fixed;
   }
 
-  html.dark body {
-    @apply text-retro-white bg-retro-black;
-    background-image:
-      linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
-      linear-gradient(to right, rgba(34, 211, 238, 0.05) 1px, transparent 1px),
-      radial-gradient(ellipse at bottom, rgba(224,47,232,0.1) 0%, transparent 50%),
-      radial-gradient(ellipse at top, rgba(34,211,238,0.1) 0%, transparent 50%);
-    background-size: 30px 30px, 30px 30px, 100% 100%, 100% 100%;
-    background-attachment: fixed;
-  }
-
+  /* Jerarquía tipográfica */
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-widest uppercase;
   }
 
+  /* Selección de texto neón */
   ::selection {
-    @apply bg-neon-fuchsia text-retro-white dark:bg-neon-cyan dark:text-retro-black;
+    @apply bg-neon-cyan text-retro-black;
   }
+
+  /* Scrollbar personalizada */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-neon-cyan) var(--color-retro-dark);
+  }
+  *::-webkit-scrollbar       { width: 4px; height: 4px; }
+  *::-webkit-scrollbar-track { background: var(--color-retro-dark); }
+  *::-webkit-scrollbar-thumb { background: var(--color-neon-cyan); }
 }
 
+/* ------------- 3. COMPONENT UTILITIES ------------- */
 @layer components {
+
+  /* ── Superficie interactiva base ── */
   .gh-surface {
-    @apply border-2 border-retro-black bg-white transition-all duration-200;
+    @apply border-2 border-retro-black bg-retro-dark transition-all duration-200;
     box-shadow: 4px 4px 0px var(--color-retro-black);
   }
-  
-  html.dark .gh-surface {
-    @apply border-2 border-neon-cyan/80 bg-retro-dark;
-    box-shadow: 4px 4px 0px rgba(34, 211, 238, 0.6),
-                0 0 15px rgba(34, 211, 238, 0.2);
-  }
 
-  .gh-glass {
-    @apply bg-black/40 backdrop-blur-xl border-2 border-white/20;
-    box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.2);
-  }
-
+  /* ── Superficie hover (animación de presión) ── */
   .gh-surface-hover {
-    @apply hover:translate-x-[2px] hover:translate-y-[2px] active:translate-x-[4px] active:translate-y-[4px];
+    @apply hover:translate-x-[2px] hover:translate-y-[2px]
+           active:translate-x-[4px] active:translate-y-[4px];
   }
-  
-  .gh-surface-hover:hover {
-    box-shadow: 2px 2px 0px var(--color-retro-black);
-  }
-  
-  .gh-surface-hover:active {
-    box-shadow: 0px 0px 0px var(--color-retro-black);
-  }
+  .gh-surface-hover:hover  { box-shadow: 2px 2px 0px #000; }
+  .gh-surface-hover:active { box-shadow: 0px 0px 0px #000; }
 
-  html.dark .gh-surface-hover:hover {
-    box-shadow: 2px 2px 0px rgba(34, 211, 238, 0.6),
-                0 0 20px rgba(34, 211, 238, 0.3);
-  }
-
-  html.dark .gh-surface-hover:active {
-    box-shadow: 0px 0px 0px rgba(34, 211, 238, 1),
-                0 0 30px rgba(34, 211, 238, 0.5);
-  }
-
-  .gh-retro-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-retro-black focus:ring-offset-2 dark:focus:ring-neon-fuchsia dark:focus:ring-offset-retro-black;
-  }
-
-  .gh-title-gradient {
-    @apply bg-gradient-to-r from-neon-blue via-neon-fuchsia to-neon-fuchsia bg-clip-text text-transparent;
-    text-shadow: 2px 2px 0px var(--color-retro-black);
-  }
-  html.dark .gh-title-gradient {
-    @apply from-neon-cyan via-neon-fuchsia to-neon-fuchsia;
-    text-shadow: 3px 3px 0px var(--color-retro-black), 0 0 10px rgba(34, 211, 238, 0.5);
-  }
-
+  /* ── Panel estructural grande ── */
   .gh-panel {
-    @apply border-2 border-retro-black bg-white p-6 transition-all duration-300 dark:border-neon-cyan/50 dark:bg-retro-dark;
-    box-shadow: 6px 6px 0px var(--color-retro-black);
-  }
-  
-  html.dark .gh-panel {
-     box-shadow: 6px 6px 0px rgba(244, 114, 182, 0.6),
-                0 0 15px rgba(244, 114, 182, 0.2);
+    @apply border-2 border-retro-black bg-retro-dark transition-all duration-300;
+    box-shadow: 6px 6px 0px #000;
   }
 
+  /* ── Cristal técnico (sin esquinas redondeadas) ── */
+  .gh-glass {
+    @apply bg-black/50 backdrop-blur-md border-2 border-white/10;
+    box-shadow: 4px 4px 0px #000;
+  }
+
+  /* ── Gradiente de título con identidad arcade ── */
+  .gh-title-gradient {
+    @apply bg-gradient-to-r from-neon-cyan via-neon-fuchsia to-neon-pink bg-clip-text text-transparent;
+  }
+
+  /* ── Glow de texto — sólido, no gaussiano ── */
   .gh-title-glow {
-    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    text-shadow: 3px 3px 0px #000, 0 0 20px currentColor;
   }
 
+  /* ── Overlay de scanlines (CRT retro) ── */
   .gh-scanlines {
     position: relative;
     overflow: hidden;
   }
   .gh-scanlines::after {
-    content: " ";
+    content: "";
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-    background-size: 100% 4px;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.12) 2px,
+      rgba(0, 0, 0, 0.12) 4px
+    );
     pointer-events: none;
     z-index: 10;
+  }
+
+  /* ── Focus ring arcade ── */
+  .gh-retro-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-retro-deep;
+  }
+
+  /* ── Chip / etiqueta de datos ── */
+  .gh-chip {
+    @apply font-pixel text-[10px] uppercase tracking-widest px-2 py-0.5 border-2 border-white/10 bg-retro-dark shadow-[2px_2px_0px_#000];
+  }
+
+  /* ── Fila de dato HUD (label + valor) ── */
+  .gh-data-row {
+    @apply flex items-center justify-between px-3 py-2 border-2 border-white/5 bg-black shadow-[inset_2px_2px_0px_#000];
+  }
+
+  /* ── Cabecera de sección ── */
+  .gh-section-header {
+    @apply font-pixel text-[10px] uppercase tracking-[0.4em] text-neon-cyan border-b-2 border-neon-cyan/30 pb-1 mb-1;
+  }
+}
+
+/* ------------- 4. ANIMATIONS GLOBALES ------------- */
+@layer utilities {
+  /* Blink cursor / indicador */
+  .blink {
+    animation: gh-blink 1.2s step-start infinite;
+  }
+  @keyframes gh-blink {
+    50% { opacity: 0; }
+  }
+
+  /* Spin lento (iconos decorativos) */
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Bounce lento (podio 1er lugar) */
+  .animate-bounce-slow {
+    animation: gh-bounce 3s ease-in-out infinite;
+  }
+  @keyframes gh-bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%       { transform: translate(-50%, -8px); }
+  }
+
+  /* Glow pulsante en borde para elemento 1er lugar */
+  .animate-glow-yellow {
+    animation: gh-glow-yellow 3s infinite;
+  }
+  @keyframes gh-glow-yellow {
+    0%, 100% { box-shadow: 12px 12px 0px #000; }
+    50%       { box-shadow: 12px 12px 0px #000, 0 0 0 3px var(--color-neon-yellow); }
+  }
+
+  /* Slide para sidebars / drawers */
+  .slide-enter-active, .slide-leave-active {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .slide-enter-from, .slide-leave-to {
+    transform: translateX(100%);
+  }
+
+  /* Fade rápido tipo pixel */
+  .pixel-fade-enter-active, .pixel-fade-leave-active {
+    transition: opacity 0.1s step-end;
+  }
+  .pixel-fade-enter-from, .pixel-fade-leave-to {
+    opacity: 0;
+  }
+
+  /* Bounce-in para toasts */
+  .bounce-enter-active  { animation: gh-bounce-in 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  .bounce-leave-active  { animation: gh-bounce-in 0.3s reverse ease-in; }
+  @keyframes gh-bounce-in {
+    0%   { transform: translate(-50%, -120%); opacity: 0; }
+    60%  { transform: translate(-50%, 5%);    opacity: 1; }
+    100% { transform: translate(-50%, 0);     opacity: 1; }
+  }
+
+  /* Loading bar infinita */
+  @keyframes gh-loading {
+    0%   { transform: translateX(-100%); }
+    50%  { transform: translateX(0); }
+    100% { transform: translateX(100%); }
   }
 }

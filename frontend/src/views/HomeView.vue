@@ -39,21 +39,21 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
       <header class="flex flex-wrap items-center justify-between gap-6 p-4 bg-black/40 border-2 border-neon-cyan shadow-[4px_4px_0px_#000] backdrop-blur-md">
          <div class="flex items-center gap-8">
             <div class="flex flex-col">
-               <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">SERVIDOR_ESTADO</span>
+               <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">Estado del servidor</span>
                <div class="flex items-center gap-2">
                   <div class="size-2 bg-neon-cyan animate-pulse shadow-[0_0_8px_#00f2ff]"></div>
-                  <span class="font-display text-xs font-black text-neon-cyan">EN_LINEA_OPTIMO</span>
+                  <span class="font-display text-xs font-black text-neon-cyan">ÓPTIMO</span>
                </div>
             </div>
             <div class="hidden md:flex flex-col">
-               <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">UPTIME_SISTEMA</span>
-               <span class="font-display text-xs font-black text-white">{{ uptime }}</span>
+               <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">Tiempo de actividad</span>
+               <span class="font-display text-xs font-black text-white">24:00:00</span>
             </div>
          </div>
          <div class="flex items-center gap-6">
             <div class="flex flex-col items-end">
-               <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">USUARIOS_CONECTADOS</span>
-               <span class="font-display text-xs font-black text-neon-pink">1.248_NÚCLEOS</span>
+               <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">Sesiones activas</span>
+               <span class="font-display text-xs font-black text-neon-pink">1.248 Usuarios</span>
             </div>
             <div class="size-10 bg-white/5 border-2 border-neon-cyan flex items-center justify-center text-neon-cyan">
                <Icon icon="lucide:shield-check" class="text-xl" />
@@ -77,8 +77,8 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
                  
                  <!-- HUD Overlay -->
                  <div class="absolute top-6 left-6 z-20 flex flex-col gap-2">
-                    <div class="bg-neon-cyan text-black px-3 py-1 font-pixel text-xs font-black uppercase tracking-widest border-2 border-black">DESTACADO_DEL_MES</div>
-                    <div class="bg-black/80 border-2 border-neon-cyan/50 px-3 py-1 font-pixel text-[10px] text-white/60 tracking-widest uppercase">CAT: {{ featuredGame.slug.toUpperCase() }}</div>
+                     <div class="bg-neon-cyan text-black px-3 py-1 font-pixel text-xs font-black uppercase tracking-widest border-2 border-black">Recomendado</div>
+                     <div class="bg-black/80 border-2 border-neon-cyan/50 px-3 py-1 font-pixel text-[10px] text-white/60 tracking-widest uppercase">Categoría: {{ featuredGame.slug.toUpperCase() }}</div>
                  </div>
 
                  <!-- Big Play Button for Hero -->
@@ -110,7 +110,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
                     <div class="flex flex-wrap gap-4 pt-4">
                        <RouterLink :to="`/play/${featuredGame.slug}`" class="flex-1">
                           <button class="w-full py-4 bg-neon-cyan text-black font-display text-sm font-black uppercase tracking-widest shadow-[6px_6px_0px_#000] hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-[9px_9px_0px_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all border-2 border-black">
-                             INICIAR_OPERACIÓN
+                             Jugar ahora
                           </button>
                        </RouterLink>
                        <RouterLink to="/store" class="shrink-0">
@@ -134,7 +134,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
                <div class="size-8 bg-neon-cyan/10 flex items-center justify-center text-neon-cyan border-2 border-neon-cyan/50 shadow-[2px_2px_0px_#000]">
                   <Icon icon="lucide:layout-grid" />
                </div>
-               <h3 class="font-display text-2xl font-black text-white uppercase tracking-tighter">Archivo_De_Simulaciones</h3>
+               <h3 class="font-display text-2xl font-black text-white uppercase tracking-tighter">Biblioteca de juegos</h3>
             </div>
             <div class="hidden sm:flex items-center gap-4 font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em]">
                <span>Filtro: TODOS</span>
@@ -146,7 +146,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
          <!-- Indicador de carga -->
          <div v-if="gameStore.isLoading" class="py-24 flex flex-col items-center justify-center gap-6">
             <div class="size-16 border-4 border-neon-cyan border-t-transparent animate-spin"></div>
-            <p class="font-pixel text-neon-cyan text-xl animate-pulse tracking-[0.4em] uppercase">SINCRONIZANDO_DATOS...</p>
+            <p class="font-pixel text-neon-cyan text-xl animate-pulse tracking-[0.4em] uppercase">Cargando biblioteca...</p>
          </div>
 
          <!-- Game Cards Grid -->
@@ -160,7 +160,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
          <div class="gh-glass p-6 bg-retro-dark/80 border-2 border-neon-cyan/30 shadow-[6px_6px_0px_#000]">
             <div class="flex items-center gap-3 mb-4 text-neon-cyan">
                <Icon icon="lucide:database" class="text-2xl" />
-               <span class="font-display text-sm font-black uppercase">Red_Distribuida</span>
+               <span class="font-display text-sm font-black uppercase">Infraestructura distribuida</span>
             </div>
             <p class="font-pixel text-[10px] text-white/40 uppercase leading-relaxed tracking-widest">
                Nuestra arquitectura utiliza nodos descentralizados para garantizar una latencia inferior a 20ms en todas las regiones arcade.
@@ -169,7 +169,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
          <div class="gh-glass p-6 bg-retro-dark/80 border-2 border-neon-pink/30 shadow-[6px_6px_0px_#000]">
             <div class="flex items-center gap-3 mb-4 text-neon-pink">
                <Icon icon="lucide:shield" class="text-2xl" />
-               <span class="font-display text-sm font-black uppercase">Protocolo_Seguro</span>
+               <span class="font-display text-sm font-black uppercase">Protocolos de seguridad</span>
             </div>
             <p class="font-pixel text-[10px] text-white/40 uppercase leading-relaxed tracking-widest">
                Todas las transacciones en el mercado digital están cifradas mediante algoritmos cuánticos de 512 bits.
@@ -178,7 +178,7 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
          <div class="gh-glass p-6 bg-retro-dark/80 border-2 border-neon-yellow/30 shadow-[6px_6px_0px_#000]">
             <div class="flex items-center gap-3 mb-4 text-neon-yellow">
                <Icon icon="lucide:zap" class="text-2xl" />
-               <span class="font-display text-sm font-black uppercase">Alto_Rendimiento</span>
+               <span class="font-display text-sm font-black uppercase">Optimización de hardware</span>
             </div>
             <p class="font-pixel text-[10px] text-white/40 uppercase leading-relaxed tracking-widest">
                Sistema optimizado para núcleos de procesamiento de última generación. FPS estables garantizados.
@@ -191,5 +191,5 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
 </template>
 
 <style scoped>
-/* Transiciones y efectos adicionales si fueran necesarios */
+/* Estilos globales en style.css */
 </style>

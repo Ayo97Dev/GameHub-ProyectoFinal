@@ -71,7 +71,7 @@ function formatDate(isoDate) {
 <template>
   <section class="mx-auto w-full max-w-7xl px-4 py-10">
     <div v-if="isLoading" class="text-center text-retro-white py-20 font-pixel text-2xl uppercase blink">
-      LOADING_PROFILE...
+      Cargando perfil...
     </div>
 
     <template v-else-if="authStore.user">
@@ -82,17 +82,17 @@ function formatDate(isoDate) {
           {{ authStore.user.name.charAt(0).toUpperCase() }}
         </div>
         <div class="relative z-10 text-center sm:text-left">
-          <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-yellow border-b-2 border-neon-cyan mb-2 pb-1 inline-block">PLAYER_DATA</p>
+          <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-yellow border-b-2 border-neon-cyan mb-2 pb-1 inline-block">Datos del perfil</p>
           <h1 class="text-4xl font-display font-black uppercase text-retro-white">{{ authStore.user.name }}</h1>
           <p class="font-sans text-sm font-bold mt-1 text-slate-400">ID: {{ authStore.user.email }}</p>
         </div>
       </div>
 
       <div class="mt-8">
-        <h2 class="mb-6 font-display text-2xl font-black uppercase tracking-widest text-retro-white border-b-4 border-neon-cyan pb-2 inline-block">SYSTEM_STATS</h2>
+        <h2 class="mb-6 font-display text-2xl font-black uppercase tracking-widest text-retro-white border-b-4 border-neon-cyan pb-2 inline-block">Estadísticas</h2>
         
         <div v-if="!authStore.user.global_stats || authStore.user.global_stats.length === 0" class="gh-panel text-center text-retro-white font-pixel uppercase tracking-widest p-10 bg-retro-dark">
-          NO DATA ON SERVER. INSERT COIN TO PLAY.
+          Aún no tienes estadísticas registradas. ¡Juega para ver tus resultados!
         </div>
 
         <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -106,15 +106,15 @@ function formatDate(isoDate) {
             <!-- Stats -->
             <div class="space-y-3 mt-2">
               <div class="flex justify-between items-center bg-black px-3 py-2 border-2 border-neon-pink shadow-[inset_2px_2px_0px_#000]">
-                <span class="font-pixel text-xs text-retro-white uppercase tracking-wider">HIGH_SCORE</span>
+                <span class="font-pixel text-xs text-retro-white uppercase tracking-wider">Puntuación máxima</span>
                 <span class="font-sans font-bold text-neon-pink">{{ stat.high_score }}</span>
               </div>
               <div class="flex justify-between items-center bg-black px-3 py-2 border-2 border-neon-cyan shadow-[inset_2px_2px_0px_#000]">
-                <span class="font-pixel text-xs text-retro-white uppercase tracking-wider">TIME_PLAYED</span>
+                <span class="font-pixel text-xs text-retro-white uppercase tracking-wider">Tiempo jugado</span>
                 <span class="font-sans font-bold text-neon-cyan">{{ formatTime(stat.time_played) }}</span>
               </div>
               <div class="flex justify-between items-center bg-black px-3 py-2 border-2 border-neon-yellow shadow-[inset_2px_2px_0px_#000]">
-                <span class="font-pixel text-xs text-retro-white uppercase tracking-wider">LAST_LOGIN</span>
+                <span class="font-pixel text-xs text-retro-white uppercase tracking-wider">Última vez</span>
                 <span class="font-sans font-bold text-neon-yellow">{{ formatDate(stat.last_played_at) }}</span>
               </div>
             </div>
@@ -122,7 +122,7 @@ function formatDate(isoDate) {
             <!-- Logros del juego -->
             <div v-if="achievementStore.achievementsByGame[stat.game_id]?.length" class="border-t-2 border-neon-cyan border-dashed pt-4 mt-2">
               <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-retro-white mb-3">
-                ACHIEVEMENTS
+                Logros
                 <span class="ml-2 bg-neon-cyan text-black px-1">
                   {{ achievementStore.achievementsByGame[stat.game_id].filter(a => a.unlocked).length }}/{{ achievementStore.achievementsByGame[stat.game_id].length }}
                 </span>
@@ -148,7 +148,7 @@ function formatDate(isoDate) {
             <div class="pt-4 mt-auto">
               <BaseButton size="sm" variant="danger" class="w-full flex items-center justify-center gap-2" @click="confirmReset(stat)">
                 <Icon icon="lucide:trash-2" />
-                RESET_DATA
+                Reiniciar datos
               </BaseButton>
             </div>
           </article>
@@ -166,18 +166,18 @@ function formatDate(isoDate) {
         @click.self="resetTarget = null"
       >
         <div class="w-full max-w-sm gh-panel bg-black border-4 border-neon-pink shadow-[12px_12px_0px_#000]">
-          <h3 class="font-display text-2xl font-black uppercase tracking-wider text-neon-pink mb-2 border-b-2 border-neon-pink pb-2">WARNING!</h3>
+          <h3 class="font-display text-2xl font-black uppercase tracking-wider text-neon-pink mb-2 border-b-2 border-neon-pink pb-2">¡Atención!</h3>
           <p class="font-sans text-sm font-bold uppercase text-retro-white mb-6 mt-4 leading-relaxed">
-            SYSTEM WILL ERASE ALL PROGRESS AND STATS FOR 
-            <span class="text-neon-pink bg-retro-dark px-1 inline-block">{{ resetTarget.title }}</span>. <br><br>THIS CANNOT BE UNDONE.
+            Se borrará todo tu progreso y estadísticas de 
+            <span class="text-neon-pink bg-retro-dark px-1 inline-block">{{ resetTarget.title }}</span>. <br><br>Esta acción no se puede deshacer.
           </p>
           <div class="flex gap-3">
             <BaseButton variant="ghost" @click="resetTarget = null" class="flex-1">
-              CANCEL
+              Cancelar
             </BaseButton>
             <BaseButton variant="danger" @click="executeReset" :disabled="isResetting" class="flex-1">
               <Icon v-if="isResetting" icon="lucide:loader-2" class="animate-spin mr-2" />
-              {{ isResetting ? 'ERASING...' : 'CONFIRM' }}
+              {{ isResetting ? 'Borrando...' : 'Confirmar' }}
             </BaseButton>
           </div>
         </div>
@@ -187,12 +187,5 @@ function formatDate(isoDate) {
 </template>
 
 <style scoped>
-.blink {
-  animation: blink 1.5s step-start infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
-}
-.pixel-fade-enter-active, .pixel-fade-leave-active { transition: opacity 0.1s step-end; }
-.pixel-fade-enter-from, .pixel-fade-leave-to       { opacity: 0; }
+/* Estilos globales en style.css */
 </style>

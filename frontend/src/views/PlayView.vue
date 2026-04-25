@@ -12,7 +12,6 @@ import Clicker from '../components/games/Clicker.vue'
 import Quiz from '../components/games/Quiz.vue'
 import Connect4 from '../components/games/Connect4.vue'
 import Towerdefense from '../components/games/Towerdefense.vue'
-import MockAd from '../components/ads/MockAd.vue'
 
 // Helper para debounce
 function useDebouncedFunction(fn, delay = 300) {
@@ -66,15 +65,15 @@ const liveScore = computed(() => {
 })
 
 const liveScoreLabel = computed(() => {
-  if (route.params.slug === 'connect4') return 'WINS'
-  if (route.params.slug === 'tower-defense') return 'WAVES_CLEARED'
-  return 'SCORE'
+  if (route.params.slug === 'connect4') return 'VICTORIAS'
+  if (route.params.slug === 'tower-defense') return 'Oleadas superadas'
+  return 'Puntuación'
 })
 
 const leaderboardLabel = computed(() => {
-  if (route.params.slug === 'connect4') return 'TOP_3_WINS'
-  if (route.params.slug === 'tower-defense') return 'TOP_3_WAVES'
-  return 'TOP_3_RANKING'
+  if (route.params.slug === 'connect4') return 'Mejores puntuaciones'
+  if (route.params.slug === 'tower-defense') return 'Mejores puntuaciones'
+  return 'Mejores puntuaciones'
 })
 
 function handleLiveScore(value) {
@@ -99,33 +98,22 @@ watch(() => route.params.slug, () => {
 <template>
   <section class="mx-auto w-full max-w-[96rem] px-3 py-8 sm:px-4 lg:px-5 xl:px-6 sm:py-10">
     <header class="mb-5 border-b-4 border-neon-cyan pb-3">
-      <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-yellow">>> SYSTEM_MODE: PLAY</p>
+      <p class="font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-yellow">>> Modo: Juego</p>
       <h1 class="mt-2 text-3xl font-display font-black uppercase tracking-widest text-retro-white sm:text-4xl">
         {{ pageTitle }}
       </h1>
     </header>
 
-    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[280px_1fr_280px]">
-      
-      <!-- LEFT SIDEBAR: PRIMARY AD MODULE -->
-      <aside class="hidden xl:flex flex-col gap-6 sticky top-24 h-fit items-center">
-        <MockAd size="skyscraper" :rotate="true" :interval="7500" />
-      </aside>
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
 
       <!-- GAME CONTAINER -->
-      <div class="order-2 lg:order-1 xl:order-2 flex flex-col gap-8">
+      <div class="flex flex-col gap-8">
         <div class="gh-panel p-0 relative overflow-hidden bg-black border-4 border-retro-black flex flex-col items-center justify-center min-h-[500px] shadow-[8px_8px_0_#000]">
           <div class="gh-scanlines pointer-events-none absolute inset-0 z-10 opacity-30"></div>
           <component :is="gameComponent" v-if="gameComponent" @live-score="handleLiveScore" class="relative z-20 w-full h-full" />
           <div v-else class="relative z-20 p-6 gh-panel text-neon-pink font-pixel text-xl blink border-none shadow-none text-center">
-            ERR_MODULE_NOT_FOUND
+            Error: Juego no encontrado
           </div>
-        </div>
-
-        <!-- MOBILE / TABLET AD (Responsive) -->
-        <div class="xl:hidden flex justify-center">
-           <MockAd size="leaderboard" :rotate="true" class="hidden md:block" />
-           <MockAd size="mobile" :rotate="true" class="md:hidden" />
         </div>
       </div>
 
@@ -136,7 +124,7 @@ watch(() => route.params.slug, () => {
         <div class="gh-panel p-5 bg-black border-4 border-neon-pink shadow-[8px_8px_0_#000] space-y-8">
           <!-- Live Score -->
           <div>
-            <h2 class="font-display text-lg font-black uppercase text-neon-pink border-b-2 border-neon-pink pb-1">>> LIVE_STATS</h2>
+            <h2 class="font-display text-lg font-black uppercase text-neon-pink border-b-2 border-neon-pink pb-1">>> Estadísticas en vivo</h2>
             <div class="mt-3 bg-retro-dark border-[3px] border-neon-cyan p-3 shadow-[inset_3px_3px_0px_#000]">
               <p class="font-pixel text-[11px] uppercase tracking-wide text-neon-yellow">{{ liveScoreLabel }}</p>
               <p class="font-sans text-2xl font-bold text-neon-cyan leading-none mt-1">{{ liveScore.toLocaleString() }}</p>
@@ -162,14 +150,9 @@ watch(() => route.params.slug, () => {
                   {{ Number(entry.high_score).toLocaleString() }}
                 </span>
               </div>
-              <p v-if="leaderboard.length === 0" class="font-pixel text-xs text-retro-white uppercase blink">AWAITING CONNECTIONS...</p>
+              <p v-if="leaderboard.length === 0" class="font-pixel text-xs text-retro-white uppercase blink">Esperando resultados...</p>
             </div>
           </div>
-        </div>
-
-        <!-- SECONDARY AD MODULE (Symmetry) -->
-        <div class="hidden xl:flex justify-center">
-          <MockAd size="skyscraper" :rotate="true" :interval="10000" />
         </div>
 
       </aside>
@@ -178,10 +161,5 @@ watch(() => route.params.slug, () => {
 </template>
 
 <style scoped>
-.blink {
-  animation: blink 1.5s step-start infinite;
-}
-@keyframes blink {
-  50% { opacity: 0; }
-}
+/* Estilos globales en style.css */
 </style>
