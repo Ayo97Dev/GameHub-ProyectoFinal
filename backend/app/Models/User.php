@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -51,6 +52,18 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get the user's avatar URL.
+     */
+    protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value 
+                ? (str_starts_with($value, 'http') ? $value : '/storage/' . $value) 
+                : null,
+        );
+    }
+
     public function gameStats(): HasMany
     {
         return $this->hasMany(GameStat::class);
@@ -70,5 +83,10 @@ class User extends Authenticatable
     public function gameSessions(): HasMany
     {
         return $this->hasMany(GameSession::class);
+    }
+
+    public function inventoryItems(): HasMany
+    {
+        return $this->hasMany(InventoryItem::class);
     }
 }

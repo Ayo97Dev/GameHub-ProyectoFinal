@@ -12,7 +12,7 @@ const items = [
   { 
     id: 'td_purge', 
     name: 'Rayo Destructor', 
-    game: 'Tower Defense', 
+    game: 'Proyecto_Cortafuegos', 
     uses: 5, 
     price: 2.50, 
     description: 'Ejecuta una descarga masiva que daña a todas las entidades activas.', 
@@ -22,7 +22,7 @@ const items = [
   { 
     id: 'td_emp', 
     name: 'Pulso EMP', 
-    game: 'Tower Defense', 
+    game: 'Proyecto_Cortafuegos', 
     uses: 3, 
     price: 1.00, 
     description: 'Paraliza a todas las unidades enemigas temporalmente con un pulso electromagnético.', 
@@ -32,7 +32,7 @@ const items = [
   { 
     id: 'td_overclock', 
     name: 'Sobrecarga', 
-    game: 'Tower Defense', 
+    game: 'Proyecto_Cortafuegos', 
     uses: 3, 
     price: 1.50, 
     description: 'Frecuencia Crítica: Duplica la cadencia de fuego de todas las defensas.', 
@@ -43,7 +43,7 @@ const items = [
   { 
     id: 'clicker_autoclick', 
     name: 'Auto-click x10s', 
-    game: 'Clicker', 
+    game: 'CoreClicker', 
     uses: 3, 
     price: 0.99, 
     description: 'Automatiza tus clics a máxima velocidad durante 10 segundos.', 
@@ -53,7 +53,7 @@ const items = [
   { 
     id: 'clicker_multiplier', 
     name: 'Multiplicador x2', 
-    game: 'Clicker', 
+    game: 'CoreClicker', 
     uses: 1, 
     price: 1.99, 
     description: 'Duplica permanentemente el valor de tus clics en la sesión actual.', 
@@ -64,7 +64,7 @@ const items = [
   { 
     id: 'rpg_potion', 
     name: 'Poción de Vida', 
-    game: 'Dungeon RPG', 
+    game: 'Descenso al Abismo', 
     uses: 1, 
     price: 0.50, 
     description: 'Restaura instantáneamente el 50% de la vitalidad de tu héroe.', 
@@ -74,12 +74,57 @@ const items = [
   { 
     id: 'rpg_scroll', 
     name: 'Pergamino Ígneo', 
-    game: 'Dungeon RPG', 
+    game: 'Descenso al Abismo', 
     uses: 1, 
     price: 1.25, 
     description: 'Lanza una bola de fuego devastadora que calcina a los enemigos cercanos.', 
     icon: 'lucide:scroll',
     color: 'neon-yellow'
+  },
+  // RPG Classes (Unlockable)
+  { 
+    id: 'rpg_class_necromancer', 
+    name: 'Clase: Nigromante', 
+    game: 'Descenso al Abismo', 
+    uses: 1, 
+    price: 4.99, 
+    description: 'Desbloquea permanentemente al Nigromante. Maestro de la muerte y el drenaje de vida.', 
+    icon: 'lucide:skull',
+    color: 'neon-pink',
+    isUnique: true
+  },
+  { 
+    id: 'rpg_class_berserker', 
+    name: 'Clase: Berserker', 
+    game: 'Descenso al Abismo', 
+    uses: 1, 
+    price: 3.99, 
+    description: 'Desbloquea permanentemente al Berserker. Furia desenfrenada y daño masivo.', 
+    icon: 'lucide:sword',
+    color: 'neon-yellow',
+    isUnique: true
+  },
+  { 
+    id: 'rpg_class_archmage', 
+    name: 'Clase: Archimago', 
+    game: 'Descenso al Abismo', 
+    uses: 1, 
+    price: 6.99, 
+    description: 'Desbloquea permanentemente al Archimago. El pináculo del poder arcano.', 
+    icon: 'lucide:wand-2',
+    color: 'neon-cyan',
+    isUnique: true
+  },
+  { 
+    id: 'rpg_class_assassin', 
+    name: 'Clase: Asesino', 
+    game: 'Descenso al Abismo', 
+    uses: 1, 
+    price: 5.49, 
+    description: 'Desbloquea permanentemente al Asesino. Sombra letal y ataques críticos.', 
+    icon: 'lucide:dagger',
+    color: 'neon-green',
+    isUnique: true
   },
   // Quiz
   { 
@@ -135,8 +180,11 @@ const cartCount = computed(() => cart.value.reduce((count, item) => count + item
 const addToCart = (item) => {
   const existing = cart.value.find(i => i.id === item.id)
   if (existing) {
+    if (item.isUnique) return // Don't add more if unique
     existing.quantity++
   } else {
+    // Also check if already in inventory for unique items
+    if (item.isUnique && inventory.hasItem(item.id)) return
     cart.value.push({ ...item, quantity: 1 })
   }
 }
@@ -172,9 +220,9 @@ const checkout = async (method) => {
   await new Promise(resolve => setTimeout(resolve, 2000))
 
   // Update inventory for all items in cart
-  cart.value.forEach(item => {
+  await Promise.all(cart.value.map(item => 
     inventory.addItems(item.id, item.uses * item.quantity)
-  })
+  ))
   
   isProcessing.value = false
   purchaseSuccess.value = true
@@ -403,11 +451,16 @@ const checkout = async (method) => {
 
                 <button 
                   @click="addToCart(item)"
-                  class="px-6 py-3 bg-retro-dark border-2 border-white/10 font-display text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all flex items-center gap-2"
-                  :class="`hover:border-${item.color} hover:text-${item.color}`"
+                  class="px-6 py-3 border-2 font-display text-[10px] font-black uppercase tracking-widest shadow-[4px_4px_0_#000] transition-all flex items-center gap-2"
+                  :class="[
+                    item.isUnique && inventory.hasItem(item.id)
+                      ? 'bg-neon-green/10 border-neon-green/40 text-neon-green cursor-not-allowed opacity-80'
+                      : `bg-retro-dark border-white/10 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none hover:border-${item.color} hover:text-${item.color}`
+                  ]"
+                  :disabled="item.isUnique && inventory.hasItem(item.id)"
                 >
-                  <Icon icon="lucide:shopping-cart" />
-                   Añadir al carrito
+                  <Icon :icon="item.isUnique && inventory.hasItem(item.id) ? 'lucide:check-circle' : 'lucide:shopping-cart'" />
+                  {{ item.isUnique && inventory.hasItem(item.id) ? 'Producto adquirido' : 'Añadir al carrito' }}
                 </button>
              </div>
           </div>

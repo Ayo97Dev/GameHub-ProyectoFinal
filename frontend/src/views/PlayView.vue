@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGameStore } from '../stores/game'
 import { useClickerStore } from '../stores/games/clicker'
@@ -32,11 +32,11 @@ const leaderboardStore = useLeaderboardStore()
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
 
 const FALLBACK_TITLE_BY_SLUG = {
-  clicker: 'REACTOR_CLICK.EXE',
-  rpg: 'RPG_MODULE.EXE',
+  'core-clicker': 'CORE_SYNC.EXE',
+  'descenso-al-abismo': 'ABISMO_INIT.EXE',
   quiz: 'QUIZ_MASTER.SYS',
   connect4: 'CONNECT_4.BIN',
-  'tower-defense': 'TOWER_DEF.DAT',
+  'proyecto-cortafuegos': 'FIREWALL_DEF.PRO',
 }
 
 const pageTitle = computed(() => {
@@ -48,31 +48,40 @@ const leaderboard = computed(() => leaderboardStore.getEntries(route.params.slug
 const towerDefenseScore = ref(0)
 const debouncedFetchLeaderboard = useDebouncedFunction(fetchLeaderboard, 300)
 
+// Session Stats
+const sessionTime = ref('00:00')
+const sessionSeconds = ref(0)
+const onlinePlayers = computed(() => gameStore.telemetry.games_telemetry[route.params.slug] ?? 0)
+
+function updateSessionStats() {
+  gameStore.fetchTelemetry()
+}
+
 const gameComponent = computed(() => {
-  if (route.params.slug === 'rpg')     return Rpg
-  if (route.params.slug === 'clicker') return Clicker
+  if (route.params.slug === 'descenso-al-abismo')     return Rpg
+  if (route.params.slug === 'core-clicker') return Clicker
   if (route.params.slug === 'quiz')    return Quiz
   if (route.params.slug === 'connect4') return Connect4
-  if (route.params.slug === 'tower-defense') return Towerdefense
+  if (route.params.slug === 'proyecto-cortafuegos') return Towerdefense
   return null
 })
 
 const liveScore = computed(() => {
-  if (route.params.slug === 'clicker') return Math.floor(clicker.balance)
+  if (route.params.slug === 'core-clicker') return Math.floor(clicker.balance)
   if (route.params.slug === 'connect4') return connect4.wins
-  if (route.params.slug === 'tower-defense') return Math.floor(towerDefense.gameState?.wave ?? 0)
+  if (route.params.slug === 'proyecto-cortafuegos') return Math.floor(towerDefense.gameState?.wave ?? 0)
   return 0
 })
 
 const liveScoreLabel = computed(() => {
   if (route.params.slug === 'connect4') return 'VICTORIAS'
-  if (route.params.slug === 'tower-defense') return 'Oleadas superadas'
+  if (route.params.slug === 'proyecto-cortafuegos') return 'Oleadas superadas'
   return 'Puntuación'
 })
 
 const leaderboardLabel = computed(() => {
   if (route.params.slug === 'connect4') return 'Mejores puntuaciones'
-  if (route.params.slug === 'tower-defense') return 'Mejores puntuaciones'
+  if (route.params.slug === 'proyecto-cortafuegos') return 'Mejores puntuaciones'
   return 'Mejores puntuaciones'
 })
 
@@ -85,12 +94,33 @@ async function fetchLeaderboard() {
   leaderboardStore.fetchLeaderboard(route.params.slug, true) // Force true to get fresh scores while playing
 }
 
+let statsInterval = null
+
 onMounted(() => {
   fetchLeaderboard()
+  updateSessionStats()
+  
+  statsInterval = setInterval(() => {
+    sessionSeconds.value++
+    const m = Math.floor(sessionSeconds.value / 60).toString().padStart(2, '0')
+    const s = (sessionSeconds.value % 60).toString().padStart(2, '0')
+    sessionTime.value = `${m}:${s}`
+    
+    if (sessionSeconds.value % 10 === 0) {
+      updateSessionStats()
+    }
+  }, 1000)
+})
+
+onUnmounted(() => {
+  if (statsInterval) clearInterval(statsInterval)
 })
 
 watch(() => route.params.slug, () => {
   towerDefenseScore.value = 0 // Reset score when changing game
+  sessionSeconds.value = 0
+  sessionTime.value = '00:00'
+  updateSessionStats()
   debouncedFetchLeaderboard()
 })
 </script>
@@ -122,6 +152,19 @@ watch(() => route.params.slug, () => {
         
         <!-- STATS PANEL -->
         <div class="gh-panel p-5 bg-black border-4 border-neon-pink shadow-[8px_8px_0_#000] space-y-8">
+          
+          <!-- Session Data -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-retro-dark border-[3px] border-neon-cyan p-3 shadow-[inset_3px_3px_0px_#000]">
+              <p class="font-pixel text-[9px] uppercase tracking-wide text-white/40">Sesión</p>
+              <p class="font-sans text-xl font-bold text-neon-cyan leading-none mt-1">{{ sessionTime }}</p>
+            </div>
+            <div class="bg-retro-dark border-[3px] border-neon-yellow p-3 shadow-[inset_3px_3px_0px_#000]">
+              <p class="font-pixel text-[9px] uppercase tracking-wide text-white/40">Jugadores</p>
+              <p class="font-sans text-xl font-bold text-neon-yellow leading-none mt-1">{{ onlinePlayers }}</p>
+            </div>
+          </div>
+
           <!-- Live Score -->
           <div>
             <h2 class="font-display text-lg font-black uppercase text-neon-pink border-b-2 border-neon-pink pb-1">>> Estadísticas en vivo</h2>

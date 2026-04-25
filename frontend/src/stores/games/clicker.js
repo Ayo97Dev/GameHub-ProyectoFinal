@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import gameEngine from '../../lib/gameEngineService'
 
 export const useClickerStore = defineStore('clicker', () => {
-  const GAME_SLUG = 'clicker'
+  const GAME_SLUG = 'core-clicker'
   const SAVE_COOLDOWN_MS = 5_000 // Mínimo 5 segundos entre saves
 
   const isLoading = ref(false)

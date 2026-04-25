@@ -1,0 +1,1156 @@
+{
+  "enemies": [
+    {
+      "id": "griffin",
+      "name": "Grifo",
+      "description": "Criatura híbrida con cuerpo de león y cabeza de águila, ágil y feroz en combate aéreo.",
+      "role": "dps",
+      "avatar": "assets/griffin.png",
+      "stats": {
+        "hp": 90,
+        "mp": 30,
+        "attack": 18,
+        "defense": 8,
+        "magicAttack": 5,
+        "magicDefense": 6,
+        "speed": 20,
+        "critRate": 10,
+        "evasion": 12
+      },
+      "skills": [
+        "claw_Strike",
+        "aerial_Rush",
+        "wing_Buffet"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 3,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "wyvern",
+      "name": "Wyverns",
+      "description": "Dragón de dos patas y alas, experto en ataques aéreos y veneno.",
+      "role": "dps",
+      "avatar": "assets/wyvern.png",
+      "stats": {
+        "hp": 110,
+        "mp": 40,
+        "attack": 20,
+        "defense": 10,
+        "magicAttack": 8,
+        "magicDefense": 8,
+        "speed": 18,
+        "critRate": 12,
+        "evasion": 10
+      },
+      "skills": [
+        "tail_Swipe",
+        "venom_Bite",
+        "aerial_Assault"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 4,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "bear",
+      "name": "Oso",
+      "description": "Bestia fuerte y resistente, especializada en ataques físicos cuerpo a cuerpo.",
+      "role": "tank",
+      "avatar": "assets/bear.png",
+      "stats": {
+        "hp": 130,
+        "mp": 10,
+        "attack": 16,
+        "defense": 14,
+        "magicAttack": 3,
+        "magicDefense": 6,
+        "speed": 8,
+        "critRate": 5,
+        "evasion": 3
+      },
+      "skills": [
+        "maul",
+        "roar",
+        "ground_Slam"
+      ],
+      "levelUp": {
+        "hp": 14,
+        "mp": 1,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "wolf",
+      "name": "Lobo",
+      "description": "Depredador ágil y feroz, especializado en emboscadas y ataques rápidos en manada.",
+      "role": "dps",
+      "avatar": "assets/wolf.png",
+      "stats": {
+        "hp": 80,
+        "mp": 10,
+        "attack": 13,
+        "defense": 8,
+        "magicAttack": 2,
+        "magicDefense": 4,
+        "speed": 22,
+        "critRate": 8,
+        "evasion": 15
+      },
+      "skills": [
+        "bite",
+        "pounce",
+        "howl"
+      ],
+      "levelUp": {
+        "hp": 8,
+        "mp": 1,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "panther",
+      "name": "Pantera",
+      "description": "Felino ágil y sigiloso, experto en ataques críticos y emboscadas.",
+      "role": "dps",
+      "avatar": "assets/panther.png",
+      "stats": {
+        "hp": 75,
+        "mp": 10,
+        "attack": 15,
+        "defense": 7,
+        "magicAttack": 2,
+        "magicDefense": 4,
+        "speed": 24,
+        "critRate": 12,
+        "evasion": 18
+      },
+      "skills": [
+        "claw_Swipe",
+        "leap_Attack",
+        "stealth_Pounce"
+      ],
+      "levelUp": {
+        "hp": 8,
+        "mp": 1,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "basilisk",
+      "name": "Basilik",
+      "description": "Reptil legendario cuya mirada puede petrificar, con ataques físicos y mágicos moderados.",
+      "role": "dps",
+      "avatar": "assets/basilisk.png",
+      "stats": {
+        "hp": 100,
+        "mp": 40,
+        "attack": 15,
+        "defense": 10,
+        "magicAttack": 14,
+        "magicDefense": 10,
+        "speed": 14,
+        "critRate": 10,
+        "evasion": 8
+      },
+      "skills": [
+        "petrifying_Gaze",
+        "tail_Whip",
+        "venom_Spike"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 4,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "rat",
+      "name": "Rata",
+      "description": "Pequeña bestia ágil, peligrosa en grupo y capaz de ataques sorpresa.",
+      "role": "dps",
+      "avatar": "assets/rat.png",
+      "stats": {
+        "hp": 30,
+        "mp": 5,
+        "attack": 5,
+        "defense": 2,
+        "magicAttack": 1,
+        "magicDefense": 2,
+        "speed": 25,
+        "critRate": 5,
+        "evasion": 15
+      },
+      "skills": [
+        "bite",
+        "squeak",
+        "swarm_Attack"
+      ],
+      "levelUp": {
+        "hp": 5,
+        "mp": 1,
+        "attack": 1,
+        "defense": 0,
+        "magicAttack": 0,
+        "magicDefense": 0,
+        "speed": 2
+      }
+    },
+    {
+      "id": "chimera",
+      "name": "Quimera",
+      "description": "Bestia híbrida con cabeza de león, cabra y serpiente, ataques físicos y mágicos equilibrados.",
+      "role": "dps",
+      "avatar": "assets/chimera.png",
+      "stats": {
+        "hp": 120,
+        "mp": 50,
+        "attack": 18,
+        "defense": 10,
+        "magicAttack": 12,
+        "magicDefense": 10,
+        "speed": 16,
+        "critRate": 12,
+        "evasion": 10
+      },
+      "skills": [
+        "fire_Breath",
+        "claw_Swipe",
+        "tail_Whip"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 5,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "harpy",
+      "name": "Arpía",
+      "description": "Criatura alada y veloz, ataca desde el aire con garras afiladas y ataques a distancia.",
+      "role": "dps",
+      "avatar": "assets/harpy.png",
+      "stats": {
+        "hp": 130,
+        "mp": 20,
+        "attack": 22,
+        "defense": 10,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 22,
+        "critRate": 10,
+        "evasion": 14
+      },
+      "skills": [
+        "claw_Attack",
+        "swoop",
+        "wind_Buffet"
+      ],
+      "levelUp": {
+        "hp": 13,
+        "mp": 2,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 3
+      }
+    },
+    {
+      "id": "mantichore",
+      "name": "Mantícola",
+      "description": "Bestia híbrida con cuerpo de león, alas de murciélago y cola venenosa, ataques físicos y a distancia.",
+      "role": "dps",
+      "avatar": "assets/mantichore.png",
+      "stats": {
+        "hp": 115,
+        "mp": 35,
+        "attack": 18,
+        "defense": 10,
+        "magicAttack": 10,
+        "magicDefense": 8,
+        "speed": 18,
+        "critRate": 12,
+        "evasion": 10
+      },
+      "skills": [
+        "tail_Sting",
+        "wing_Slam",
+        "claw_Attack"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 3,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "roc",
+      "name": "Roc",
+      "description": "Ave gigante capaz de aplastar con sus garras y ataques aéreos devastadores.",
+      "role": "dps",
+      "avatar": "assets/roc.png",
+      "stats": {
+        "hp": 160,
+        "mp": 20,
+        "attack": 24,
+        "defense": 12,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 20,
+        "critRate": 10,
+        "evasion": 12
+      },
+      "skills": [
+        "giga_Claw",
+        "aerial_Assault",
+        "wing_Buffet"
+      ],
+      "levelUp": {
+        "hp": 16,
+        "mp": 2,
+        "attack": 3,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "skeleton",
+      "name": "Esqueleto",
+      "description": "No-muerto básico, débil físicamente pero resistente a efectos de estado.",
+      "role": "dps",
+      "avatar": "assets/skeleton.png",
+      "stats": {
+        "hp": 50,
+        "mp": 10,
+        "attack": 10,
+        "defense": 5,
+        "magicAttack": 5,
+        "magicDefense": 10,
+        "speed": 12,
+        "critRate": 5,
+        "evasion": 6
+      },
+      "skills": [
+        "bone_Slash",
+        "shield_Bone",
+        "rattle"
+      ],
+      "levelUp": {
+        "hp": 8,
+        "mp": 1,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "zombie",
+      "name": "Zombie",
+      "description": "No-muerto lento pero resistente, capaz de absorber ataques y causar daño constante.",
+      "role": "tank",
+      "avatar": "assets/zombie.png",
+      "stats": {
+        "hp": 80,
+        "mp": 10,
+        "attack": 12,
+        "defense": 8,
+        "magicAttack": 3,
+        "magicDefense": 8,
+        "speed": 6,
+        "critRate": 4,
+        "evasion": 3
+      },
+      "skills": [
+        "slam",
+        "bite",
+        "moan"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 1,
+        "attack": 2,
+        "defense": 2,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 0
+      }
+    },
+    {
+      "id": "dullahan",
+      "name": "Dullahan",
+      "description": "Caballero sin cabeza, rápido y peligroso, experto en ataques físicos con espada y movilidad.",
+      "role": "dps",
+      "avatar": "assets/dullahan.png",
+      "stats": {
+        "hp": 95,
+        "mp": 20,
+        "attack": 17,
+        "defense": 10,
+        "magicAttack": 8,
+        "magicDefense": 8,
+        "speed": 18,
+        "critRate": 12,
+        "evasion": 10
+      },
+      "skills": [
+        "headless_Strike",
+        "swift_Slash",
+        "phantom_Ride"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 2,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "ghoul",
+      "name": "Ghoul",
+      "description": "No-muerto rápido y depredador, ataca con garras y puede envenenar al enemigo.",
+      "role": "dps",
+      "avatar": "assets/ghoul.png",
+      "stats": {
+        "hp": 110,
+        "mp": 20,
+        "attack": 20,
+        "defense": 10,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 18,
+        "critRate": 10,
+        "evasion": 12
+      },
+      "skills": [
+        "claw_Swipe",
+        "bite",
+        "poison_Claw"
+      ],
+      "levelUp": {
+        "hp": 11,
+        "mp": 2,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "ghost",
+      "name": "Fantasma",
+      "description": "Entidad etérea que evade ataques físicos y ataca con magia oscura o psíquica.",
+      "role": "dps",
+      "avatar": "assets/ghost.png",
+      "stats": {
+        "hp": 90,
+        "mp": 100,
+        "attack": 5,
+        "defense": 6,
+        "magicAttack": 20,
+        "magicDefense": 15,
+        "speed": 18,
+        "critRate": 8,
+        "evasion": 15
+      },
+      "skills": [
+        "phantom_Strike",
+        "shadow_Pulse",
+        "ethereal_Shield"
+      ],
+      "levelUp": {
+        "hp": 9,
+        "mp": 10,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 2,
+        "speed": 2
+      }
+    },
+    {
+      "id": "banshee",
+      "name": "Banshee",
+      "description": "Espíritu que ataca con gritos y magia de miedo, debilitando a los enemigos.",
+      "role": "dps",
+      "avatar": "assets/banshee.png",
+      "stats": {
+        "hp": 85,
+        "mp": 120,
+        "attack": 5,
+        "defense": 5,
+        "magicAttack": 22,
+        "magicDefense": 16,
+        "speed": 16,
+        "critRate": 10,
+        "evasion": 12
+      },
+      "skills": [
+        "wail_of_terror",
+        "shadow_Bolt",
+        "fear_Aura"
+      ],
+      "levelUp": {
+        "hp": 8,
+        "mp": 12,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 3,
+        "magicDefense": 2,
+        "speed": 2
+      }
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "description": "Humanoide pequeño y astuto, especializado en ataques en grupo y trampas.",
+      "role": "dps",
+      "avatar": "assets/goblin.png",
+      "stats": {
+        "hp": 55,
+        "mp": 10,
+        "attack": 9,
+        "defense": 4,
+        "magicAttack": 5,
+        "magicDefense": 6,
+        "speed": 18,
+        "critRate": 8,
+        "evasion": 10
+      },
+      "skills": [
+        "dagger_Stab",
+        "trap_Setup",
+        "quick_Stab"
+      ],
+      "levelUp": {
+        "hp": 8,
+        "mp": 1,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "kobold",
+      "name": "Kobold",
+      "description": "Humanoide pequeño y ágil, experto en emboscadas y ataques coordinados.",
+      "role": "dps",
+      "avatar": "assets/kobold.png",
+      "stats": {
+        "hp": 50,
+        "mp": 10,
+        "attack": 8,
+        "defense": 3,
+        "magicAttack": 4,
+        "magicDefense": 5,
+        "speed": 20,
+        "critRate": 9,
+        "evasion": 12
+      },
+      "skills": [
+        "dagger_Slash",
+        "poison_Tip",
+        "quick_Jump"
+      ],
+      "levelUp": {
+        "hp": 7,
+        "mp": 1,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 3
+      }
+    },
+    {
+      "id": "orc",
+      "name": "Orco",
+      "description": "Humanoide grande y fuerte, especializado en daño físico y embestidas.",
+      "role": "tank",
+      "avatar": "assets/orc.png",
+      "stats": {
+        "hp": 100,
+        "mp": 10,
+        "attack": 16,
+        "defense": 12,
+        "magicAttack": 4,
+        "magicDefense": 6,
+        "speed": 10,
+        "critRate": 6,
+        "evasion": 4
+      },
+      "skills": [
+        "heavy_Slash",
+        "charge",
+        "war_Cry"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 1,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "troll",
+      "name": "Troll",
+      "description": "Gigante resistente, capaz de regenerar salud y causar gran daño físico.",
+      "role": "tank",
+      "avatar": "assets/troll.png",
+      "stats": {
+        "hp": 120,
+        "mp": 15,
+        "attack": 18,
+        "defense": 14,
+        "magicAttack": 6,
+        "magicDefense": 8,
+        "speed": 8,
+        "critRate": 5,
+        "evasion": 3
+      },
+      "skills": [
+        "club_Swing",
+        "regenerate",
+        "stomp"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 2,
+        "attack": 2,
+        "defense": 2,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "ogre",
+      "name": "Ogro",
+      "description": "Gigante fuerte y lento, inflige daño masivo cuerpo a cuerpo con ataques contundentes.",
+      "role": "tank",
+      "avatar": "assets/ogre.png",
+      "stats": {
+        "hp": 115,
+        "mp": 10,
+        "attack": 20,
+        "defense": 13,
+        "magicAttack": 5,
+        "magicDefense": 7,
+        "speed": 7,
+        "critRate": 6,
+        "evasion": 2
+      },
+      "skills": [
+        "smash",
+        "club_Throw",
+        "stomp"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 1,
+        "attack": 3,
+        "defense": 1,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 0
+      }
+    },
+    {
+      "id": "centaur",
+      "name": "Centauro",
+      "description": "Criatura mitad humano, mitad caballo, ágil y fuerte en ataques físicos y embestidas.",
+      "role": "dps",
+      "avatar": "assets/centaur.png",
+      "stats": {
+        "hp": 95,
+        "mp": 20,
+        "attack": 16,
+        "defense": 10,
+        "magicAttack": 6,
+        "magicDefense": 7,
+        "speed": 18,
+        "critRate": 10,
+        "evasion": 12
+      },
+      "skills": [
+        "hoof_Strike",
+        "arrow_Shot",
+        "charge"
+      ],
+      "levelUp": {
+        "hp": 10,
+        "mp": 2,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "vampire",
+      "name": "Vampiro",
+      "description": "No-muerto inteligente, ágil y fuerte, capaz de drenar vida y ataques rápidos.",
+      "role": "dps",
+      "avatar": "assets/vampire.png",
+      "stats": {
+        "hp": 85,
+        "mp": 50,
+        "attack": 15,
+        "defense": 9,
+        "magicAttack": 14,
+        "magicDefense": 10,
+        "speed": 20,
+        "critRate": 12,
+        "evasion": 14
+      },
+      "skills": [
+        "life_Drain",
+        "swift_Bite",
+        "shadow_Leap"
+      ],
+      "levelUp": {
+        "hp": 9,
+        "mp": 5,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "satyr",
+      "name": "Sátiro",
+      "description": "Criatura mitológica ágil, con ataques físicos y encantamientos mágicos moderados.",
+      "role": "dps",
+      "avatar": "assets/satyr.png",
+      "stats": {
+        "hp": 120,
+        "mp": 40,
+        "attack": 20,
+        "defense": 10,
+        "magicAttack": 12,
+        "magicDefense": 10,
+        "speed": 18,
+        "critRate": 10,
+        "evasion": 12
+      },
+      "skills": [
+        "horn_Attack",
+        "charm",
+        "kick"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 4,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "gnoll",
+      "name": "Gnoll",
+      "description": "Humanoide bestial y agresivo, experto en ataques coordinados y emboscadas.",
+      "role": "dps",
+      "avatar": "assets/gnoll.png",
+      "stats": {
+        "hp": 130,
+        "mp": 15,
+        "attack": 22,
+        "defense": 12,
+        "magicAttack": 6,
+        "magicDefense": 8,
+        "speed": 16,
+        "critRate": 10,
+        "evasion": 10
+      },
+      "skills": [
+        "bite",
+        "claw_Attack",
+        "frenzy"
+      ],
+      "levelUp": {
+        "hp": 13,
+        "mp": 2,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "demon",
+      "name": "Demonio",
+      "description": "Entidad sobrenatural extremadamente poderosa, con ataques mágicos y físicos devastadores.",
+      "role": "dps",
+      "avatar": "assets/demon.png",
+      "stats": {
+        "hp": 125,
+        "mp": 100,
+        "attack": 20,
+        "defense": 14,
+        "magicAttack": 22,
+        "magicDefense": 18,
+        "speed": 18,
+        "critRate": 15,
+        "evasion": 12
+      },
+      "skills": [
+        "hell_Flame",
+        "shadow_Strike",
+        "fear_Aura"
+      ],
+      "levelUp": {
+        "hp": 14,
+        "mp": 8,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "minotaur",
+      "name": "Minotauro",
+      "description": "Humanoide con cabeza de toro, extremadamente fuerte y resistente en combate cuerpo a cuerpo.",
+      "role": "tank",
+      "avatar": "assets/minotaur.png",
+      "stats": {
+        "hp": 130,
+        "mp": 20,
+        "attack": 21,
+        "defense": 16,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 10,
+        "critRate": 8,
+        "evasion": 5
+      },
+      "skills": [
+        "gore",
+        "charge",
+        "earthquake"
+      ],
+      "levelUp": {
+        "hp": 15,
+        "mp": 2,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "gargoyle",
+      "name": "Górgola",
+      "description": "Estatua viviente, resistente y defensiva, especializada en ataques físicos y resistencia mágica.",
+      "role": "tank",
+      "avatar": "assets/gargoyle.png",
+      "stats": {
+        "hp": 170,
+        "mp": 20,
+        "attack": 25,
+        "defense": 22,
+        "magicAttack": 8,
+        "magicDefense": 18,
+        "speed": 8,
+        "critRate": 5,
+        "evasion": 5
+      },
+      "skills": [
+        "stone_Slam",
+        "wing_Buffet",
+        "rock_Shield"
+      ],
+      "levelUp": {
+        "hp": 17,
+        "mp": 2,
+        "attack": 2,
+        "defense": 3,
+        "magicAttack": 1,
+        "magicDefense": 2,
+        "speed": 1
+      }
+    },
+    {
+      "id": "naga",
+      "name": "Naga",
+      "description": "Ser serpentino con habilidades mágicas y ataques de cola venenosa.",
+      "role": "dps",
+      "avatar": "assets/naga.png",
+      "stats": {
+        "hp": 140,
+        "mp": 50,
+        "attack": 20,
+        "defense": 12,
+        "magicAttack": 22,
+        "magicDefense": 15,
+        "speed": 16,
+        "critRate": 10,
+        "evasion": 10
+      },
+      "skills": [
+        "tail_Swipe",
+        "poison_Spike",
+        "magic_Blast"
+      ],
+      "levelUp": {
+        "hp": 14,
+        "mp": 5,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "giant",
+      "name": "Gigante",
+      "description": "Criatura colosal, extremadamente fuerte, pero lenta, especializada en daño físico masivo.",
+      "role": "tank",
+      "avatar": "assets/giant.png",
+      "stats": {
+        "hp": 150,
+        "mp": 15,
+        "attack": 24,
+        "defense": 20,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 6,
+        "critRate": 8,
+        "evasion": 2
+      },
+      "skills": [
+        "giant_Slam",
+        "stomp",
+        "rock_Throw"
+      ],
+      "levelUp": {
+        "hp": 18,
+        "mp": 2,
+        "attack": 3,
+        "defense": 2,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 0
+      }
+    },
+    {
+      "id": "elf",
+      "name": "Elfo",
+      "description": "Humanoide ágil y experto en ataques a distancia y magia de precisión.",
+      "role": "dps",
+      "avatar": "assets/elf.png",
+      "stats": {
+        "hp": 110,
+        "mp": 60,
+        "attack": 18,
+        "defense": 10,
+        "magicAttack": 20,
+        "magicDefense": 12,
+        "speed": 22,
+        "critRate": 12,
+        "evasion": 15
+      },
+      "skills": [
+        "arrow_Shot",
+        "magic_Arrow",
+        "quick_Step"
+      ],
+      "levelUp": {
+        "hp": 11,
+        "mp": 6,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 3
+      }
+    },
+    {
+      "id": "dwarf",
+      "name": "Enano",
+      "description": "Humanoide resistente y fuerte, especializado en ataques físicos y defensa sólida.",
+      "role": "tank",
+      "avatar": "assets/dwarf.png",
+      "stats": {
+        "hp": 140,
+        "mp": 30,
+        "attack": 22,
+        "defense": 20,
+        "magicAttack": 6,
+        "magicDefense": 12,
+        "speed": 10,
+        "critRate": 6,
+        "evasion": 6
+      },
+      "skills": [
+        "axe_Swing",
+        "shield_Block",
+        "sturdy_Stance"
+      ],
+      "levelUp": {
+        "hp": 14,
+        "mp": 3,
+        "attack": 3,
+        "defense": 2,
+        "magicAttack": 1,
+        "magicDefense": 2,
+        "speed": 1
+      }
+    },
+    {
+      "id": "human",
+      "name": "Humano",
+      "description": "Versátil y equilibrado, capaz de adaptarse a diversas estrategias y roles.",
+      "role": "dps",
+      "avatar": "assets/human.png",
+      "stats": {
+        "hp": 120,
+        "mp": 40,
+        "attack": 20,
+        "defense": 12,
+        "magicAttack": 15,
+        "magicDefense": 12,
+        "speed": 16,
+        "critRate": 10,
+        "evasion": 12
+      },
+      "skills": [
+        "sword_Strike",
+        "magic_Blast",
+        "quick_Move"
+      ],
+      "levelUp": {
+        "hp": 12,
+        "mp": 4,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 2
+      }
+    },
+    {
+      "id": "draconic",
+      "name": "Dracónico",
+      "description": "Ser de linaje dracónico, balance entre fuerza, velocidad y magia elemental.",
+      "role": "dps",
+      "avatar": "assets/draconic.png",
+      "stats": {
+        "hp": 120,
+        "mp": 60,
+        "attack": 19,
+        "defense": 13,
+        "magicAttack": 18,
+        "magicDefense": 14,
+        "speed": 18,
+        "critRate": 12,
+        "evasion": 12
+      },
+      "skills": [
+        "fire_Breath",
+        "claw_Strike",
+        "wing_Buffet"
+      ],
+      "levelUp": {
+        "hp": 14,
+        "mp": 6,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "gnome",
+      "name": "Gnomo",
+      "description": "Pequeño humanoide, experto en magia, trampas y ataques técnicos.",
+      "role": "support",
+      "avatar": "assets/gnome.png",
+      "stats": {
+        "hp": 90,
+        "mp": 80,
+        "attack": 10,
+        "defense": 8,
+        "magicAttack": 22,
+        "magicDefense": 18,
+        "speed": 14,
+        "critRate": 8,
+        "evasion": 10
+      },
+      "skills": [
+        "magic_Bolt",
+        "trap_Setup",
+        "supportive_Charm"
+      ],
+      "levelUp": {
+        "hp": 9,
+        "mp": 8,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 2,
+        "speed": 2
+      }
+    }
+  ]
+}

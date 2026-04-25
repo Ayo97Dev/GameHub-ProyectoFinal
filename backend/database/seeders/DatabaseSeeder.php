@@ -22,9 +22,10 @@ class DatabaseSeeder extends Seeder
         );
 
         // Juegos
-        $clicker = Game::firstOrCreate(['slug' => 'clicker'], [
-            'title' => 'ClickMaster',
-            'description' => 'Haz clic, mejora tu producción y domina el ranking.',
+        $clicker = Game::firstOrCreate(['slug' => 'core-clicker'], [
+            'title' => 'CoreClicker',
+            'category' => 'CLICKER',
+            'description' => 'Optimiza el núcleo del sistema mediante clics de alta frecuencia.',
             'is_active' => true,
             'config' => [
                 'allowed_actions' => ['click', 'buy_upgrade', 'prestige'],
@@ -32,9 +33,10 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        $rpg = Game::firstOrCreate(['slug' => 'rpg'], [
-            'title' => 'Dungeon RPG',
-            'description' => 'Explora mazmorras y sube de nivel a tu héroe.',
+        $rpg = Game::firstOrCreate(['slug' => 'descenso-al-abismo'], [
+            'title' => 'Descenso al Abismo',
+            'category' => 'RPG',
+            'description' => 'Sobrevive a las profundidades en este RPG.',
             'is_active' => true,
             'config' => [
                 'allowed_actions' => ['move', 'attack', 'heal'],
@@ -44,6 +46,7 @@ class DatabaseSeeder extends Seeder
 
         $quiz = Game::firstOrCreate(['slug' => 'quiz'], [
             'title' => 'Quiz',
+            'category' => 'PUZZLE',
             'description' => 'Preguntas y respuestas.',
             'is_active' => true,
             'config' => [
@@ -54,6 +57,7 @@ class DatabaseSeeder extends Seeder
 
         $connect4 = Game::firstOrCreate(['slug' => 'connect4'], [
             'title' => 'Connect 4',
+            'category' => 'PUZZLE',
             'description' => 'Conecta cuatro fichas contra la IA.',
             'is_active' => true,
             'config' => [
@@ -62,9 +66,10 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        Game::firstOrCreate(['slug' => 'tower-defense'], [
-            'title' => 'Tower Defense',
-            'description' => 'Defiende tu base con torretas y oleadas crecientes.',
+        Game::firstOrCreate(['slug' => 'proyecto-cortafuegos'], [
+            'title' => 'Proyecto_Cortafuegos',
+            'category' => 'DEFENSE',
+            'description' => 'Protege la red central contra intrusiones masivas desplegando contramedidas tácticas.',
             'is_active' => true,
             'config' => [
                 'allowed_actions' => [],

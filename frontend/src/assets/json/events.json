@@ -1,0 +1,326 @@
+[
+  {
+    "id": "blood_altar",
+    "title": "Altar de Sangre",
+    "text": "Un altar tallado en obsidiana gotea sangre fresca. Una voz susurra: \"Vida por poder\".",
+    "choices": [
+      {
+        "text": "Sacrificar 20 HP por +2 Ataque",
+        "action": {
+          "effects": [
+            { "type": "stat", "target": "hp", "value": -20, "min": 1 },
+            { "type": "stat", "target": "attack", "value": 2 }
+          ],
+          "message": "Sientes una fuerza oscura correr por tus venas."
+        }
+      },
+      {
+        "text": "Ignorar y marcharte",
+        "action": {
+          "message": "Decides no tentar al destino."
+        }
+      }
+    ]
+  },
+  {
+    "id": "mystic_fountain",
+    "title": "Fuente Mística",
+    "text": "El agua brilla con una luz plateada. ¿Te atreves a beber?",
+    "choices": [
+      {
+        "text": "Beber profundamente",
+        "action": {
+          "type": "random",
+          "outcomes": [
+            {
+              "chance": 50,
+              "effects": [{ "type": "stat", "target": "hp", "value": 40 }],
+              "message": "El agua te revitaliza profundamente."
+            },
+            {
+              "chance": 50,
+              "effects": [{ "type": "stat", "target": "mp", "value": -20 }],
+              "message": "El agua amarga quema tu espíritu."
+            }
+          ]
+        }
+      },
+      {
+        "text": "Solo lavarte la cara",
+        "action": {
+          "effects": [{ "type": "stat", "target": "hp", "value": 10 }],
+          "message": "Te sientes refrescado."
+        }
+      }
+    ]
+  },
+  {
+    "id": "shadow_merchant",
+    "title": "Mercader de Sombras",
+    "text": "Un espectro envuelto en harapos te ofrece un trato: \"Oro por reliquias, viajero...\"",
+    "choices": [
+      {
+        "text": "Comprar Reliquia (50 Oro)",
+        "condition": { "type": "stat", "target": "gold", "min": 50 },
+        "action": {
+          "effects": [
+            { "type": "stat", "target": "gold", "value": -50 },
+            { "type": "item", "count": 1 }
+          ],
+          "message": "El espectro ríe mientras te entrega un objeto envuelto en niebla."
+        }
+      },
+      {
+        "text": "Marcharte en silencio",
+        "action": {
+          "message": "El espectro se disuelve en las sombras."
+        }
+      }
+    ]
+  },
+  {
+    "id": "mad_librarian",
+    "title": "El Bibliotecario Loco",
+    "text": "Encuentras a un anciano rodeado de libros que arden con fuego fatuo. Te ofrece un tomo prohibido.",
+    "choices": [
+      {
+        "text": "Leer el Tomo (+5 Atk Mágico, -10 Maná Máx)",
+        "action": {
+          "effects": [
+            { "type": "stat", "target": "magicAttack", "value": 5 },
+            { "type": "stat", "target": "maxMp", "value": -10 }
+          ],
+          "message": "Tus ojos arden, pero tu mente rebosa de secretos prohibidos."
+        }
+      },
+      {
+        "text": "Quemar el libro (+10 HP)",
+        "action": {
+          "effects": [{ "type": "stat", "target": "hp", "value": 10 }],
+          "message": "El calor de las llamas reconforta tu cuerpo cansado."
+        }
+      }
+    ]
+  },
+  {
+    "id": "abandoned_forge",
+    "title": "Forja Abandonada",
+    "text": "Un yunque encantado brilla débilmente. Aún queda calor en las brasas.",
+    "choices": [
+      {
+        "text": "Afilar Armas (+3 Ataque)",
+        "action": {
+          "effects": [{ "type": "stat", "target": "attack", "value": 3 }],
+          "message": "Tus armas cortan el aire con una precisión renovada."
+        }
+      },
+      {
+        "text": "Reparar Armadura (+3 Defensa)",
+        "action": {
+          "effects": [{ "type": "stat", "target": "defense", "value": 3 }],
+          "message": "Sientes el peso de tu protección más firme y seguro."
+        }
+      }
+    ]
+  },
+  {
+    "id": "luck_shrine",
+    "title": "Santuario de la Suerte",
+    "text": "Una estatua de una deidad caprichosa sostiene una balanza. \"La suerte favorece a los audaces\".",
+    "choices": [
+      {
+        "text": "Ofrenda de Oro (30 Oro)",
+        "condition": { "type": "stat", "target": "gold", "min": 30 },
+        "action": {
+          "type": "random",
+          "outcomes": [
+            {
+              "chance": 30,
+              "effects": [{ "type": "stat", "target": "gold", "value": 100 }],
+              "message": "¡La balanza se inclina a tu favor! Recibes una lluvia de oro."
+            },
+            {
+              "chance": 70,
+              "effects": [{ "type": "stat", "target": "gold", "value": -30 }],
+              "message": "La deidad ignora tu ofrenda."
+            }
+          ]
+        }
+      },
+      {
+        "text": "Rezar en silencio",
+        "action": {
+          "effects": [{ "type": "stat", "target": "mp", "value": 15 }],
+          "message": "Una paz momentánea inunda tu mente."
+        }
+      }
+    ]
+  },
+  {
+    "id": "cursed_chest",
+    "title": "Cofre Maldito",
+    "text": "Un cofre encadenado que emite un hedor a muerte. Las cadenas parecen debilitarse.",
+    "choices": [
+      {
+        "text": "Forzar el cofre",
+        "action": {
+          "type": "random",
+          "outcomes": [
+            {
+              "chance": 40,
+              "effects": [{ "type": "stat", "target": "gold", "value": 80 }, { "type": "item", "count": 1 }],
+              "message": "¡Éxito! El botín es magnífico."
+            },
+            {
+              "chance": 60,
+              "effects": [{ "type": "stat", "target": "hp", "value": -25 }],
+              "message": "¡Una trampa! Gas venenoso emana del cofre."
+            }
+          ]
+        }
+      },
+      {
+        "text": "Dejarlo atrás",
+        "action": {
+          "message": "El riesgo es demasiado alto para tu gesta."
+        }
+      }
+    ]
+  },
+  {
+    "id": "hero_spirit",
+    "title": "El Espíritu del Héroe",
+    "text": "Una sombra con armadura te observa. Ofrece su espada espectral si demuestras tu voluntad.",
+    "choices": [
+      {
+        "text": "Duelo de Voluntad (-30 HP Máx, +10 Atk y +10 Def)",
+        "condition": { "type": "stat", "target": "maxHp", "min": 50 },
+        "action": {
+          "effects": [
+            { "type": "stat", "target": "maxHp", "value": -30 },
+            { "type": "stat", "target": "hp", "value": 0 },
+            { "type": "stat", "target": "attack", "value": 10 },
+            { "type": "stat", "target": "defense", "value": 10 }
+          ],
+          "message": "Tu cuerpo se debilita, pero tu técnica alcanza niveles legendarios."
+        }
+      },
+      {
+        "text": "Rezar por guía (+20 MP Máx)",
+        "action": {
+          "effects": [{ "type": "stat", "target": "maxMp", "value": 20 }],
+          "message": "La sombra asiente y desaparece en una ráfaga de luz azulada."
+        }
+      }
+    ]
+  },
+  {
+    "id": "soul_mirror",
+    "title": "Espejo de Almas",
+    "text": "Un espejo que no refleja tu rostro, sino tu potencial oculto. Una grieta comienza a formarse.",
+    "choices": [
+      {
+        "text": "Tocar el Cristal",
+        "action": {
+          "type": "random",
+          "outcomes": [
+            {
+              "chance": 30,
+              "effects": [
+                { "type": "stat", "target": "attack", "value": 5 },
+                { "type": "stat", "target": "magicAttack", "value": 5 },
+                { "type": "stat", "target": "critRate", "value": 5 }
+              ],
+              "message": "¡El cristal se funde contigo! Sientes un poder inmenso."
+            },
+            {
+              "chance": 70,
+              "effects": [{ "type": "stat", "target": "hp", "value": -40 }],
+              "message": "El espejo estalla, hiriendo tu alma y tu cuerpo."
+            }
+          ]
+        }
+      },
+      {
+        "text": "Romper el espejo (+100 Oro)",
+        "action": {
+          "effects": [{ "type": "stat", "target": "gold", "value": 100 }],
+          "message": "Recoges los fragmentos brillantes. Tienen valor, aunque el pecado pesa en tu pecho."
+        }
+      }
+    ]
+  },
+  {
+    "id": "void_pact",
+    "title": "Pacto del Vacío",
+    "text": "Una entidad sin forma te ofrece un intercambio prohibido. El aire se vuelve irrespirable.",
+    "choices": [
+      {
+        "text": "Ojos de Abismo (+15 Crítico, -15 Evasión)",
+        "action": {
+          "effects": [
+            { "type": "stat", "target": "critRate", "value": 15 },
+            { "type": "stat", "target": "evasion", "value": -15 }
+          ],
+          "message": "Ves los puntos débiles de todo, pero ya no puedes ver los ataques que vienen hacia ti."
+        }
+      },
+      {
+        "text": "Piel de Sombra (+15 Evasión, -10 Defensa)",
+        "action": {
+          "effects": [
+            { "type": "stat", "target": "evasion", "value": 15 },
+            { "type": "stat", "target": "defense", "value": -10 }
+          ],
+          "message": "Tu cuerpo se vuelve etéreo. Eres difícil de golpear, pero frágil como el cristal."
+        }
+      }
+    ]
+  },
+  {
+    "id": "golden_egg",
+    "title": "El Huevo Dorado",
+    "text": "Encuentras un nido con un huevo que emite un calor reconfortante. Podría ser tu salvación o tu perdición.",
+    "choices": [
+      {
+        "text": "Incubar (Gana 3 Objetos Aleatorios)",
+        "action": {
+          "effects": [{ "type": "item", "count": 3 }],
+          "message": "El huevo eclosiona en una explosión de luz. Encuentras tesoros entre las cáscaras."
+        }
+      },
+      {
+        "text": "Comerlo (+50 HP Máx)",
+        "action": {
+          "effects": [{ "type": "stat", "target": "maxHp", "value": 50 }, { "type": "stat", "target": "hp", "value": 50 }],
+          "message": "Una vitalidad primordial recorre tu cuerpo. Te sientes más fuerte que nunca."
+        }
+      }
+    ]
+  },
+  {
+    "id": "ancient_reliquary",
+    "title": "Relicario Ancestral",
+    "text": "Un cofre de oro puro que solo se abre con un sacrificio de voluntad.",
+    "choices": [
+      {
+        "text": "Ofrenda de Sangre Máxima (-20 HP Máx, Objeto Legendario)",
+        "condition": { "type": "stat", "target": "maxHp", "min": 40 },
+        "action": {
+          "effects": [
+            { "type": "stat", "target": "maxHp", "value": -20 },
+            { "type": "item", "count": 1 }
+          ],
+          "message": "El relicario se abre. El objeto en su interior vibra con un poder antiguo."
+        }
+      },
+      {
+        "text": "Solo observar (+20 MP)",
+        "action": {
+          "effects": [{ "type": "stat", "target": "mp", "value": 20 }],
+          "message": "La belleza del relicario calma tus nervios."
+        }
+      }
+    ]
+  }
+]

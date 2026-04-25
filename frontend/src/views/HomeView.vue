@@ -1,30 +1,84 @@
 <script setup>
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useGameStore } from '../stores/game'
 import GameCard from '../components/ui/GameCard.vue'
 
 const gameStore = useGameStore()
 const uptime = ref('00:00:00')
+const selectedFilter = ref('TODOS')
+const selectedSort = ref('POPULAR')
 
-// Simulated uptime counter
+let uptimeInterval = null
+
+// Simulated uptime counter and real telemetry fetch
 onMounted(() => {
   if (gameStore.games.length === 0) {
     gameStore.fetchGames()
   }
+  gameStore.fetchTelemetry()
 
   const start = Date.now()
-  setInterval(() => {
-    const diff = Math.floor((Date.now() - start) / 1000)
-    const h = Math.floor(diff / 3600).toString().padStart(2, '0')
-    const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0')
-    const s = (diff % 60).toString().padStart(2, '0')
+  uptimeInterval = setInterval(() => {
+    // Update Uptime (Local simulation based on server base)
+    const currentUptime = (gameStore.telemetry.server_uptime || 0) + Math.floor((Date.now() - start) / 1000)
+    const h = Math.floor(currentUptime / 3600).toString().padStart(2, '0')
+    const m = Math.floor((currentUptime % 3600) / 60).toString().padStart(2, '0')
+    const s = (currentUptime % 60).toString().padStart(2, '0')
     uptime.value = `${h}:${m}:${s}`
+    
+    // Fetch telemetry every 30 seconds
+    const diff = Math.floor((Date.now() - start) / 1000)
+    if (diff % 30 === 0 && diff > 0) {
+      gameStore.fetchTelemetry()
+    }
   }, 1000)
 })
 
-const featuredGame = computed(() => gameStore.games.find(g => g.slug === 'rpg') || gameStore.games[0])
-const otherGames = computed(() => gameStore.games.filter(g => g.slug !== featuredGame.value?.slug))
+onUnmounted(() => {
+  if (uptimeInterval) clearInterval(uptimeInterval)
+})
+
+const featuredGame = computed(() => {
+  const games = gameStore.games || []
+  return games.find(g => g.slug === 'descenso-al-abismo') || games[0]
+})
+
+const categories = computed(() => {
+  const games = gameStore.games || []
+  const cats = new Set(games.map(g => g.category).filter(Boolean))
+  return ['TODOS', ...Array.from(cats).sort()]
+})
+
+const filteredGames = computed(() => {
+  const allGames = Array.isArray(gameStore.games) ? gameStore.games : []
+  if (allGames.length === 0) return []
+
+  let list = allGames.filter(g => g.slug !== featuredGame.value?.slug)
+  
+  // Filtering logic
+  if (selectedFilter.value !== 'TODOS') {
+    list = list.filter(g => g.category === selectedFilter.value)
+  }
+
+  // Sorting logic
+  const result = [...list]
+  if (selectedSort.value === 'ALFABÉTICO') {
+    result.sort((a, b) => (a.title || '').localeCompare(b.title || ''))
+  } else if (selectedSort.value === 'POPULAR') {
+    result.sort((a, b) => {
+      const playersA = gameStore.telemetry.games_telemetry[a.slug] ?? 0
+      const playersB = gameStore.telemetry.games_telemetry[b.slug] ?? 0
+      return playersB - playersA // Mayor a menor
+    })
+  }
+
+  return result
+})
+
+const toggleSort = () => {
+  selectedSort.value = selectedSort.value === 'POPULAR' ? 'ALFABÉTICO' : 'POPULAR'
+}
 </script>
 
 <template>
@@ -47,13 +101,13 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
             </div>
             <div class="hidden md:flex flex-col">
                <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">Tiempo de actividad</span>
-               <span class="font-display text-xs font-black text-white">24:00:00</span>
+               <span class="font-display text-xs font-black text-white">{{ uptime }}</span>
             </div>
          </div>
          <div class="flex items-center gap-6">
             <div class="flex flex-col items-end">
                <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em] mb-1">Sesiones activas</span>
-               <span class="font-display text-xs font-black text-neon-pink">1.248 Usuarios</span>
+               <span class="font-display text-xs font-black text-neon-pink">{{ gameStore.telemetry.active_users }} Usuarios</span>
             </div>
             <div class="size-10 bg-white/5 border-2 border-neon-cyan flex items-center justify-center text-neon-cyan">
                <Icon icon="lucide:shield-check" class="text-xl" />
@@ -128,32 +182,84 @@ const otherGames = computed(() => gameStore.games.filter(g => g.slug !== feature
       </div>
 
       <!-- MAIN CATALOG GRID -->
-      <div class="space-y-8">
-         <div class="flex items-center justify-between border-b-4 border-neon-cyan/20 pb-4">
-            <div class="flex items-center gap-4">
-               <div class="size-8 bg-neon-cyan/10 flex items-center justify-center text-neon-cyan border-2 border-neon-cyan/50 shadow-[2px_2px_0px_#000]">
-                  <Icon icon="lucide:layout-grid" />
+      <div class="space-y-12">
+         
+         <!-- FILTERS PANEL (Aesthetic similar to Leaderboard View Header) -->
+         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Category Filter -->
+            <div class="md:col-span-3 gh-panel p-6 bg-black border-4 border-neon-cyan shadow-[8px_8px_0px_#000] relative overflow-hidden flex flex-col sm:flex-row sm:items-center gap-6">
+               <div class="gh-scanlines absolute inset-0 opacity-10 pointer-events-none"></div>
+               
+               <div class="relative z-10 flex items-center gap-3 shrink-0 border-r-2 border-white/10 pr-6 mr-2 hidden sm:flex">
+                  <Icon icon="lucide:filter" class="text-neon-cyan text-xl" />
+                  <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.2em]">Filtros de<br/>subsistema</span>
                </div>
-               <h3 class="font-display text-2xl font-black text-white uppercase tracking-tighter">Biblioteca de juegos</h3>
+
+               <div class="relative z-10 flex flex-wrap gap-3">
+                  <button 
+                    v-for="cat in categories" 
+                    :key="cat"
+                    @click="selectedFilter = cat"
+                    class="px-5 py-2 border-2 font-display text-[10px] font-black uppercase tracking-[0.2em] relative group"
+                    :class="selectedFilter === cat 
+                      ? 'bg-neon-cyan text-black border-black shadow-none translate-x-[2px] translate-y-[2px]' 
+                      : 'bg-retro-dark text-white/40 border-white/5 hover:border-white/20 hover:text-white shadow-[4px_4px_0px_#000] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]'"
+                  >
+                    {{ cat }}
+                  </button>
+               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-4 font-pixel text-[10px] text-white/30 uppercase tracking-[0.3em]">
-               <span>Filtro: TODOS</span>
-               <span>|</span>
-               <span>Orden: RECIENTE</span>
+
+            <!-- Sort Toggle -->
+            <div class="gh-panel p-6 bg-black border-4 border-neon-yellow shadow-[8px_8px_0px_#000] relative overflow-hidden">
+               <div class="gh-scanlines absolute inset-0 opacity-10 pointer-events-none"></div>
+               <button @click="toggleSort" class="relative z-10 w-full h-full flex flex-col items-center justify-center gap-1 group">
+                  <span class="font-pixel text-[9px] text-white/30 uppercase tracking-widest group-hover:text-neon-yellow transition-colors">Orden de salida:</span>
+                  <div class="flex items-center gap-3">
+                     <Icon :icon="selectedSort === 'POPULAR' ? 'lucide:flame' : 'lucide:type'" class="text-neon-yellow text-xl" />
+                     <span class="font-display text-xl font-black text-white uppercase tracking-tighter">{{ selectedSort }}</span>
+                  </div>
+               </button>
+            </div>
+         </div>
+
+         <!-- Header Info -->
+         <div class="flex items-center justify-between border-b-2 border-white/5 pb-4">
+            <div class="flex items-center gap-4">
+               <div class="size-6 bg-neon-cyan/20 border border-neon-cyan flex items-center justify-center text-neon-cyan">
+                  <Icon icon="lucide:layout-grid" class="text-xs" />
+               </div>
+               <h3 class="font-display text-xl font-black text-white uppercase tracking-tighter">Módulos disponibles: <span class="text-neon-cyan">{{ filteredGames.length }}</span></h3>
+            </div>
+            <div class="hidden sm:block font-pixel text-[9px] text-white/20 uppercase tracking-[0.4em]">
+               Sincronizando con el servidor central...
             </div>
          </div>
 
          <!-- Indicador de carga -->
-         <div v-if="gameStore.isLoading" class="py-24 flex flex-col items-center justify-center gap-6">
-            <div class="size-16 border-4 border-neon-cyan border-t-transparent animate-spin"></div>
-            <p class="font-pixel text-neon-cyan text-xl animate-pulse tracking-[0.4em] uppercase">Cargando biblioteca...</p>
+         <div v-if="gameStore.isLoading && gameStore.games.length === 0" class="py-32 flex flex-col items-center justify-center gap-8 gh-panel border-none">
+            <div class="size-20 border-4 border-neon-cyan border-t-transparent animate-spin shadow-[0_0_20px_#00f2ff]"></div>
+            <div class="text-center space-y-2">
+               <p class="font-pixel text-neon-cyan text-2xl animate-pulse tracking-[0.5em] uppercase">Booting System...</p>
+               <p class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.2em]">Cargando biblioteca de datos históricos</p>
+            </div>
          </div>
 
          <!-- Game Cards Grid -->
-         <div v-else class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-           <GameCard v-for="game in otherGames" :key="game.slug" :game="game" />
+         <div v-else-if="filteredGames.length > 0" class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+           <GameCard v-for="game in filteredGames" :key="game.slug" :game="game" />
+         </div>
+
+         <!-- Empty State -->
+         <div v-else class="py-32 flex flex-col items-center justify-center gap-6 gh-panel bg-black/40 border-dashed border-4 border-white/10">
+            <Icon icon="lucide:search-x" class="text-6xl text-white/10" />
+            <div class="text-center">
+               <p class="font-pixel text-xl text-white/20 uppercase tracking-widest">No se encontraron módulos activos</p>
+               <button @click="selectedFilter = 'TODOS'" class="mt-4 font-display text-xs font-black text-neon-cyan uppercase underline underline-offset-4 hover:text-white transition-colors">Reiniciar filtros</button>
+            </div>
          </div>
       </div>
+
 
       <!-- FOOTER DIAGNOSTICS -->
       <footer class="pt-12 border-t-4 border-neon-cyan/10 grid grid-cols-1 md:grid-cols-3 gap-8">

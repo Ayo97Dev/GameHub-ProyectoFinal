@@ -1,7 +1,8 @@
 <script setup>
+import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
-import BaseButton from './BaseButton.vue'
+import { useGameStore } from '../../stores/game'
 
 const props = defineProps({
   game: {
@@ -10,12 +11,13 @@ const props = defineProps({
   },
 })
 
-// Simulated data for the "Wow" effect
-const stats = {
-  players: Math.floor(Math.random() * 500) + 50,
-  difficulty: props.game.slug === 'rpg' ? 'Dificultad: Alta' : (props.game.slug === 'td' ? 'Dificultad: Media' : 'Dificultad: Baja'),
+const gameStore = useGameStore()
+
+const stats = computed(() => ({
+  players: gameStore.telemetry.games_telemetry[props.game.slug] ?? 0,
+  difficulty: props.game.slug === 'descenso-al-abismo' ? 'Dificultad: Alta' : (props.game.slug === 'proyecto-cortafuegos' ? 'Dificultad: Media' : 'Dificultad: Baja'),
   version: 'v2.4.0'
-}
+}))
 </script>
 
 <template>
