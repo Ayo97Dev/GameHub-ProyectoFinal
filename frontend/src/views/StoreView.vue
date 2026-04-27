@@ -12,7 +12,7 @@ const items = [
   { 
     id: 'td_purge', 
     name: 'Rayo Destructor', 
-    game: 'Proyecto_Cortafuegos', 
+    game: 'Proyecto Cortafuegos', 
     uses: 5, 
     price: 2.50, 
     description: 'Ejecuta una descarga masiva que daña a todas las entidades activas.', 
@@ -22,7 +22,7 @@ const items = [
   { 
     id: 'td_emp', 
     name: 'Pulso EMP', 
-    game: 'Proyecto_Cortafuegos', 
+    game: 'Proyecto Cortafuegos', 
     uses: 3, 
     price: 1.00, 
     description: 'Paraliza a todas las unidades enemigas temporalmente con un pulso electromagnético.', 
@@ -32,7 +32,7 @@ const items = [
   { 
     id: 'td_overclock', 
     name: 'Sobrecarga', 
-    game: 'Proyecto_Cortafuegos', 
+    game: 'Proyecto Cortafuegos', 
     uses: 3, 
     price: 1.50, 
     description: 'Frecuencia Crítica: Duplica la cadencia de fuego de todas las defensas.', 

@@ -20,14 +20,29 @@
             <div class="h-1 w-32 mx-auto bg-gradient-to-r from-transparent via-[#8c2d1f] to-transparent"></div>
           </div>
           
-          <div class="flex gap-4">
+          <div class="flex flex-col gap-4">
             <button 
               @click="startNewRun" 
               class="group relative px-12 py-6 transition-all duration-500 transform hover:scale-105 active:scale-95"
             >
               <div class="absolute inset-0 bg-[#1a1a1a] border-4 border-[#3c2a1a] shadow-[10px_10px_30px_rgba(0,0,0,0.8)]"></div>
               <div class="absolute inset-1 border-2 border-[#8c2d1f]/30"></div>
-              <span class="relative z-10 font-fantasy text-3xl text-[#b8a38a] group-hover:text-white uppercase tracking-[0.2em] transition-colors">Entrar</span>
+              <span class="relative z-10 font-fantasy text-3xl text-[#b8a38a] group-hover:text-white uppercase tracking-[0.2em] transition-colors">Nueva Gesta</span>
+            </button>
+
+            <button 
+              v-if="hasSave && saveSummary"
+              @click="loadRun" 
+              class="group relative px-12 py-4 transition-all duration-500 transform hover:scale-105 active:scale-95 overflow-hidden"
+            >
+              <div class="absolute inset-0 bg-[#3c2a1a] border-2 border-[#8c2d1f]/40 shadow-lg"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              <div class="relative z-10 flex flex-col items-center">
+                <span class="font-fantasy text-xl text-[#b8a38a] group-hover:text-white uppercase tracking-widest transition-colors">Continuar Gesta</span>
+                <span class="text-[10px] text-amber-600 font-fantasy uppercase tracking-wider mt-1 opacity-80">
+                  {{ saveSummary.className }} • Nivel {{ saveSummary.level }} • Piso {{ saveSummary.floor }}
+                </span>
+              </div>
             </button>
           </div>
 
@@ -719,6 +734,10 @@ const GAME_SLUG = 'descenso-al-abismo'
 const isLoading = ref(false); const error = ref(null); const sessionId = ref(null); const log = ref([]); 
 const showModal = ref(false); const showExitConfirm = ref(false);
 const goldFlash = ref(false); const hitHero = ref(false); const hitEnemy = ref(false);
+const hasSave = ref(false);
+const saveSummary = ref(null);
+const playStartTime = ref(null);
+const totalTimePlayed = ref(0);
 
 const classes = classesData.classes
 const allEnemies = enemiesData.enemies
@@ -1144,7 +1163,13 @@ function endCombatIfNeeded() {
     }
     return true 
   }
-  if (hero.value.hp <= 0) { phase.value = 'defeat'; pushLog('Has sucumbido ante la oscuridad...'); return true }; return false
+  if (hero.value.hp <= 0) { 
+    phase.value = 'defeat'; 
+    pushLog('Has sucumbido ante la oscuridad...'); 
+    resetSave();
+    return true 
+  }; 
+  return false
 }
 
 function triggerGoldFlash() { goldFlash.value = true; setTimeout(() => { goldFlash.value = false }, 1000) }
@@ -1339,6 +1364,7 @@ function advanceRoom() {
     run.value.floor++
     run.value.roomInFloor = 1
     phase.value = 'room'
+    saveRun() // Autosave on floor change
     enterRoom()
   } else if (run.value.roomInFloor === 1 || run.value.roomInFloor === 2) {
     // If we are in room 1, we select path for room 2
@@ -1424,14 +1450,73 @@ function checkChoiceCondition(choice) {
 
 const canAdvanceRoom = computed(() => ['victory', 'treasure', 'camp', 'staircase'].includes(phase.value))
 
-async function startNewRun() { phase.value = 'classSelect'; showModal.value = true; }
-async function loadRun() { /* Logic */ }
+async function startNewRun() { 
+  try {
+    const data = await gameEngine.play(GAME_SLUG, false)
+    sessionId.value = data.session_id
+    playStartTime.value = Date.now()
+    phase.value = 'classSelect'
+    showModal.value = true
+  } catch (e) {
+    error.value = "Error al iniciar sesión."
+  }
+}
+
+async function checkSave() {
+  try {
+    const data = await gameEngine.load(GAME_SLUG)
+    if (data && data.game_state && data.game_state.hero) {
+      hasSave.value = true
+      saveSummary.value = {
+        className: data.game_state.hero.className,
+        level: data.game_state.hero.level,
+        floor: data.game_state.floor
+      }
+    } else {
+      hasSave.value = false
+      saveSummary.value = null
+    }
+  } catch (e) {
+    hasSave.value = false
+    saveSummary.value = null
+  }
+}
+
+async function loadRun() { 
+  isLoading.value = true
+  try {
+    const data = await gameEngine.play(GAME_SLUG, true)
+    sessionId.value = data.session_id
+    playStartTime.value = Date.now()
+    totalTimePlayed.value = data.playtime || 0
+    applyLoadedState(data.game_state)
+    showModal.value = true
+  } catch (e) {
+    error.value = "Error al cargar la gesta."
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function resetSave() {
+  try {
+    await gameEngine.reset(GAME_SLUG)
+    hasSave.value = false
+    saveSummary.value = null
+  } catch (e) {
+    console.error("Error reseteando guardado")
+  }
+}
+
 async function saveRun() { 
   if (!sessionId.value) return; 
   isLoading.value = true; 
+  const currentDuration = Math.floor((Date.now() - playStartTime.value) / 1000);
   try { 
     const p = { 
       session_id: sessionId.value, 
+      score: run.value.floor,
+      playtime: currentDuration,
       game_state: { 
         floor: run.value.floor, 
         roomInFloor: run.value.roomInFloor, 
@@ -1445,14 +1530,18 @@ async function saveRun() {
     }; 
     await gameEngine.save(GAME_SLUG, p); 
     pushLog('Crónica guardada en los anales.') 
+    hasSave.value = true
+    // Update start time to avoid double counting playtime in next save
+    playStartTime.value = Date.now()
   } catch (e) { 
-    error.value = 'Error.' 
+    error.value = 'Error al guardar.' 
   } finally { 
     isLoading.value = false 
   } 
 }
 
 function applyLoadedState(s) { 
+  if (!s) return
   run.value = { 
     floor: s.floor || 1, 
     roomInFloor: s.roomInFloor || 1, 
@@ -1466,6 +1555,7 @@ function applyLoadedState(s) {
 }
 
 onMounted(() => {
+  checkSave()
   if (run.value.hero) phase.value = 'room'
   else phase.value = 'idle'
 })

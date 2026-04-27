@@ -62,7 +62,7 @@ const stats = computed(() => ({
            <div class="h-px w-4 bg-neon-cyan"></div>
            <p class="font-pixel text-[9px] text-neon-cyan uppercase tracking-[0.3em]">Módulo de juego</p>
         </div>
-        <h3 class="font-display text-3xl font-black uppercase text-white tracking-tighter leading-none mb-4 group-hover:text-neon-cyan transition-colors">
+        <h3 class="font-display text-2xl sm:text-3xl font-black uppercase text-white tracking-tighter leading-none mb-4 group-hover:text-neon-cyan transition-colors break-words">
           {{ game.title }}
         </h3>
         <p class="font-sans text-[11px] font-bold uppercase leading-relaxed text-white/40 line-clamp-2 h-8">

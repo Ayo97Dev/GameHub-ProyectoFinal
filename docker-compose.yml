@@ -29,6 +29,7 @@ services:
     #   - "8000:8000"
     environment:
       - AUTORUN_ENABLED=false
+      - PHP_OPCACHE_ENABLE=1
     command: >
       sh -lc "
         set -e;
@@ -42,10 +43,11 @@ services:
         if ! grep -q '^APP_KEY=base64:' .env; then
           php artisan key:generate --force;
         fi;
-        php artisan serve --host=0.0.0.0 --port=8000
+        php artisan octane:start --server=roadrunner --host=0.0.0.0 --rpc-port=6001 --port=8000 --workers=4
       "
     depends_on:
       - db
+      - redis
     networks:
       - gamehub_network
 
@@ -74,6 +76,13 @@ services:
     depends_on:
       - backend
       - frontend
+    networks:
+      - gamehub_network
+
+  redis:
+    image: redis:alpine
+    container_name: gamehub_redis
+    restart: unless-stopped
     networks:
       - gamehub_network
 

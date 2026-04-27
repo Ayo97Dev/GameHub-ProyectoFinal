@@ -153,7 +153,7 @@ const toggleSort = () => {
                        <span class="font-pixel text-xs text-neon-cyan tracking-[0.4em] uppercase">SYSTEM.BOOT_COMPLETE</span>
                     </div>
                     
-                    <h2 class="font-display text-5xl sm:text-6xl font-black text-white uppercase gh-title-glow tracking-tighter leading-none">
+                    <h2 class="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-white uppercase gh-title-glow tracking-tighter leading-none break-words">
                       {{ featuredGame.title }}
                     </h2>
                     

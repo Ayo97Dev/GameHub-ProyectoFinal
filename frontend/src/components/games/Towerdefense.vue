@@ -14,7 +14,7 @@
            <div class="h-px w-12 bg-neon-cyan"></div>
         </div>
         
-        <h1 class="font-display text-2xl sm:text-3xl font-black text-white mb-6 gh-title-glow tracking-[-0.05em]">PROYECTO_CORTAFUEGOS</h1>
+        <h1 class="font-display text-2xl sm:text-3xl font-black text-white mb-6 gh-title-glow tracking-[-0.05em]">PROYECTO CORTAFUEGOS</h1>
         <p class="font-sans text-xs font-medium uppercase text-white/40 mb-12 max-w-sm mx-auto leading-relaxed">
           CONSTRUYE NODOS DE DEFENSA PARA PROTEGER EL NÚCLEO DEL REACTOR CONTRA LA INFILTRACIÓN DE MALWARE.
         </p>

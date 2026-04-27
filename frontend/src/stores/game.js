@@ -12,7 +12,7 @@ export const useGameStore = defineStore('game', () => {
     { slug: 'core-clicker', title: 'CoreClicker', description: 'Optimiza el núcleo del sistema mediante clics de alta frecuencia.' },
     { slug: 'quiz', title: 'Quiz', description: 'Preguntas rápidas.' },
     { slug: 'connect4', title: 'Conecta 4', description: 'Clásico Conecta 4 contra la IA' },
-    { slug: 'proyecto-cortafuegos', title: 'Proyecto_Cortafuegos', description: 'Protege la red central contra intrusiones masivas desplegando contramedidas tácticas.' },
+    { slug: 'proyecto-cortafuegos', title: 'Proyecto Cortafuegos', description: 'Protege la red central contra intrusiones masivas desplegando contramedidas tácticas.' },
   ]
 
   const DEFAULT_COVERS = {

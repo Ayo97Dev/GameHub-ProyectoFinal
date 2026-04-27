@@ -29,6 +29,11 @@ class GameEngineService {
     const { data } = await api.post(`/games/${game}/complete`, completeData)
     return data
   }
+
+  async reset(game) {
+    const { data } = await api.delete(`/games/${game}/reset`)
+    return data
+  }
 }
 
 export default new GameEngineService()
