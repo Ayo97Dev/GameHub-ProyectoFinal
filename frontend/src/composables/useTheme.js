@@ -1,12 +1,10 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
-const isDark = ref(typeof window !== 'undefined' ? localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) : true)
+const isDark = ref(true)
 
 function applyTheme() {
-  if (isDark.value) {
+  if (typeof document !== 'undefined') {
     document.documentElement.classList.add('dark')
-  } else {
-    document.documentElement.classList.remove('dark')
   }
 }
 
@@ -16,14 +14,7 @@ if (typeof window !== 'undefined') {
 }
 
 export function useTheme() {
-  function toggleTheme() {
-    isDark.value = !isDark.value
-    localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-    applyTheme()
-  }
-
   return {
-    isDark,
-    toggleTheme
+    isDark
   }
 }

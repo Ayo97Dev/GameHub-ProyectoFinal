@@ -1,0 +1,139 @@
+{
+  "items": [
+    {
+      "id": "health_potion",
+      "name": "Poción de Vida",
+      "description": "Restaura 50 HP.",
+      "type": "potion",
+      "rarity": "common",
+      "effect": { "hp": 50 },
+      "price": 50
+    },
+    {
+      "id": "mana_potion",
+      "name": "Poción de Maná",
+      "description": "Restaura 20 MP.",
+      "type": "potion",
+      "rarity": "common",
+      "effect": { "mp": 20 },
+      "price": 20
+    },
+    {
+      "id": "iron_sword",
+      "name": "Espada de Hierro",
+      "description": "Aumenta el ataque permanentemente en +5.",
+      "type": "weapon",
+      "rarity": "common",
+      "effect": { "attack": 5 },
+      "price": 100
+    },
+    {
+      "id": "steel_armor",
+      "name": "Armadura de Acero",
+      "description": "Aumenta la defensa permanentemente en +3.",
+      "type": "armor",
+      "rarity": "uncommon",
+      "effect": { "defense": 3 },
+      "price": 150
+    },
+    {
+      "id": "scroll_fireball",
+      "name": "Pergamino de Bola de Fuego",
+      "description": "Otorga la habilidad 'Bola de Fuego' temporalmente.",
+      "type": "scroll",
+      "rarity": "rare",
+      "effect": { "skill": "fireball" },
+      "price": 300
+    },
+    {
+      "id": "scroll_heal",
+      "name": "Pergamino de Sanación",
+      "description": "Otorga la habilidad 'Curar' temporalmente.",
+      "type": "scroll",
+      "rarity": "uncommon",
+      "effect": { "skill": "heal" },
+      "price": 200
+    },
+    {
+      "id": "dragon_heart",
+      "name": "Corazón de Dragón",
+      "description": "Aumenta la vida máxima permanentemente en +50.",
+      "type": "relic",
+      "rarity": "legendary",
+      "effect": { "maxHp": 50 },
+      "price": 1000
+    },
+    {
+      "id": "ancient_relic",
+      "name": "Reliquia Antigua",
+      "description": "Aumenta el ataque permanentemente en +10.",
+      "type": "relic",
+      "rarity": "epic",
+      "effect": { "attack": 10 },
+      "price": 600
+    },
+    {
+      "id": "mystic_pendant",
+      "name": "Colgante Místico",
+      "description": "Aumenta el ataque mágico permanentemente en +10.",
+      "type": "relic",
+      "rarity": "epic",
+      "effect": { "magicAttack": 10 },
+      "price": 600
+    },
+    {
+      "id": "guardian_plate",
+      "name": "Placa del Guardián",
+      "description": "Aumenta la defensa permanentemente en +5.",
+      "type": "relic",
+      "rarity": "rare",
+      "effect": { "defense": 5 },
+      "price": 400
+    },
+    {
+      "id": "winged_boots",
+      "name": "Botas Aladas",
+      "description": "Aumenta la velocidad permanentemente en +5.",
+      "type": "relic",
+      "rarity": "rare",
+      "effect": { "speed": 5 },
+      "price": 400
+    },
+    {
+      "id": "void_essence",
+      "name": "Esencia del Vacío",
+      "description": "Aumenta el maná máximo permanentemente en +30.",
+      "type": "relic",
+      "rarity": "rare",
+      "effect": { "maxMp": 30 },
+      "price": 400
+    },
+    {
+      "id": "cursed_blade",
+      "name": "Hoja Maldita",
+      "description": "Gran poder a cambio de protección (+15 Atk, -5 Def).",
+      "type": "weapon",
+      "rarity": "epic",
+      "effect": { "attack": 15, "defense": -5 },
+      "price": 800
+    },
+    {
+      "id": "silver_shield",
+      "name": "Escudo de Plata",
+      "description": "Aumenta la defensa mágica permanentemente en +8.",
+      "type": "armor",
+      "rarity": "uncommon",
+      "effect": { "magicDefense": 8 },
+      "price": 250
+    },
+    {
+      "id": "demon_horn",
+      "name": "Cuerno de Demonio",
+      "description": "Poder dual del abismo (+12 Atk, +12 M.Atk).",
+      "type": "relic",
+      "rarity": "legendary",
+      "effect": { "attack": 12, "magicAttack": 12 },
+      "price": 1200
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "bosses": [
+    {
+      "id": "dragon",
+      "name": "Dragón del abismo",
+      "description": "El soberano de los cielos abisales. Su aliento reduce ciudades a cenizas.",
+      "stats": {
+        "hp": 180,
+        "mp": 70,
+        "attack": 30,
+        "defense": 18,
+        "magicAttack": 22,
+        "magicDefense": 16,
+        "speed": 12,
+        "critRate": 15,
+        "evasion": 8
+      },
+      "skills": [
+        "dragon's_Fire_Breath",
+        "tail_Swipe",
+        "wing_Buffet"
+      ],
+      "levelUp": {
+        "hp": 18,
+        "mp": 6,
+        "attack": 3,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "hydra",
+      "name": "Hidra de las Profundidades",
+      "description": "Una monstruosidad de múltiples cabezas que se regenera con cada herida.",
+      "stats": {
+        "hp": 160,
+        "mp": 40,
+        "attack": 25,
+        "defense": 14,
+        "magicAttack": 12,
+        "magicDefense": 10,
+        "speed": 10,
+        "critRate": 10,
+        "evasion": 8
+      },
+      "skills": [
+        "multi_Bite",
+        "tail_Sweep",
+        "regeneration"
+      ],
+      "levelUp": {
+        "hp": 16,
+        "mp": 4,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "lich",
+      "name": "Archiliche Kael",
+      "description": "Un antiguo mago que sacrificó su alma por la inmortalidad. Domina las artes oscuras.",
+      "stats": {
+        "hp": 90,
+        "mp": 110,
+        "attack": 10,
+        "defense": 8,
+        "magicAttack": 25,
+        "magicDefense": 18,
+        "speed": 10,
+        "critRate": 8,
+        "evasion": 6
+      },
+      "skills": [
+        "dark_Bolt",
+        "curse",
+        "summon_Skeleton"
+      ],
+      "levelUp": {
+        "hp": 9,
+        "mp": 10,
+        "attack": 1,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "demon",
+      "name": "Señor del Terror",
+      "description": "Un demonio mayor que se alimenta del miedo de sus víctimas.",
+      "stats": {
+        "hp": 160,
+        "mp": 90,
+        "attack": 25,
+        "defense": 16,
+        "magicAttack": 26,
+        "magicDefense": 20,
+        "speed": 18,
+        "critRate": 15,
+        "evasion": 12
+      },
+      "skills": [
+        "hell_Flame",
+        "shadow_Strike",
+        "fear_Aura"
+      ],
+      "levelUp": {
+        "hp": 16,
+        "mp": 8,
+        "attack": 2,
+        "defense": 1,
+        "magicAttack": 2,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "minotaur",
+      "name": "Gran Minotauro de Laberinto",
+      "description": "Una bestia imparable de fuerza bruta y cuernos afilados.",
+      "stats": {
+        "hp": 160,
+        "mp": 20,
+        "attack": 26,
+        "defense": 18,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 10,
+        "critRate": 8,
+        "evasion": 5
+      },
+      "skills": [
+        "gore",
+        "charge",
+        "earthquake"
+      ],
+      "levelUp": {
+        "hp": 16,
+        "mp": 2,
+        "attack": 3,
+        "defense": 2,
+        "magicAttack": 1,
+        "magicDefense": 1,
+        "speed": 1
+      }
+    },
+    {
+      "id": "giant",
+      "name": "Coloso de Granito",
+      "description": "Un gigante de piedra cuya mera presencia hace temblar la tierra.",
+      "stats": {
+        "hp": 180,
+        "mp": 15,
+        "attack": 30,
+        "defense": 22,
+        "magicAttack": 5,
+        "magicDefense": 8,
+        "speed": 6,
+        "critRate": 8,
+        "evasion": 2
+      },
+      "skills": [
+        "giant_Slam",
+        "stomp",
+        "rock_Throw"
+      ],
+      "levelUp": {
+        "hp": 18,
+        "mp": 2,
+        "attack": 3,
+        "defense": 2,
+        "magicAttack": 0,
+        "magicDefense": 1,
+        "speed": 0
+      }
+    }
+  ]
+}

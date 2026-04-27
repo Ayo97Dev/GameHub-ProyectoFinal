@@ -5,12 +5,9 @@ import Navbar from './components/layout/Navbar.vue'
 import Footer from './components/layout/Footer.vue'
 import { useAuthStore } from './stores/auth'
 import { useGameStore } from './stores/game'
-import { useTheme } from './composables/useTheme'
 
 const authStore = useAuthStore()
 const gameStore = useGameStore()
-// Initialize theme
-useTheme()
 
 onMounted(() => {
   if (authStore.token) {
@@ -24,7 +21,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col bg-retro-deep text-retro-white">
     <Navbar />
     <main class="flex-1">
       <RouterView />

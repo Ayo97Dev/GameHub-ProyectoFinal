@@ -25,10 +25,11 @@ services:
     working_dir: /var/www/html/backend
     volumes:
       - .:/var/www/html
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     environment:
       - AUTORUN_ENABLED=false
+      - PHP_OPCACHE_ENABLE=1
     command: >
       sh -lc "
         set -e;
@@ -42,10 +43,11 @@ services:
         if ! grep -q '^APP_KEY=base64:' .env; then
           php artisan key:generate --force;
         fi;
-        php artisan serve --host=0.0.0.0 --port=8000
+        php artisan octane:start --server=roadrunner --host=0.0.0.0 --rpc-port=6001 --port=8000 --workers=4
       "
     depends_on:
       - db
+      - redis
     networks:
       - gamehub_network
 
@@ -56,10 +58,31 @@ services:
     working_dir: /app
     volumes:
       - ./frontend:/app
-    ports:
-      - "5173:5173"
+    # ports:
+    #   - "5174:5173"
     command: >
       sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 5173"
+    networks:
+      - gamehub_network
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: gamehub_proxy
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "8443:443"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - gamehub_network
+
+  redis:
+    image: redis:alpine
+    container_name: gamehub_redis
+    restart: unless-stopped
     networks:
       - gamehub_network
 

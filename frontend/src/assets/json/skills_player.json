@@ -1,0 +1,399 @@
+{
+  "skills": [
+    {
+      "id": "basic_attack",
+      "name": "Ataque Básico",
+      "description": "Un golpe simple sin coste de maná.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 0,
+      "power": 70,
+      "cooldown": 0
+    },
+    {
+      "id": "slash",
+      "name": "Golpe",
+      "description": "Ataque físico básico.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 5,
+      "power": 100,
+      "cooldown": 0,
+      "statusEffect": { "id": "bleed", "chance": 30, "duration": 3 }
+    },
+    {
+      "id": "shield_Block",
+      "name": "Bloqueo",
+      "description": "Reduce el daño recibido.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 10,
+      "power": 40,
+      "cooldown": 3,
+      "statusEffect": { "id": "shield", "chance": 100, "duration": 2 }
+    },
+    {
+      "id": "second_Wind",
+      "name": "Segundo Aliento",
+      "description": "Recupera vida.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 40,
+      "cooldown": 4
+    },
+    {
+      "id": "divine_Shield",
+      "name": "Escudo Divino",
+      "description": "Reduce gran cantidad de daño.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 60,
+      "cooldown": 4,
+      "statusEffect": { "id": "shield", "chance": 100, "duration": 3 }
+    },
+    {
+      "id": "holy_Light",
+      "name": "Luz Sagrada",
+      "description": "Cura a un aliado.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 55,
+      "cooldown": 2,
+      "statusEffect": { "id": "regeneration", "chance": 100, "duration": 3 }
+    },
+    {
+      "id": "judgment",
+      "name": "Juicio",
+      "description": "Ataque mágico moderado.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 12,
+      "power": 110,
+      "cooldown": 1,
+      "statusEffect": { "id": "vulnerability", "chance": 40, "duration": 2 }
+    },
+    {
+      "id": "backstab",
+      "name": "Puñalada",
+      "description": "Gran daño crítico.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 10,
+      "power": 140,
+      "cooldown": 2,
+      "statusEffect": { "id": "bleed", "chance": 50, "duration": 3 }
+    },
+    {
+      "id": "dagger_Throw",
+      "name": "Lanzamiento de Daga",
+      "description": "Ataque rápido a distancia.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 6,
+      "power": 90,
+      "cooldown": 0,
+      "statusEffect": { "id": "poison", "chance": 40, "duration": 3 }
+    },
+    {
+      "id": "shadow_Recovery",
+      "name": "Recuperación Sombría",
+      "description": "Se cura ligeramente tras atacar.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 12,
+      "power": 35,
+      "cooldown": 3
+    },
+    {
+      "id": "aimed_Shoot",
+      "name": "Disparo Preciso",
+      "description": "Ataque a distancia potente.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 10,
+      "power": 120,
+      "cooldown": 1,
+      "statusEffect": { "id": "vulnerability", "chance": 100, "duration": 2 }
+    },
+    {
+      "id": "stealth",
+      "name": "Sigilo",
+      "description": "Aumenta crítico y evasión.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 45,
+      "cooldown": 4,
+      "statusEffect": { "id": "haste", "chance": 100, "duration": 3 }
+    },
+    {
+      "id": "survival_Instinct",
+      "name": "Instinto de Supervivencia",
+      "description": "Se cura y gana ligera evasión.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 40,
+      "cooldown": 3,
+      "statusEffect": { "id": "haste", "chance": 100, "duration": 2 }
+    },
+    {
+      "id": "fireball",
+      "name": "Bola de Fuego",
+      "description": "Daño mágico alto.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 15,
+      "power": 130,
+      "cooldown": 1,
+      "statusEffect": { "id": "burn", "chance": 100, "duration": 3 }
+    },
+    {
+      "id": "lightning_Bolt",
+      "name": "Rayo",
+      "description": "Daño mágico rápido.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 10,
+      "power": 100,
+      "cooldown": 0,
+      "statusEffect": { "id": "stun", "chance": 15, "duration": 1 }
+    },
+    {
+      "id": "arcane_Recovery",
+      "name": "Recuperación Arcana",
+      "description": "Convierte energía mágica en vida.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 16,
+      "power": 45,
+      "cooldown": 3
+    },
+    {
+      "id": "heal",
+      "name": "Curar",
+      "description": "Restaura HP.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 65,
+      "cooldown": 1
+    },
+    {
+      "id": "blessing",
+      "name": "Bendición",
+      "description": "Aumenta stats.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 35,
+      "cooldown": 3,
+      "statusEffect": { "id": "might", "chance": 100, "duration": 3 }
+    },
+    {
+      "id": "punishment",
+      "name": "Castigo",
+      "description": "Ataque mágico.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 10,
+      "power": 100,
+      "cooldown": 1,
+      "statusEffect": { "id": "weakness", "chance": 30, "duration": 2 }
+    },
+    {
+      "id": "double_Slash",
+      "name": "Doble Corte",
+      "description": "Ataque doble.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 12,
+      "power": 110,
+      "cooldown": 1,
+      "statusEffect": { "id": "bleed", "chance": 40, "duration": 3 }
+    },
+    {
+      "id": "blade_Dance",
+      "name": "Danza de Espadas",
+      "description": "Ataque potente continuo.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 18,
+      "power": 140,
+      "cooldown": 3,
+      "statusEffect": { "id": "might", "chance": 50, "duration": 2 }
+    },
+    {
+      "id": "battle_Recovery",
+      "name": "Recuperación de Combate",
+      "description": "Recupera vida en medio del combate.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 42,
+      "cooldown": 3,
+      "statusEffect": { "id": "regeneration", "chance": 100, "duration": 2 }
+    },
+    {
+      "id": "curse",
+      "name": "Maldición",
+      "description": "Reduce defensa.",
+      "type": "debuff",
+      "damageType": null,
+      "mpCost": 12,
+      "power": 40,
+      "cooldown": 2,
+      "statusEffect": { "id": "vulnerability", "chance": 100, "duration": 3 }
+    },
+    {
+      "id": "life_Drain",
+      "name": "Drenar Vida",
+      "description": "Daño y cura.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 14,
+      "power": 100,
+      "cooldown": 2,
+      "statusEffect": { "id": "bleed", "chance": 30, "duration": 3 }
+    },
+    {
+      "id": "dark_Pact",
+      "name": "Pacto Oscuro",
+      "description": "Aumenta poder a cambio de HP.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 0,
+      "power": 50,
+      "cooldown": 4,
+      "statusEffect": { "id": "might", "chance": 100, "duration": 4 }
+    },
+    {
+      "id": "quick_Shot",
+      "name": "Disparo Rápido",
+      "description": "Ataque veloz.",
+      "type": "damage",
+      "damageType": "physical",
+      "mpCost": 6,
+      "power": 95,
+      "cooldown": 0,
+      "statusEffect": { "id": "bleed", "chance": 20, "duration": 2 }
+    },
+    {
+      "id": "reload",
+      "name": "Recargar",
+      "description": "Aumenta ataque.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 8,
+      "power": 40,
+      "cooldown": 2,
+      "statusEffect": { "id": "might", "chance": 100, "duration": 2 }
+    },
+    {
+      "id": "adrenaline_Shot",
+      "name": "Disparo de Adrenalina",
+      "description": "Se cura tras disparar.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 12,
+      "power": 38,
+      "cooldown": 3
+    },
+    {
+      "id": "regrowth",
+      "name": "Regeneración",
+      "description": "Cura progresiva.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 14,
+      "power": 50,
+      "cooldown": 2,
+      "statusEffect": { "id": "regeneration", "chance": 100, "duration": 4 }
+    },
+    {
+      "id": "nature_Strike",
+      "name": "Golpe Natural",
+      "description": "Ataque mágico de la naturaleza.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 12,
+      "power": 105,
+      "cooldown": 1
+    },
+    {
+      "id": "nature_Blessing",
+      "name": "Bendición Natural",
+      "description": "Buff a aliados.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 35,
+      "cooldown": 3,
+      "statusEffect": { "id": "ward", "chance": 100, "duration": 3 }
+    },
+    {
+      "id": "sonic_Strike",
+      "name": "Golpe Sonoro",
+      "description": "Ataque mágico basado en ondas de sonido.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 12,
+      "power": 100,
+      "cooldown": 1
+    },
+    {
+      "id": "inspiration",
+      "name": "Inspiración",
+      "description": "Aumenta crítico.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 15,
+      "power": 35,
+      "cooldown": 3
+    },
+    {
+      "id": "healing_Melody",
+      "name": "Melodía Sanadora",
+      "description": "Cura moderadamente al objetivo.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 18,
+      "power": 45,
+      "cooldown": 2
+    },
+    {
+      "id": "elemental_Blast",
+      "name": "Explosión Elemental",
+      "description": "Ataque mágico elemental.",
+      "type": "damage",
+      "damageType": "magical",
+      "mpCost": 13,
+      "power": 110,
+      "cooldown": 1
+    },
+    {
+      "id": "earth_Shield",
+      "name": "Escudo de Tierra",
+      "description": "Reduce daño.",
+      "type": "buff",
+      "damageType": null,
+      "mpCost": 16,
+      "power": 45,
+      "cooldown": 3,
+      "statusEffect": { "id": "shield", "chance": 100, "duration": 2 }
+    },
+    {
+      "id": "spirit_Recovery",
+      "name": "Recuperación Espiritual",
+      "description": "Cura usando energía espiritual.",
+      "type": "heal",
+      "damageType": null,
+      "mpCost": 17,
+      "power": 45,
+      "cooldown": 3
+    }
+  ]
+}

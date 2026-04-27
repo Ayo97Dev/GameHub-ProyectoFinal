@@ -71,6 +71,17 @@ class AchievementService
             'total_towers_built' => $data['total_towers_built'] ?? 0,
             // Tower Defense: Oro gastado
             'total_gold_spent' => $data['total_gold_spent'] ?? 0,
+            // RPG fields
+            'floor' => $data['floor'] ?? 0,
+            'level' => $data['level'] ?? 0,
+            'max_hp' => $data['max_hp'] ?? 0,
+            'attack' => $data['attack'] ?? 0,
+            'defense' => $data['defense'] ?? 0,
+            'magic_attack' => $data['magic_attack'] ?? 0,
+            'speed' => $data['speed'] ?? 0,
+            'gold_run' => $data['gold_run'] ?? 0,
+            'class' => $data['class'] ?? 'none',
+            'bosses_defeated' => $data['bosses_defeated'] ?? 0,
             default => null,
         };
 
@@ -78,7 +89,7 @@ class AchievementService
             return false;
         }
 
-        return match ($operator) {
+        $result = match ($operator) {
             'greater_than' => $value > $target,
             'greater_than_or_equal' => $value >= $target,
             'equal' => $value == $target,
@@ -86,6 +97,17 @@ class AchievementService
             'less_than_or_equal' => $value <= $target,
             default => false,
         };
+
+        if (!$result) {
+            return false;
+        }
+
+        // Check additional constraints (like 'class')
+        if (isset($condition['class']) && ($data['class'] ?? '') !== $condition['class']) {
+            return false;
+        }
+
+        return true;
     }
 
     private function isUnlocked(User $user, int $achievementId): bool

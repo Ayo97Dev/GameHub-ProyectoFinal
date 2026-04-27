@@ -6,7 +6,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
   const SAVE_COOLDOWN_MS = 5_000 // Mínimo 5 segundos entre saves
   
   const gameState = reactive({
-    lives: 20,
+    lives: 100,
     gold: 150,
     wave: 1,
     waveActive: false,
@@ -28,7 +28,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
   async function loadGame() {
     isLoading.value = true
     try {
-      const response = await gameEngineService.load('tower-defense')
+      const response = await gameEngineService.load('proyecto-cortafuegos')
       if (response.game_state && Object.keys(response.game_state).length > 0) {
         savedGame.value = response.game_state
       }
@@ -47,7 +47,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
     isLoading.value = true
     lastSaveRequestAt.value = 0
     try {
-      const response = await gameEngineService.play('tower-defense', continueGame && !!savedGame.value)
+      const response = await gameEngineService.play('proyecto-cortafuegos', continueGame && !!savedGame.value)
       sessionId.value = response.session_id
 
       const state = response.game_state
@@ -74,7 +74,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
     
     try {
       isSaving.value = true
-      const response = await gameEngineService.save('tower-defense', {
+      const response = await gameEngineService.save('proyecto-cortafuegos', {
         game_state: gameState,
         score,
         playtime: 0,
@@ -97,7 +97,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
    */
   async function completeSession(finalScore, duration) {
     try {
-      const response = await gameEngineService.complete('tower-defense', {
+      const response = await gameEngineService.complete('proyecto-cortafuegos', {
         session_id: sessionId.value,
         final_score: finalScore,
         duration,
@@ -118,7 +118,7 @@ export const useTowerDefenseStore = defineStore('tower-defense', () => {
    */
   async function resetGame() {
     try {
-      await gameEngineService.reset('tower-defense')
+      await gameEngineService.reset('proyecto-cortafuegos')
       savedGame.value = null
     } catch (error) {
       console.error('Error resetting game:', error)

@@ -316,6 +316,13 @@ Executes a validated action within the game. Rate limited at the per-game config
   - `click` — `payload.count` (int, 1–100): clics en lote procesados de una sola vez.
   - `buy_upgrade` — `payload.upgrade_id` (int): compra una mejora. El coste escala con `baseCost × 1.15^n` donde `n` es el número de veces ya comprada.
   - `prestige` — sin payload.
+- **Available actions (tower-defense):**
+  - `wave_start` — Inicia una nueva oleada.
+  - `build_tower` — `payload.type` (string), `payload.x` (int), `payload.y` (int).
+  - `upgrade_tower` — `payload.x` (int), `payload.y` (int).
+  - `sell_tower` — `payload.x` (int), `payload.y` (int).
+  - `complete_wave` — `payload.gameState` (object).
+  - `lose_game` — `payload.gameState` (object).
 - **Response (200 OK):**
   ```json
   {
@@ -455,6 +462,109 @@ Lists achievements for a specific game.
 
 ---
 
+## User Management
+
+### 19. Update User Profile
+Update the authenticated user's name, bio, and avatar.
+
+- **Endpoint:** `POST /user/profile`
+- **Auth Required:** Yes
+- **Body (JSON):**
+  ```json
+  {
+    "name": "New Name",
+    "bio": "New Bio",
+    "avatar": "https://example.com/new-avatar.png"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Profile updated successfully",
+    "user": { ... }
+  }
+  ```
+
+### 20. Update Password
+Change the authenticated user's password.
+
+- **Endpoint:** `POST /user/password`
+- **Auth Required:** Yes
+- **Body (JSON):**
+  ```json
+  {
+    "current_password": "oldpassword123",
+    "password": "newpassword456",
+    "password_confirmation": "newpassword456"
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  { "message": "Password updated successfully" }
+  ```
+
+---
+
+## Inventory
+
+### 21. Get User Inventory
+Retrieve all items in the user's global inventory. Returns a key-value pair of item keys and quantities.
+
+- **Endpoint:** `GET /inventory`
+- **Auth Required:** Yes
+- **Response (200 OK):**
+  ```json
+  {
+    "gold_coin": 1250,
+    "mana_potion": 5,
+    "exp_booster": 1
+  }
+  ```
+
+### 22. Update Inventory Item
+Add or remove quantity from a specific inventory item.
+
+- **Endpoint:** `POST /inventory/update`
+- **Auth Required:** Yes
+- **Body (JSON):**
+  ```json
+  {
+    "item_key": "gold_coin",
+    "quantity": 100
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Inventory updated",
+    "item": { "key": "gold_coin", "quantity": 1350 }
+  }
+  ```
+
+### 23. Bulk Sync Inventory
+Sync multiple items at once.
+
+- **Endpoint:** `POST /inventory/sync`
+- **Auth Required:** Yes
+- **Body (JSON):**
+  ```json
+  {
+    "items": {
+      "item_1": 5,
+      "item_2": 20
+    }
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+  {
+    "message": "Inventory synced successfully",
+    "inventory": { ... }
+  }
+  ```
+
+---
+
 ## Achievement Condition Types
 
 The `condition` JSON field of each achievement supports the following shapes:
@@ -462,12 +572,18 @@ The `condition` JSON field of each achievement supports the following shapes:
 | `field` | Description | Extra keys |
 |---|---|---|
 | `score` | Current balance/score | — |
-| `total_clicks` | Lifetime click count | — |
-| `prestige_level` | Number of prestiges performed | — |
-| `total_upgrades_bought` | Sum of all upgrades purchased | — |
+| `total_clicks` | Lifetime click count (Clicker) | — |
+| `prestige_level` | Number of prestiges performed (Clicker) | — |
+| `total_upgrades_bought` | Sum of all upgrades purchased (Clicker) | — |
 | `max_upgrade_count` | Highest purchase count for a single upgrade | — |
 | `upgrade_count` | Purchase count of a specific upgrade | `upgrade_id` (int) |
 | `duration` | Session duration in seconds (for `complete`) | — |
+| `floor` | Current floor reached (RPG) | — |
+| `gold_run` | Gold collected in current run (RPG) | — |
+| `level` | Hero level reached (RPG) | — |
+| `max_wave_reached` | Highest wave completed (TD) | — |
+| `total_towers_built` | Total towers placed (TD) | — |
+| `wins` | Total games won (Connect 4) | — |
 
 **Operators:** `greater_than`, `greater_than_or_equal`, `equal`, `less_than`, `less_than_or_equal`
 

@@ -21,6 +21,9 @@ class UserResource extends JsonResource
             'avatar' => $this->avatar,
             'bio' => $this->bio,
             'global_stats' => GameStatResource::collection($this->whenLoaded('gameStats')),
+            'inventory' => $this->whenLoaded('inventoryItems', function () {
+                return $this->inventoryItems->pluck('quantity', 'item_key');
+            }),
         ];
     }
 }

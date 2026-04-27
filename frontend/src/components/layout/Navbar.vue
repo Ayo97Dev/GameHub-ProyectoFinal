@@ -3,14 +3,10 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { useGameStore } from '../../stores/game'
-import { useTheme } from '../../composables/useTheme'
-import BaseButton from '../ui/BaseButton.vue'
 
 const authStore = useAuthStore()
 const gameStore = useGameStore()
-const router = useRouter()
-const { isDark, toggleTheme } = useTheme()
-const navGames = computed(() => gameStore.games)
+const router    = useRouter()
 const isLoggingOut = ref(false)
 
 onMounted(() => {
@@ -20,15 +16,12 @@ onMounted(() => {
 })
 
 async function handleLogout() {
-  if (isLoggingOut.value) return // Prevenir múltiples clics
-  
+  if (isLoggingOut.value) return
   isLoggingOut.value = true
   try {
     await authStore.logout()
     router.push('/')
-  } catch (error) {
-    console.error('Error during logout:', error)
-    // El logout ya se ejecutó, redirigir de todas formas
+  } catch {
     router.push('/')
   } finally {
     isLoggingOut.value = false
@@ -37,66 +30,195 @@ async function handleLogout() {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 border-b border-slate-300/80 dark:border-slate-800/70 bg-slate-50/95 dark:bg-zinc-950/85 shadow-sm shadow-slate-200/80 dark:shadow-black/20 backdrop-blur-xl transition-colors duration-300">
-    <nav class="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="flex items-center justify-between gap-3">
-        <RouterLink to="/" class="text-3xl font-black tracking-[0.06em] text-cyan-600 dark:text-cyan-300 drop-shadow-sm dark:drop-shadow-[0_0_16px_rgba(34,211,238,.35)] transition-colors">
+  <header class="sticky top-0 z-40 bg-retro-black border-b-4 border-neon-cyan shadow-[0_4px_0px_#000]">
+    <!-- Scanline sutil en la navbar -->
+    <div class="gh-scanlines absolute inset-0 opacity-5 pointer-events-none z-0"></div>
+
+    <nav class="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3">
+
+      <!-- ── Logo ── -->
+      <div class="flex items-center gap-3 shrink-0">
+        <RouterLink
+          to="/"
+          class="font-display text-2xl font-black uppercase tracking-widest gh-title-gradient hover:opacity-80 transition-opacity"
+        >
           GameHub
         </RouterLink>
-        <span class="rounded-full border border-violet-200 bg-violet-100 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:border-violet-400/45 dark:bg-violet-500/10 dark:text-violet-200 transition-colors">
-          Arena
+        <span class="font-pixel text-[10px] uppercase tracking-widest text-neon-pink border-2 border-neon-pink px-2 py-0.5 shadow-[2px_2px_0px_#000]">
+          ARCADE
         </span>
       </div>
 
-      <div class="flex items-center justify-between gap-3">
-        <button 
-          @click="toggleTheme" 
-          class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
-          title="Alternar Tema"
-        >
-          <svg v-if="!isDark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <!-- Moon icon -->
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <!-- Sun icon -->
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-        </button>
+      <!-- ── Nav Links ── -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
 
-        <div class="gh-surface gh-neon-ring flex flex-wrap items-center gap-1.5 p-1.5 sm:gap-2">
+        <!-- Juegos -->
+        <RouterLink
+          to="/"
+          class="nav-link"
+          :class="{ 'nav-link--active': $route.path === '/' }"
+        >
+          <Icon icon="lucide:layout-grid" />
+          <span>Juegos</span>
+        </RouterLink>
+
+        <!-- Tienda -->
+        <RouterLink
+          to="/store"
+          class="nav-link nav-link--yellow"
+          :class="{ 'nav-link--active-yellow': $route.path === '/store' }"
+        >
+          <Icon icon="lucide:shopping-bag" />
+          <span>Tienda</span>
+        </RouterLink>
+
+        <!-- Logros (solo si autenticado) -->
+        <RouterLink
+          v-if="authStore.isLoggedIn"
+          to="/achievements"
+          class="nav-link"
+          :class="{ 'nav-link--active': $route.path === '/achievements' }"
+        >
+          <Icon icon="lucide:award" />
+          <span class="hidden sm:inline">Logros</span>
+        </RouterLink>
+
+        <!-- ── Separador vertical ── -->
+        <div class="h-6 w-px bg-white/10 mx-1"></div>
+
+        <!-- Logged IN -->
+        <template v-if="authStore.isLoggedIn">
           <RouterLink
-            v-for="game in navGames"
-            :key="game.slug"
-            :to="game.route || `/play/${game.slug}`"
-            class="rounded-md px-3 py-2 text-sm font-semibold uppercase tracking-wide text-slate-600 hover:bg-slate-100 hover:text-cyan-600 dark:text-slate-300 transition-colors dark:hover:bg-slate-800/80 dark:hover:text-cyan-300"
-            active-class="bg-slate-100 text-cyan-600 shadow-sm dark:bg-slate-800 dark:text-cyan-300 dark:shadow-[0_0_18px_rgba(34,211,238,.2)]"
+            to="/profile"
+            class="nav-link"
+            :class="{ 'nav-link--active': $route.path === '/profile' }"
           >
-            {{ game.title.split(' ')[0] }}
+            <Icon icon="lucide:user" />
+            <span class="hidden sm:inline">Perfil</span>
           </RouterLink>
 
-          <template v-if="authStore.isLoggedIn">
-            <RouterLink
-              to="/profile"
-              class="rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 hover:text-cyan-600 dark:text-slate-300 transition-colors dark:hover:bg-slate-800/80 dark:hover:text-cyan-300"
-              active-class="bg-slate-100 text-cyan-600 shadow-sm dark:bg-slate-800 dark:text-cyan-300 dark:shadow-[0_0_18px_rgba(34,211,238,.2)]"
-            >
-              Perfil
-            </RouterLink>
-            <BaseButton size="sm" @click="handleLogout" :disabled="isLoggingOut">
-              {{ isLoggingOut ? '⏳ Cerrando...' : 'Cerrar sesión' }}
-            </BaseButton>
-          </template>
-          <template v-else>
-            <RouterLink to="/login">
-              <BaseButton size="sm" variant="ghost">Entrar</BaseButton>
-            </RouterLink>
-            <RouterLink to="/register">
-              <BaseButton size="sm">Registro</BaseButton>
-            </RouterLink>
-          </template>
-        </div>
+          <button
+            class="nav-link nav-link--danger"
+            :disabled="isLoggingOut"
+            @click="handleLogout"
+          >
+            <Icon :icon="isLoggingOut ? 'lucide:loader-2' : 'lucide:log-out'" :class="{ 'animate-spin': isLoggingOut }" />
+            <span class="hidden sm:inline">{{ isLoggingOut ? 'Saliendo…' : 'Salir' }}</span>
+          </button>
+        </template>
+
+        <!-- Logged OUT -->
+        <template v-else>
+          <RouterLink to="/login" class="nav-link">
+            <Icon icon="lucide:log-in" />
+            <span>Entrar</span>
+          </RouterLink>
+
+          <RouterLink to="/register" class="nav-link nav-link--cta">
+            <Icon icon="lucide:user-plus" />
+            <span>Registro</span>
+          </RouterLink>
+        </template>
+
       </div>
     </nav>
   </header>
 </template>
+
+<style scoped>
+/* ── Base nav-link ──────────────────────────────────────────── */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-retro-white);
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 3px 3px 0px #000;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.15s, color 0.15s, border-color 0.15s;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--color-neon-cyan);
+  color: var(--color-neon-cyan);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
+.nav-link:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+.nav-link:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Active state ── */
+.nav-link--active {
+  background: var(--color-neon-cyan);
+  border-color: #000;
+  color: #000 !important;
+  box-shadow: 3px 3px 0px #000;
+}
+.nav-link--active:hover {
+  background: var(--color-neon-cyan);
+  color: #000;
+  border-color: #000;
+}
+
+/* ── Yellow (Tienda) ── */
+.nav-link--yellow {
+  border-color: rgba(255, 242, 0, 0.35);
+  color: var(--color-neon-yellow);
+}
+.nav-link--yellow:hover {
+  border-color: var(--color-neon-yellow);
+  color: var(--color-neon-yellow);
+  background: rgba(255, 242, 0, 0.08);
+}
+
+.nav-link--active-yellow {
+  background: var(--color-neon-yellow);
+  border-color: #000;
+  color: #000 !important;
+}
+.nav-link--active-yellow:hover {
+  background: var(--color-neon-yellow);
+  color: #000;
+}
+
+/* ── Danger (Salir) ── */
+.nav-link--danger {
+  border-color: rgba(255, 45, 85, 0.4);
+  color: var(--color-neon-pink);
+}
+.nav-link--danger:hover {
+  border-color: var(--color-neon-pink);
+  color: var(--color-neon-pink);
+  background: rgba(255, 45, 85, 0.1);
+}
+
+/* ── CTA (Registro) ── */
+.nav-link--cta {
+  background: var(--color-neon-cyan);
+  border-color: #000;
+  color: #000 !important;
+  box-shadow: 3px 3px 0px #000;
+}
+.nav-link--cta:hover {
+  background: var(--color-neon-cyan);
+  color: #000;
+  filter: brightness(1.1);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
+</style>

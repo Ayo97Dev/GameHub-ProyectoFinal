@@ -1,86 +1,221 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Syne:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap');
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
+/* =============================================
+   GAMEHUB — BLOCKY RETRO-FUTURISTA
+   Design System v2.0
+   ============================================= */
 
+/* ------------- 1. DESIGN TOKENS ------------- */
+@theme {
+  --font-sans: "Space Mono", monospace;
+  --font-display: "Orbitron", sans-serif;
+  --font-pixel: "VT323", monospace;
+
+  /* Neon Accents */
+  --color-neon-cyan:    #00f2ff;
+  --color-neon-pink:    #ff2d55;
+  --color-neon-yellow:  #fff200;
+  --color-neon-fuchsia: #e02fe8;
+  --color-neon-blue:    #007aff;
+  --color-neon-green:   #00ff88;
+
+  /* Neutral Dark Palette */
+  --color-retro-white:  #f8fafc;
+  --color-retro-cream:  #f1f5f9;
+  --color-retro-black:  #0c0c0e;
+  --color-retro-dark:   #121214;
+  --color-retro-deep:   #08080a;
+}
+
+/* ------------- 2. BASE LAYER ------------- */
 @layer base {
   html, body, #app {
     min-height: 100%;
   }
 
   html {
+    font-size: 16px;
     scroll-behavior: smooth;
+    @apply antialiased;
   }
 
+  /* ► ARCADE DARK MODE — único modo soportado */
   body {
-    @apply font-sans antialiased text-slate-800 bg-slate-50 transition-colors duration-300;
-    font-family: 'Rajdhani', sans-serif;
+    @apply text-base font-sans leading-relaxed text-retro-white bg-retro-deep;
+    /* Scanline grid sutil como textura de fondo */
     background-image:
-      radial-gradient(80rem 30rem at 10% -10%, rgba(34, 211, 238, 0.15), transparent 45%),
-      radial-gradient(70rem 30rem at 90% -20%, rgba(139, 92, 246, 0.15), transparent 45%),
-      linear-gradient(to bottom, #f8fafc, #e2e8f0 65%);
+      linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to right, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
     background-attachment: fixed;
   }
 
-  html.dark body {
-    @apply text-slate-100 bg-zinc-950;
-    background-image:
-      radial-gradient(80rem 30rem at 10% -10%, rgba(34, 211, 238, 0.12), transparent 45%),
-      radial-gradient(70rem 30rem at 90% -20%, rgba(139, 92, 246, 0.14), transparent 45%),
-      linear-gradient(to bottom, #09090b, #020617 65%);
+  /* Jerarquía tipográfica */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-widest uppercase;
   }
 
-  h1, h2, h3 {
-    font-family: 'Syne', 'Rajdhani', sans-serif;
-    letter-spacing: 0.01em;
-  }
-
+  /* Selección de texto neón */
   ::selection {
-    @apply bg-violet-500/30 text-slate-900 dark:bg-cyan-400/35 dark:text-white;
+    @apply bg-neon-cyan text-retro-black;
+  }
+
+  /* Scrollbar personalizada */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-neon-cyan) var(--color-retro-dark);
+  }
+  *::-webkit-scrollbar       { width: 4px; height: 4px; }
+  *::-webkit-scrollbar-track { background: var(--color-retro-dark); }
+  *::-webkit-scrollbar-thumb { background: var(--color-neon-cyan); }
+}
+
+/* ------------- 3. COMPONENT UTILITIES ------------- */
+@layer components {
+
+  /* ── Superficie interactiva base ── */
+  .gh-surface {
+    @apply border-2 border-retro-black bg-retro-dark transition-all duration-200;
+    box-shadow: 4px 4px 0px var(--color-retro-black);
+  }
+
+  /* ── Superficie hover (animación de presión) ── */
+  .gh-surface-hover {
+    @apply hover:translate-x-[2px] hover:translate-y-[2px]
+           active:translate-x-[4px] active:translate-y-[4px];
+  }
+  .gh-surface-hover:hover  { box-shadow: 2px 2px 0px #000; }
+  .gh-surface-hover:active { box-shadow: 0px 0px 0px #000; }
+
+  /* ── Panel estructural grande ── */
+  .gh-panel {
+    @apply border-2 border-retro-black bg-retro-dark transition-all duration-300;
+    box-shadow: 6px 6px 0px #000;
+  }
+
+  /* ── Cristal técnico (sin esquinas redondeadas) ── */
+  .gh-glass {
+    @apply bg-black/50 backdrop-blur-md border-2 border-white/10;
+    box-shadow: 4px 4px 0px #000;
+  }
+
+  /* ── Gradiente de título con identidad arcade ── */
+  .gh-title-gradient {
+    @apply bg-gradient-to-r from-neon-cyan via-neon-fuchsia to-neon-pink bg-clip-text text-transparent;
+  }
+
+  /* ── Glow de texto — sólido, no gaussiano ── */
+  .gh-title-glow {
+    text-shadow: 3px 3px 0px #000, 0 0 20px currentColor;
+  }
+
+  /* ── Overlay de scanlines (CRT retro) ── */
+  .gh-scanlines {
+    position: relative;
+    overflow: hidden;
+  }
+  .gh-scanlines::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.12) 2px,
+      rgba(0, 0, 0, 0.12) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* ── Focus ring arcade ── */
+  .gh-retro-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-retro-deep;
+  }
+
+  /* ── Chip / etiqueta de datos ── */
+  .gh-chip {
+    @apply font-pixel text-[10px] uppercase tracking-widest px-2 py-0.5 border-2 border-white/10 bg-retro-dark shadow-[2px_2px_0px_#000];
+  }
+
+  /* ── Fila de dato HUD (label + valor) ── */
+  .gh-data-row {
+    @apply flex items-center justify-between px-3 py-2 border-2 border-white/5 bg-black shadow-[inset_2px_2px_0px_#000];
+  }
+
+  /* ── Cabecera de sección ── */
+  .gh-section-header {
+    @apply font-pixel text-[10px] uppercase tracking-[0.4em] text-neon-cyan border-b-2 border-neon-cyan/30 pb-1 mb-1;
   }
 }
 
-@layer components {
-  .gh-surface {
-    @apply rounded-2xl border border-slate-200/80 bg-white/85 backdrop-blur-md shadow-sm transition-colors duration-300;
+/* ------------- 4. ANIMATIONS GLOBALES ------------- */
+@layer utilities {
+  /* Blink cursor / indicador */
+  .blink {
+    animation: gh-blink 1.2s step-start infinite;
   }
-  
-  html.dark .gh-surface {
-    @apply border-slate-800/80 bg-slate-900/65 shadow-none;
-  }
-
-  .gh-neon-ring {
-    box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.2) inset,
-      0 0 0 1px rgba(139, 92, 246, 0.15),
-      0 8px 30px rgba(100, 116, 139, 0.2);
+  @keyframes gh-blink {
+    50% { opacity: 0; }
   }
 
-  html.dark .gh-neon-ring {
-    box-shadow:
-      0 0 0 1px rgba(34, 211, 238, 0.15) inset,
-      0 0 0 1px rgba(139, 92, 246, 0.1),
-      0 10px 40px rgba(2, 6, 23, 0.65);
+  /* Spin lento (iconos decorativos) */
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
-  .gh-grid-bg {
-    background-image:
-      linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
-      linear-gradient(to right, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
-    background-size: 24px 24px;
+  /* Bounce lento (podio 1er lugar) */
+  .animate-bounce-slow {
+    animation: gh-bounce 3s ease-in-out infinite;
+  }
+  @keyframes gh-bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%       { transform: translate(-50%, -8px); }
   }
 
-  html.dark .gh-grid-bg {
-    background-image:
-      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-      linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  /* Glow pulsante en borde para elemento 1er lugar */
+  .animate-glow-yellow {
+    animation: gh-glow-yellow 3s infinite;
+  }
+  @keyframes gh-glow-yellow {
+    0%, 100% { box-shadow: 12px 12px 0px #000; }
+    50%       { box-shadow: 12px 12px 0px #000, 0 0 0 3px var(--color-neon-yellow); }
   }
 
-  .gh-panel {
-    @apply rounded-2xl border border-slate-200/90 bg-white/90 shadow-xl shadow-slate-200/60 backdrop-blur-md transition-colors duration-300 dark:border-slate-800/80 dark:bg-slate-900/80 dark:shadow-black/20;
+  /* Slide para sidebars / drawers */
+  .slide-enter-active, .slide-leave-active {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .slide-enter-from, .slide-leave-to {
+    transform: translateX(100%);
   }
 
-  .gh-title-gradient {
-    @apply bg-gradient-to-r from-violet-600 via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent dark:from-violet-300 dark:via-fuchsia-300 dark:to-cyan-300;
+  /* Fade rápido tipo pixel */
+  .pixel-fade-enter-active, .pixel-fade-leave-active {
+    transition: opacity 0.1s step-end;
+  }
+  .pixel-fade-enter-from, .pixel-fade-leave-to {
+    opacity: 0;
+  }
+
+  /* Bounce-in para toasts */
+  .bounce-enter-active  { animation: gh-bounce-in 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+  .bounce-leave-active  { animation: gh-bounce-in 0.3s reverse ease-in; }
+  @keyframes gh-bounce-in {
+    0%   { transform: translate(-50%, -120%); opacity: 0; }
+    60%  { transform: translate(-50%, 5%);    opacity: 1; }
+    100% { transform: translate(-50%, 0);     opacity: 1; }
+  }
+
+  /* Loading bar infinita */
+  @keyframes gh-loading {
+    0%   { transform: translateX(-100%); }
+    50%  { transform: translateX(0); }
+    100% { transform: translateX(100%); }
   }
 }

@@ -20,6 +20,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        $user->load(['gameStats.game', 'inventoryItems']);
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -39,6 +40,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
+        $user->load(['gameStats.game', 'inventoryItems']);
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -60,6 +62,7 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return new UserResource($request->user());
+        $user = $request->user()->load(['gameStats.game', 'inventoryItems']);
+        return new UserResource($user);
     }
 }

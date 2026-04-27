@@ -186,6 +186,7 @@ class GameController extends Controller
             'connect4' => new Connect4GameService($user, $game),
             'clicker' => new ClickerGameService($user, $game),
             'tower-defense' => new TowerDefenseGameService($user, $game),
+            'descenso-al-abismo' => new \App\Services\Games\RpgGameService($user, $game),
             default => new ClickerGameService($user, $game), // fallback genérico
         };
     }
