@@ -5,6 +5,8 @@ import { useGameStore } from '../stores/game'
 import { useClickerStore } from '../stores/games/clicker'
 import { useConnect4Store } from '../stores/games/connect4'
 import { useTowerDefenseStore } from '../stores/games/towerdefense'
+import { useBattleshipStore } from '../stores/games/battleship'
+import { useChessStore } from '../stores/games/chess'
 import { useLeaderboardStore } from '../stores/leaderboard'
 import api from '../lib/axios'
 import Rpg from '../components/games/Rpg.vue'
@@ -12,6 +14,8 @@ import Clicker from '../components/games/Clicker.vue'
 import Quiz from '../components/games/Quiz.vue'
 import Connect4 from '../components/games/Connect4.vue'
 import Towerdefense from '../components/games/Towerdefense.vue'
+import Battleship from '../components/games/Battleship.vue'
+import Chess from '../components/games/Chess.vue'
 
 // Helper para debounce
 function useDebouncedFunction(fn, delay = 300) {
@@ -27,6 +31,8 @@ const gameStore  = useGameStore()
 const clicker    = useClickerStore()
 const connect4   = useConnect4Store()
 const towerDefense = useTowerDefenseStore()
+const battleship = useBattleshipStore()
+const chess = useChessStore()
 const leaderboardStore = useLeaderboardStore()
 
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
@@ -37,6 +43,8 @@ const FALLBACK_TITLE_BY_SLUG = {
   quiz: 'QUIZ_MASTER.SYS',
   connect4: 'CONNECT_4.BIN',
   'proyecto-cortafuegos': 'FIREWALL_DEF.PRO',
+  battleship: 'BATTLESHIP.BIN',
+  chess: 'CHESS_GRANDMASTER.SYS',
 }
 
 const pageTitle = computed(() => {
@@ -63,6 +71,8 @@ const gameComponent = computed(() => {
   if (route.params.slug === 'quiz')    return Quiz
   if (route.params.slug === 'connect4') return Connect4
   if (route.params.slug === 'proyecto-cortafuegos') return Towerdefense
+  if (route.params.slug === 'battleship') return Battleship
+  if (route.params.slug === 'chess') return Chess
   return null
 })
 
@@ -70,12 +80,16 @@ const liveScore = computed(() => {
   if (route.params.slug === 'core-clicker') return Math.floor(clicker.balance)
   if (route.params.slug === 'connect4') return connect4.wins
   if (route.params.slug === 'proyecto-cortafuegos') return Math.floor(towerDefense.gameState?.wave ?? 0)
+  if (route.params.slug === 'battleship') return battleship.wins
+  if (route.params.slug === 'chess') return chess.wins
   return 0
 })
 
 const liveScoreLabel = computed(() => {
   if (route.params.slug === 'connect4') return 'VICTORIAS'
   if (route.params.slug === 'proyecto-cortafuegos') return 'Oleadas superadas'
+  if (route.params.slug === 'battleship') return 'VICTORIAS'
+  if (route.params.slug === 'chess') return 'VICTORIAS'
   return 'Puntuación'
 })
 

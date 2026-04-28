@@ -19,10 +19,12 @@
           CONSTRUYE NODOS DE DEFENSA PARA PROTEGER EL NÚCLEO DEL REACTOR CONTRA LA INFILTRACIÓN DE MALWARE.
         </p>
         
-        <div v-if="store.isLoading" class="py-6">
-           <div class="size-12 border-t-2 border-neon-cyan rounded-full animate-spin mx-auto"></div>
-           <p class="font-pixel text-neon-cyan mt-6 animate-pulse uppercase tracking-widest">CONECTANDO_NÚCLEO...</p>
-        </div>
+        <BaseLoading 
+          v-if="store.isLoading" 
+          message="CONECTANDO_NÚCLEO..." 
+          submessage="Sincronizando protocolos de defensa" 
+        />
+
         
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <button
@@ -58,7 +60,7 @@
           <div class="flex items-center gap-10">
             <div class="flex flex-col">
               <div class="flex items-center gap-2 mb-1">
-                <div class="size-2 bg-neon-cyan animate-pulse shadow-[0_0_5px_#00f2ff]"></div>
+                <Icon icon="game-icons:heart-organ" class="text-neon-pink text-xs" />
                 <span class="font-pixel text-xs text-neon-cyan/80 uppercase tracking-widest">NÚCLEO_STB</span>
               </div>
               <div class="flex items-center gap-4">
@@ -70,7 +72,10 @@
             </div>
 
             <div class="flex flex-col">
-              <span class="font-pixel text-xs text-white/30 uppercase tracking-tighter mb-0.5">DATOS_RED</span>
+              <div class="flex items-center gap-2 mb-0.5">
+                <Icon icon="game-icons:database" class="text-neon-cyan text-[10px]" />
+                <span class="font-pixel text-xs text-white/30 uppercase tracking-tighter">DATOS_RED</span>
+              </div>
               <span class="font-display text-xl font-black text-neon-cyan">{{ gameState.gold }}</span>
             </div>
           </div>
@@ -126,12 +131,18 @@
                   <button 
                     @click="activateAbility(key)" 
                     :disabled="gameState.cooldowns[key] > 0 || gameState.isPaused || !inventory.hasItem('td_' + key)" 
-                    class="relative border border-white/10 bg-black/60 flex flex-col items-center justify-center min-w-[110px] h-14 px-3 disabled:opacity-30 disabled:grayscale transition-all hover:border-neon-cyan/50 hover:bg-white/5 active:scale-95 group overflow-hidden"
+                    class="relative border border-white/10 bg-black/60 flex flex-col items-center justify-center min-w-[110px] h-16 px-3 disabled:opacity-30 disabled:grayscale transition-all hover:border-neon-cyan/50 hover:bg-white/5 active:scale-95 group overflow-hidden"
                   >
                     <div class="absolute inset-0 origin-bottom transition-all" :class="`bg-neon-${key==='emp'?'cyan':(key==='overclock'?'yellow':'pink')}/10`" :style="{ height: `${(gameState.cooldowns[key] / (key==='emp'?600:(key==='overclock'?900:1200))) * 100}%` }"></div>
                     
                     <span v-if="!inventory.hasItem('td_' + key)" class="absolute inset-0 flex items-center justify-center bg-black/80 font-pixel text-[8px] text-neon-pink uppercase z-20">0 USOS - TIENDA</span>
                     
+                    <Icon 
+                      :icon="key === 'emp' ? 'game-icons:lightning-shield' : (key === 'overclock' ? 'game-icons:speedometer' : 'game-icons:laser-blast')" 
+                      class="text-lg mb-1 relative z-10"
+                      :class="`text-neon-${key==='emp'?'cyan':(key==='overclock'?'yellow':'pink')}`"
+                    />
+
                     <span class="font-display text-[9px] font-black uppercase text-white/60 group-hover:text-white relative z-10 text-center leading-tight">
                       {{ key==='emp' ? 'PULSO EMP' : (key==='overclock' ? 'SOBRECARGA' : 'PURGA TOTAL') }}
                     </span>
@@ -195,18 +206,26 @@
                  <span class="font-pixel text-[10px] text-white/20 uppercase">ZOOM: {{ (finalScale * 100).toFixed(0) }}%</span>
                </div>
                <div class="flex gap-1">
-                 <button @click="userZoom -= 0.1" class="size-8 border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center">-</button>
+                 <button @click="userZoom -= 0.1" class="size-8 border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center">
+                    <Icon icon="game-icons:magnifying-glass" class="rotate-90 scale-x-[-1]" />
+                 </button>
                  <button @click="userZoom = 1.0" class="px-3 h-8 border border-white/10 text-xs font-pixel text-white/20 hover:bg-white/10">RST</button>
-                 <button @click="userZoom += 0.1" class="size-8 border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center">+</button>
+                 <button @click="userZoom += 0.1" class="size-8 border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center">
+                    <Icon icon="game-icons:magnifying-glass" />
+                 </button>
                </div>
             </div>
 
             <div class="flex flex-col gap-1.5">
                <span class="font-pixel text-[10px] text-white/20 uppercase text-center">VELOCIDAD</span>
                <div class="flex gap-1">
-                 <button @click="gameState.isPaused = !gameState.isPaused" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all" :class="gameState.isPaused ? 'bg-neon-pink text-black' : 'text-white/40 hover:bg-white/10'">PAU</button>
+                 <button @click="gameState.isPaused = !gameState.isPaused" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all flex items-center justify-center gap-2" :class="gameState.isPaused ? 'bg-neon-pink text-black' : 'text-white/40 hover:bg-white/10'">
+                    <Icon :icon="gameState.isPaused ? 'game-icons:play-button' : 'game-icons:pause-button'" />
+                 </button>
                  <button @click="gameState.speed = 1; gameState.isPaused = false" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all" :class="gameState.speed === 1 && !gameState.isPaused ? 'bg-neon-cyan text-black' : 'text-white/40 hover:bg-white/10'">x1</button>
-                 <button @click="gameState.speed = 2; gameState.isPaused = false" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all" :class="gameState.speed === 2 && !gameState.isPaused ? 'bg-neon-yellow text-black' : 'text-white/40 hover:bg-white/10'">x2</button>
+                 <button @click="gameState.speed = 2; gameState.isPaused = false" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all flex items-center justify-center gap-2" :class="gameState.speed === 2 && !gameState.isPaused ? 'bg-neon-yellow text-black' : 'text-white/40 hover:bg-white/10'">
+                    <Icon icon="game-icons:fast-forward" />
+                 </button>
                </div>
             </div>
           </div>
@@ -268,8 +287,9 @@
                      class="group relative flex items-center p-3  border border-white/10 transition-all cursor-pointer bg-white/5 hover:border-neon-cyan/40 hover:bg-white/10"
                      :class="{ 'opacity-30 grayscale cursor-not-allowed': gameState.gold < type.cost }"
                    >
-                      <div class="size-10  shrink-0 border border-white/10 relative overflow-hidden mr-4" :style="{ backgroundColor: type.color }">
+                      <div class="size-10  shrink-0 border border-white/10 relative overflow-hidden mr-4 flex items-center justify-center" :style="{ backgroundColor: type.color }">
                          <div class="absolute inset-0 bg-gradient-to-tr from-black/40 to-transparent"></div>
+                         <Icon :icon="type.icon" class="text-white text-xl relative z-10" />
                       </div>
                       <div class="flex-1 min-w-0">
                          <div class="flex justify-between items-baseline mb-0.5">
@@ -326,8 +346,11 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useTowerDefenseStore } from '../../stores/games/towerdefense'
 import { useInventoryStore } from '../../stores/inventory'
+import BaseLoading from '../ui/BaseLoading.vue'
+
 
 const emit = defineEmits(['live-score'])
 const store = useTowerDefenseStore()
@@ -439,12 +462,12 @@ const isPath = (x, y) => gameState.path.some((p) => p.x === x && p.y === y)
 const towers = ref([]); const enemies = ref([]); const projectiles = ref([]); const selectedCell = ref(null); const clickPosition = ref(null)
 
 const towerTypes = {
-  basic: { name: 'Centinela', cost: 30, range: 2.5, damage: 15, cooldownMax: 20, color: '#007aff', desc: 'Defensa Estándar', effect: 'none' },
-  rapid: { name: 'Pulso-X', cost: 60, range: 2, damage: 4, cooldownMax: 4, color: '#f97316', desc: 'Protocolo de Ataque Rápido', effect: 'fast' },
-  sniper: { name: 'Francotirador', cost: 100, range: 5, damage: 60, cooldownMax: 60, color: '#ff2d55', desc: 'Eliminación a Gran Distancia', effect: 'none' },
-  heavy: { name: 'Cañón Nova', cost: 120, range: 2.5, damage: 40, cooldownMax: 45, color: '#a855f7', desc: 'Disruptor de Área', effect: 'splash' },
-  frost: { name: 'Criocentral', cost: 70, range: 2.8, damage: 8, cooldownMax: 28, color: '#00f2ff', desc: 'Bitrate Lento (-20%)', effect: 'slow' },
-  poison: { name: 'Bio-Nodo', cost: 90, range: 3, damage: 10, cooldownMax: 40, color: '#22c55e', desc: 'Corrupción (Daño Continuo)', effect: 'poison' }
+  basic: { name: 'Centinela', cost: 30, range: 2.5, damage: 15, cooldownMax: 20, color: '#007aff', desc: 'Defensa Estándar', effect: 'none', icon: 'game-icons:turret' },
+  rapid: { name: 'Pulso-X', cost: 60, range: 2, damage: 4, cooldownMax: 4, color: '#f97316', desc: 'Protocolo de Ataque Rápido', effect: 'fast', icon: 'game-icons:striking-arrows' },
+  sniper: { name: 'Francotirador', cost: 100, range: 5, damage: 60, cooldownMax: 60, color: '#ff2d55', desc: 'Eliminación a Gran Distancia', effect: 'none', icon: 'game-icons:crosshair' },
+  heavy: { name: 'Cañón Nova', cost: 120, range: 2.5, damage: 40, cooldownMax: 45, color: '#a855f7', desc: 'Disruptor de Área', effect: 'splash', icon: 'game-icons:cannon' },
+  frost: { name: 'Criocentral', cost: 70, range: 2.8, damage: 8, cooldownMax: 28, color: '#00f2ff', desc: 'Bitrate Lento (-20%)', effect: 'slow', icon: 'game-icons:snowflake-1' },
+  poison: { name: 'Bio-Nodo', cost: 90, range: 3, damage: 10, cooldownMax: 40, color: '#22c55e', desc: 'Corrupción (Daño Continuo)', effect: 'poison', icon: 'game-icons:poison-gas' }
 }
 
 const enemyArchetypes = {

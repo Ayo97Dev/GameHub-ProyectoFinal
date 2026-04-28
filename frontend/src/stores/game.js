@@ -13,16 +13,20 @@ export const useGameStore = defineStore('game', () => {
     { slug: 'quiz', title: 'Quiz', description: 'Preguntas rápidas.' },
     { slug: 'connect4', title: 'Conecta 4', description: 'Clásico Conecta 4 contra la IA' },
     { slug: 'proyecto-cortafuegos', title: 'Proyecto Cortafuegos', description: 'Protege la red central contra intrusiones masivas desplegando contramedidas tácticas.' },
+    { slug: 'battleship', title: 'Hunde la Flota', description: 'Estrategia naval clásica: localiza y destruye la flota enemiga.' },
+    { slug: 'chess', title: 'Ajedrez', description: 'El juego de reyes: desafía a la IA en un duelo táctico total.' },
   ]
 
   const DEFAULT_COVERS = {
-    'space-invaders': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
-    'cookie-clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
-    'descenso-al-abismo': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
-    'core-clicker': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
-    'quiz': 'https://images.unsplash.com/photo-1486572788966-cfd3df1f5b42?auto=format&fit=crop&w=1200&q=80',
-    'connect4': 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200&q=80',
-    'proyecto-cortafuegos': 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?auto=format&fit=crop&w=1200&q=80'
+    'space-invaders': '/images/games/wip-quiz.png',
+    'cookie-clicker': '/images/games/wip-quiz.png',
+    'descenso-al-abismo': '/images/games/descenso-al-abismo.png',
+    'core-clicker': '/images/games/core-clicker.png',
+    'quiz': '/images/games/wip-quiz.png',
+    'connect4': '/images/games/connect4.png',
+    'proyecto-cortafuegos': '/images/games/proyecto-cortafuegos.png',
+    'battleship': '/images/games/battleship.png',
+    'chess': '/images/games/chess.png'
   }
 
   function withPresentation(game) {

@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useInventoryStore } from '../stores/inventory'
+import BaseLoading from '../components/ui/BaseLoading.vue'
+
 
 const inventory = useInventoryStore()
 
@@ -50,37 +52,6 @@ const items = [
     icon: 'lucide:bot',
     color: 'neon-cyan'
   },
-  { 
-    id: 'clicker_multiplier', 
-    name: 'Multiplicador x2', 
-    game: 'CoreClicker', 
-    uses: 1, 
-    price: 1.99, 
-    description: 'Duplica permanentemente el valor de tus clics en la sesión actual.', 
-    icon: 'lucide:trending-up',
-    color: 'neon-green'
-  },
-  // RPG
-  { 
-    id: 'rpg_potion', 
-    name: 'Poción de Vida', 
-    game: 'Descenso al Abismo', 
-    uses: 1, 
-    price: 0.50, 
-    description: 'Restaura instantáneamente el 50% de la vitalidad de tu héroe.', 
-    icon: 'lucide:heart',
-    color: 'neon-pink'
-  },
-  { 
-    id: 'rpg_scroll', 
-    name: 'Pergamino Ígneo', 
-    game: 'Descenso al Abismo', 
-    uses: 1, 
-    price: 1.25, 
-    description: 'Lanza una bola de fuego devastadora que calcina a los enemigos cercanos.', 
-    icon: 'lucide:scroll',
-    color: 'neon-yellow'
-  },
   // RPG Classes (Unlockable)
   { 
     id: 'rpg_class_necromancer', 
@@ -125,17 +96,6 @@ const items = [
     icon: 'lucide:dagger',
     color: 'neon-green',
     isUnique: true
-  },
-  // Quiz
-  { 
-    id: 'quiz_hint', 
-    name: 'Pista de IA', 
-    game: 'Quiz', 
-    uses: 2, 
-    price: 0.75, 
-    description: 'Elimina dos respuestas incorrectas de la pregunta actual.', 
-    icon: 'lucide:lightbulb',
-    color: 'neon-cyan'
   }
 ]
 
@@ -378,17 +338,13 @@ const checkout = async (method) => {
         </div>
 
         <!-- PROCESSING OVERLAY -->
-        <div v-if="isProcessing" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md">
-          <div class="flex flex-col items-center p-12 bg-black border-4 border-neon-cyan shadow-[0_0_100px_rgba(0,242,255,0.2)]">
-            <div class="size-20 border-4 border-neon-cyan border-t-transparent animate-spin mb-8"></div>
-            <p class="font-pixel text-neon-cyan text-xl animate-pulse tracking-[0.4em] uppercase">Procesando pago...</p>
-            <p v-if="selectedMethod" class="font-sans text-xs text-white/60 mt-2 uppercase tracking-widest">Via {{ selectedMethod.name }}</p>
-            <div class="w-64 h-2 bg-retro-dark mt-8 overflow-hidden border border-white/10">
-               <div class="h-full bg-neon-cyan animate-[loading_2s_ease-in-out_infinite]"></div>
-            </div>
-            <p class="font-sans text-[10px] text-white/30 mt-4 uppercase tracking-[0.2em]">Encriptando datos de transferencia...</p>
-          </div>
-        </div>
+        <BaseLoading 
+          v-if="isProcessing" 
+          full-screen
+          message="Procesando pago..."
+          :submessage="`Transacción vía ${selectedMethod?.name || 'Sistema'}`"
+        />
+
 
         <!-- SUCCESS TOAST -->
         <Transition name="bounce">

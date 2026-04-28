@@ -77,6 +77,28 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        $battleship = Game::firstOrCreate(['slug' => 'battleship'], [
+            'title' => 'Battleship',
+            'category' => 'PUZZLE',
+            'description' => 'Estrategia naval clásica. Encuentra y hunde la flota enemiga.',
+            'is_active' => true,
+            'config' => [
+                'allowed_actions' => [],
+                'rate_limit_per_minute' => 60,
+            ],
+        ]);
+
+        $chess = Game::firstOrCreate(['slug' => 'chess'], [
+            'title' => 'Ajedrez',
+            'category' => 'PUZZLE',
+            'description' => 'El juego de mesa más famoso del mundo. Jaque mate a la IA.',
+            'is_active' => true,
+            'config' => [
+                'allowed_actions' => [],
+                'rate_limit_per_minute' => 60,
+            ],
+        ]);
+
         // Achievements globales
         $achievementsData = [
             // ── Puntuación ──────────────────────────────────────────────────────
@@ -178,6 +200,16 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'rpg-level-40',  'title' => 'Eternidad Alcanzada',   'description' => 'Alcanza el nivel 40.',       'game_id' => $rpg->id, 'points_reward' => 400, 'rarity' => 'legendary', 'condition' => ['field' => 'level', 'operator' => 'greater_than_or_equal', 'value' => 40]],
             ['slug' => 'rpg-boss-7',    'title' => 'Aniquilador de Mitos',  'description' => 'Derrota a 7 jefes.',         'game_id' => $rpg->id, 'points_reward' => 500, 'rarity' => 'legendary', 'condition' => ['field' => 'bosses_defeated', 'operator' => 'greater_than_or_equal', 'value' => 7]],
             ['slug' => 'rpg-boss-10',   'title' => 'Fin de los Tiempos',    'description' => 'Derrota a 10 jefes.',        'game_id' => $rpg->id, 'points_reward' => 1000, 'rarity' => 'legendary', 'condition' => ['field' => 'bosses_defeated', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+
+            // ── Battleship: Victorias ─────────────────────────────────────────
+            ['slug' => 'battleship-wins-1',  'title' => 'Bautismo de Fuego',       'description' => 'Gana 1 partida de Battleship.',              'game_id' => $battleship->id, 'points_reward' => 20,  'rarity' => 'common',    'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 1]],
+            ['slug' => 'battleship-wins-5',  'title' => 'Comodoro',                'description' => 'Gana 5 partidas de Battleship.',              'game_id' => $battleship->id, 'points_reward' => 60,  'rarity' => 'uncommon',  'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 5]],
+            ['slug' => 'battleship-wins-10', 'title' => 'Almirante de la Flota',   'description' => 'Gana 10 partidas de Battleship.',             'game_id' => $battleship->id, 'points_reward' => 150, 'rarity' => 'rare',      'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+
+            // ── Chess: Victorias ──────────────────────────────────────────────
+            ['slug' => 'chess-wins-1',       'title' => 'Mate de Pastor',          'description' => 'Gana 1 partida de Ajedrez.',                 'game_id' => $chess->id,      'points_reward' => 20,  'rarity' => 'common',    'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 1]],
+            ['slug' => 'chess-wins-5',       'title' => 'Maestría Táctica',        'description' => 'Gana 5 partidas de Ajedrez.',                 'game_id' => $chess->id,      'points_reward' => 100, 'rarity' => 'uncommon',  'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 5]],
+            ['slug' => 'chess-wins-10',      'title' => 'Gran Maestro',            'description' => 'Gana 10 partidas de Ajedrez.',                'game_id' => $chess->id,      'points_reward' => 250, 'rarity' => 'rare',      'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 10]],
 
             // ── Global ───────────────────────────────────────────────────────
             ['slug' => 'speed-runner',       'title' => 'Speed Runner',             'description' => 'Completa una sesión en menos de 60 segundos.', 'game_id' => null,       'points_reward' => 75,  'rarity' => 'epic',      'condition' => ['field' => 'duration', 'operator' => 'less_than_or_equal', 'value' => 60]],

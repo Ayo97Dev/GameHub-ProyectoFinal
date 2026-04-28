@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useLeaderboardStore } from '../stores/leaderboard'
 import { useGameStore } from '../stores/game'
+import BaseLoading from '../components/ui/BaseLoading.vue'
+
 
 const leaderboardStore = useLeaderboardStore()
 const gameStore = useGameStore()
@@ -65,10 +67,12 @@ onMounted(async () => {
       </div>
     </header>
 
-    <div v-if="isLoading" class="flex flex-col items-center justify-center py-24 gh-panel bg-black/40">
-      <Icon icon="lucide:loader-2" class="text-6xl text-neon-yellow animate-spin mb-4" />
-      <p class="font-pixel text-2xl text-neon-yellow uppercase blink tracking-widest">Cargando datos...</p>
-    </div>
+    <BaseLoading 
+      v-if="isLoading" 
+      message="Cargando datos..." 
+      submessage="Recuperando telemetría global de la red" 
+    />
+
 
     <div v-else-if="entries.length === 0" class="gh-panel p-16 text-center bg-black border-4 border-dashed border-white/10">
       <Icon icon="lucide:database-zap" class="text-6xl text-white/10 mx-auto mb-4" />

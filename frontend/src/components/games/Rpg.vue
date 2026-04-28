@@ -65,7 +65,7 @@
           >
             <div class="absolute inset-0 bg-[#8c2d1f] rounded-full shadow-[0_4px_12px_rgba(0,0,0,1)] border-4 border-[#5c1a11] group-hover:bg-[#a63626] transition-colors"></div>
             <div class="absolute inset-1.5 border-2 border-dashed border-black/30 rounded-full"></div>
-            <Icon icon="lucide:skull" class="relative z-10 text-black text-2xl pointer-events-none" />
+            <Icon icon="game-icons:death-skull" class="relative z-10 text-black text-2xl pointer-events-none" />
           </button>
 
           <!-- Main Parchment Frame -->
@@ -94,7 +94,7 @@
             <header class="relative z-[60] p-4 sm:p-5 pr-48 lg:pr-64 flex flex-col md:flex-row items-center justify-between gap-6 border-b-4 border-double border-[#3c2a1a] bg-black/40 backdrop-blur-sm">
               <div class="flex items-center gap-6">
                 <div class="size-14 bg-[#0a0a0a] flex items-center justify-center text-[#8c2d1f] text-3xl border-4 border-[#3c2a1a] shadow-2xl iron-shadow transform -rotate-3">
-                  <Icon icon="lucide:swords" />
+                  <Icon icon="game-icons:crossed-swords" />
                 </div>
                 <div>
                   <h2 class="font-fantasy text-2xl text-[#b8a38a] uppercase tracking-wide drop-shadow-md">Descenso al Abismo</h2>
@@ -140,7 +140,7 @@
                       ? 'bg-white border-white shadow-[0_0_15px_rgba(255,255,255,0.8)] scale-125'
                       : (idx < run.roomInFloor ? 'bg-[#8c2d1f] border-[#5c1a11] shadow-[0_0_8px_rgba(140,45,31,0.4)]' : 'bg-black/80 border-[#3c2a1a]')"
                   >
-                    <Icon v-if="idx === 3" :icon="run.floor % 10 === 0 ? 'lucide:skull' : 'lucide:door-open'" class="text-[8px]" :class="idx <= run.roomInFloor ? 'text-black' : 'text-[#3c2a1a]'" />
+                    <Icon v-if="idx === 3" :icon="run.floor % 10 === 0 ? 'game-icons:death-skull' : 'game-icons:doorway'" class="text-[8px]" :class="idx <= run.roomInFloor ? 'text-black' : 'text-[#3c2a1a]'" />
                   </div>
                 </div>
                 
@@ -178,7 +178,7 @@
                       <div class="flex flex-col items-end">
                         <span class="text-[10px] text-[#8c2d1f] font-fantasy uppercase px-2 py-0.5 bg-black border border-[#8c2d1f]/30">{{ c.role }}</span>
                         <span v-if="!unlockedClasses.includes(c.id)" class="text-[9px] text-amber-500 font-fantasy mt-1 flex items-center gap-1">
-                          <Icon icon="lucide:lock" class="size-3" /> Tienda Global
+                          <Icon icon="game-icons:padlock" class="size-3" /> Tienda Global
                         </span>
                       </div>
                     </div>
@@ -243,7 +243,7 @@
                               class="size-48 sm:size-60 bg-[#0a0a0a] border-[8px] border-double border-[#3c2a1a] flex items-center justify-center transition-all duration-700 transform relative z-10 overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,1)]"
                               :class="{ 'border-[#b8a38a]/30 shadow-[0_0_40px_rgba(184,163,138,0.1),inset_0_0_40px_rgba(0,0,0,1)]': turn === 'hero' && phase === 'combat' }"
                             >
-                               <Icon icon="lucide:shield-check" class="size-36 text-[#b8a38a]/20 drop-shadow-md" />
+                               <Icon icon="game-icons:shield-echoes" class="size-36 text-[#b8a38a]/20 drop-shadow-md" />
                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             </div>
                             <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 px-8 py-2 bg-[#1a1a1a] text-[#b8a38a] font-fantasy text-xs uppercase tracking-[0.3em] shadow-2xl border-2 border-[#3c2a1a] z-20">{{ hero.className }}</div>
@@ -332,7 +332,7 @@
                               class="size-48 sm:size-60 bg-black/80 border-[8px] border-double border-red-950/40 flex items-center justify-center transition-all duration-700 transform relative z-10 shadow-[inset_0_0_50px_rgba(0,0,0,1)]"
                               :class="{ 'border-red-900 shadow-[0_0_40px_rgba(153,27,27,0.1),inset_0_0_50px_rgba(0,0,0,1)]': turn === 'enemy' && phase === 'combat' }"
                             >
-                               <Icon icon="lucide:skull" class="size-36 text-red-950/10" />
+                               <Icon icon="game-icons:death-skull" class="size-36 text-red-950/10" />
                             </div>
                             <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 px-8 py-2 bg-[#1a0505] text-red-700 font-fantasy text-xs uppercase tracking-[0.3em] shadow-2xl border-2 border-red-950 z-20">{{ enemy.name }}</div>
 
@@ -463,8 +463,8 @@
                   <div class="grid grid-cols-3 gap-2">
                     <div 
                       v-for="(item, idx) in 6" :key="idx"
-                      class="aspect-square border-2 border-[#3c2a1a] bg-black/40 flex items-center justify-center group relative overflow-visible"
-                      :class="{ 'hover:border-[#8c2d1f] cursor-pointer': hero?.inventory[idx] }"
+                      class="aspect-square border-2 bg-black/40 flex items-center justify-center group relative overflow-visible transition-all duration-300"
+                      :class="hero?.inventory[idx] ? getRarityColor(hero.inventory[idx].rarity) : 'border-[#3c2a1a] opacity-40'"
                       @click="hero?.inventory[idx] && useItem(idx)"
                     >
                       <template v-if="hero?.inventory[idx]">
@@ -515,7 +515,7 @@
                 >
                   <span class="relative z-10 font-fantasy text-[#b8a38a]/30 text-[10px] uppercase tracking-[0.4em]">Botín Arcano</span>
                   <div class="relative z-10 flex items-center gap-3">
-                    <Icon icon="lucide:coins" class="text-[#b8a38a] text-2xl" :class="{ 'animate-bounce text-amber-500': goldFlash }" />
+                    <Icon icon="game-icons:coins" class="text-[#b8a38a] text-2xl" :class="{ 'animate-bounce text-amber-500': goldFlash }" />
                     <span class="font-fantasy text-[#b8a38a] text-2xl tracking-tighter">{{ run.gold }}</span>
                   </div>
                 </div>
@@ -565,7 +565,7 @@
                 
                 <div class="relative z-10 space-y-6">
                   <div class="size-24 bg-red-950/20 mx-auto rounded-full flex items-center justify-center text-5xl text-red-700 border-4 border-red-900 shadow-[0_0_50px_rgba(140,45,31,0.5)]">
-                    <Icon icon="lucide:skull" />
+                    <Icon icon="game-icons:death-skull" />
                   </div>
                   <h3 class="text-5xl font-fantasy text-red-700 uppercase tracking-[0.5em] leading-tight">La Oscuridad te ha Reclamado</h3>
 <p class="text-[#b8a38a]/40 font-serif italic text-lg leading-relaxed max-w-lg mx-auto">
@@ -595,7 +595,7 @@
               <div class="max-w-4xl w-full bg-[#1a1714] border-[10px] border-double border-[#3c2a1a] p-8 md:p-12 text-center space-y-8 relative">
                 <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] pointer-events-none"></div>
                 <div class="flex items-center justify-center gap-4 mb-4">
-                   <Icon icon="lucide:store" class="text-4xl text-amber-600" />
+                   <Icon icon="game-icons:shop" class="text-4xl text-amber-600" />
                    <h3 class="text-4xl font-fantasy text-[#b8a38a] uppercase tracking-[0.3em]">Mercader Errante</h3>
                 </div>
                 <p class="text-[#b8a38a]/60 font-serif italic text-lg leading-relaxed">"Mis mercancías son raras, mis precios... justos para quien valora su vida."</p>
@@ -604,7 +604,11 @@
                   <div 
                     v-for="(item, idx) in shopItems" 
                     :key="idx"
-                    class="group relative p-6 bg-[#0a0a0a] border-2 border-[#3c2a1a] hover:border-amber-600 transition-all flex flex-col items-center gap-4"
+                    class="group relative p-6 bg-[#0a0a0a] border-4 transition-all flex flex-col items-center gap-4"
+                    :class="[
+                      getRarityColor(item.rarity),
+                      run.gold < item.price ? 'opacity-40 grayscale' : 'hover:scale-[1.02] cursor-pointer'
+                    ]"
                   >
                     <Icon :icon="getItemIcon(item)" class="text-4xl text-[#b8a38a] group-hover:scale-110 transition-transform" />
                     <div>
@@ -613,7 +617,7 @@
                     </div>
                     <div class="mt-auto pt-4 border-t border-[#3c2a1a] w-full flex flex-col gap-3">
                       <div class="flex items-center justify-center gap-2 text-amber-500 font-fantasy text-lg">
-                        <Icon icon="lucide:coins" />
+                        <Icon icon="game-icons:coins" />
                         <span>{{ item.price }}</span>
                       </div>
                       <button 
@@ -645,7 +649,7 @@
                   <!-- Visual Decoration -->
                   <div class="absolute inset-0 bg-amber-600/5 blur-[120px] rounded-full animate-pulse-slow"></div>
                   <div class="absolute -top-12 left-1/2 -translate-x-1/2 size-24 bg-[#0a0a0a] border-4 border-amber-600 rounded-full flex items-center justify-center text-5xl text-amber-500 shadow-[0_0_50px_rgba(245,158,11,0.3)]">
-                    <Icon icon="lucide:trophy" />
+                    <Icon icon="game-icons:trophy" />
                   </div>
 
                   <div class="space-y-4 pt-6">
@@ -665,10 +669,10 @@
                       <p class="text-2xl text-blue-500 font-fantasy">+{{ bossRewards.xp }}</p>
                     </div>
                     <div v-if="bossRewards.item" class="col-span-2 pt-4 border-t border-amber-900/20">
-                      <p class="text-[10px] text-purple-500/40 uppercase font-fantasy mb-2">Reliquia Divina Hallada</p>
-                      <div class="flex items-center justify-center gap-3 text-purple-400">
-                        <Icon :icon="getItemIcon(bossRewards.item)" class="text-2xl" />
-                        <span class="font-fantasy text-lg uppercase">{{ bossRewards.item.name }}</span>
+                      <p class="text-[10px] uppercase font-fantasy mb-3" :class="getRarityColor(bossRewards.item.rarity)">{{ bossRewards.item.rarity === 'legendary' ? 'Reliquia Divina Hallada' : 'Botín Épico Obtenido' }}</p>
+                      <div class="flex items-center justify-center gap-4 p-4 border-2 bg-black/60 shadow-2xl" :class="getRarityColor(bossRewards.item.rarity)">
+                        <Icon :icon="getItemIcon(bossRewards.item)" class="text-3xl" />
+                        <span class="font-fantasy text-xl uppercase tracking-widest">{{ bossRewards.item.name }}</span>
                       </div>
                     </div>
                   </div>
@@ -967,7 +971,7 @@ function getPathTitle(t) {
   return { combat: 'Conflicto', camp: 'Refugio', treasure: 'Botín', event: 'Misterio', shop: 'Mercader' }[t]
 }
 function getPathIcon(t) {
-  return { combat: 'lucide:swords', camp: 'lucide:tent', treasure: 'lucide:package', event: 'lucide:help-circle', shop: 'lucide:store' }[t]
+  return { combat: 'game-icons:crossed-swords', camp: 'game-icons:campfire', treasure: 'game-icons:open-treasure-chest', event: 'game-icons:star-swirl', shop: 'game-icons:shop' }[t]
 }
 function getPathDesc(t) {
   return { 
@@ -1044,10 +1048,10 @@ function getStatusTitle(id) {
 }
 function getStatusIcon(id) {
   return { 
-    bleed: 'lucide:droplet', poison: 'lucide:skull', stun: 'lucide:zap', 
-    weakness: 'lucide:trending-down', vulnerability: 'lucide:shield-off', burn: 'lucide:flame',
-    regeneration: 'lucide:heart-pulse', might: 'lucide:swords', shield: 'lucide:shield', 
-    haste: 'lucide:wind', ward: 'lucide:sparkles'
+    bleed: 'game-icons:bleeding-wound', poison: 'game-icons:poison-gas', stun: 'game-icons:lightning-arc', 
+    weakness: 'game-icons:kneeling', vulnerability: 'game-icons:broken-shield', burn: 'game-icons:flame',
+    regeneration: 'game-icons:heart-beats', might: 'game-icons:crossed-swords', shield: 'game-icons:shield', 
+    haste: 'game-icons:whirlwind', ward: 'game-icons:magic-swirl'
   }[id]
 }
 function getStatusColor(id) {
@@ -1069,21 +1073,21 @@ function canUseSkill(s) {
 function skillCooldownRemaining(unit, sid) { return unit?.skillCooldowns?.[sid] || 0 }
 
 function getItemIcon(item) {
-  if (item.type === 'potion') return 'lucide:beaker'
-  if (item.type === 'weapon') return 'lucide:swords'
-  if (item.type === 'armor') return 'lucide:shield'
-  if (item.type === 'scroll') return 'lucide:scroll'
-  return 'lucide:gem'
+  if (item.type === 'potion') return 'game-icons:health-potion'
+  if (item.type === 'weapon') return 'game-icons:broadsword'
+  if (item.type === 'armor') return 'game-icons:breastplate'
+  if (item.type === 'scroll') return 'game-icons:scroll-unfurled'
+  return 'game-icons:crystal-cluster'
 }
 
 function getRarityColor(rarity) {
   switch (rarity) {
-    case 'common': return 'text-slate-400 border-slate-400/30'
-    case 'uncommon': return 'text-green-500 border-green-500/30'
-    case 'rare': return 'text-blue-500 border-blue-500/30'
-    case 'epic': return 'text-purple-500 border-purple-500/30'
-    case 'legendary': return 'text-amber-500 border-amber-500/30'
-    default: return 'text-slate-400'
+    case 'common': return 'text-slate-400 border-slate-500/30'
+    case 'uncommon': return 'text-green-500 border-green-600/40 shadow-[inset_0_0_10px_rgba(34,197,94,0.1)]'
+    case 'rare': return 'text-blue-500 border-blue-600/50 shadow-[inset_0_0_15px_rgba(59,130,246,0.15)]'
+    case 'epic': return 'text-purple-500 border-purple-600/60 shadow-[inset_0_0_20px_rgba(168,85,247,0.2)]'
+    case 'legendary': return 'text-amber-500 border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.2),inset_0_0_25px_rgba(245,158,11,0.3)] animate-pulse-rarity'
+    default: return 'text-slate-400 border-[#3c2a1a]'
   }
 }
 
@@ -1616,4 +1620,10 @@ onMounted(() => {
 .iron-shadow {
   box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 4px 4px 8px rgba(0,0,0,0.4);
 }
+
+@keyframes pulse-rarity {
+  0%, 100% { border-color: rgba(245, 158, 11, 0.6); box-shadow: 0 0 10px rgba(245, 158, 11, 0.1), inset 0 0 15px rgba(245, 158, 11, 0.2); }
+  50% { border-color: rgba(245, 158, 11, 1); box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), inset 0 0 25px rgba(245, 158, 11, 0.4); }
+}
+.animate-pulse-rarity { animation: pulse-rarity 2s infinite ease-in-out; }
 </style>

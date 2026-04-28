@@ -3,6 +3,9 @@ import { reactive, ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import BaseButton from '../components/ui/BaseButton.vue'
 import { useAuthStore } from '../stores/auth'
+import { Icon } from '@iconify/vue'
+import BaseLoading from '../components/ui/BaseLoading.vue'
+
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -39,7 +42,15 @@ async function submitRegister() {
     <div class="gh-panel relative w-full max-w-md p-6 sm:p-10 border-[4px] border-neon-pink shadow-[8px_8px_0px_#000] bg-black">
       <div class="gh-scanlines absolute inset-0 opacity-20 pointer-events-none"></div>
 
+      <BaseLoading 
+        v-if="isLoading" 
+        full-screen 
+        message="REGISTRANDO..." 
+        submessage="Creando nueva identidad en la red" 
+      />
+
       <p class="relative z-10 font-pixel text-[10px] font-bold uppercase tracking-widest text-neon-yellow mb-2 border-b-2 border-neon-pink pb-1 inline-block">Nuevo usuario</p>
+
       <h1 class="relative z-10 mt-2 text-4xl font-display font-black uppercase tracking-widest text-retro-white">Crear cuenta</h1>
       
       <div v-if="errorMsg" class="relative z-10 mt-6 border-[3px] border-neon-pink bg-black p-3 font-pixel text-xs text-neon-pink uppercase blink shadow-[4px_4px_0px_#000]">
@@ -64,7 +75,8 @@ async function submitRegister() {
           <input v-model="form.password_confirmation" type="password" required class="w-full border-4 border-neon-pink bg-retro-dark px-4 py-3 font-sans font-bold text-retro-white outline-none transition focus:shadow-[inset_4px_4px_0px_#f472b6]" />
         </div>
         <BaseButton variant="danger" type="submit" class="w-full mt-4 py-4 text-xl">
-          <Icon :icon="isLoading ? 'lucide:loader-2' : 'lucide:user-plus'" class="mr-2" :class="{ 'animate-spin': isLoading }" />
+          <Icon :icon="isLoading ? 'svg-spinners:ring-resize' : 'lucide:user-plus'" class="mr-2" />
+
           {{ isLoading ? 'Procesando...' : 'Registrar datos' }}
         </BaseButton>
       </form>

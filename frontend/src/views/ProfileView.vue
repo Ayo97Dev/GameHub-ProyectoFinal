@@ -8,6 +8,8 @@ import { useGameStore } from '../stores/game'
 import { useLeaderboardStore } from '../stores/leaderboard'
 import api from '../lib/axios'
 import BaseButton from '../components/ui/BaseButton.vue'
+import BaseLoading from '../components/ui/BaseLoading.vue'
+
 
 const authStore = useAuthStore()
 const achievementStore = useAchievementStore()
@@ -182,10 +184,12 @@ const RARITY_BADGE = {
 
 <template>
   <section class="mx-auto w-full max-w-7xl px-4 py-10 min-h-screen">
-    <div v-if="isLoading" class="flex flex-col items-center justify-center py-40 gap-6">
-       <div class="size-16 border-4 border-neon-cyan border-t-transparent animate-spin"></div>
-       <p class="font-pixel text-xl text-neon-cyan uppercase blink tracking-[0.4em]">Sincronizando Perfil...</p>
-    </div>
+    <BaseLoading 
+      v-if="isLoading" 
+      message="Sincronizando Perfil..." 
+      submessage="Estableciendo conexión segura con la red central" 
+    />
+
 
     <template v-else-if="authStore.user">
       
@@ -392,7 +396,8 @@ const RARITY_BADGE = {
                      <textarea v-model="settingsForm.bio" rows="4" class="w-full bg-retro-dark border-2 border-white/10 p-3 font-sans font-bold text-white outline-none focus:border-neon-cyan transition-all uppercase resize-none" placeholder="Escribe algo sobre ti..."></textarea>
                   </div>
                   <BaseButton type="submit" :disabled="isUpdatingProfile" class="w-full">
-                     <Icon v-if="isUpdatingProfile" icon="lucide:loader-2" class="animate-spin mr-2" />
+                     <Icon v-if="isUpdatingProfile" icon="svg-spinners:ring-resize" class="mr-2" />
+
                      Guardar Cambios
                   </BaseButton>
                </div>
@@ -420,7 +425,8 @@ const RARITY_BADGE = {
                </div>
                <div class="flex justify-end">
                   <BaseButton type="submit" variant="danger" :disabled="isUpdatingPassword">
-                     <Icon v-if="isUpdatingPassword" icon="lucide:loader-2" class="animate-spin mr-2" />
+                     <Icon v-if="isUpdatingPassword" icon="svg-spinners:ring-resize" class="mr-2" />
+
                      Actualizar Seguridad
                   </BaseButton>
                </div>
@@ -450,7 +456,8 @@ const RARITY_BADGE = {
               Cancelar
             </BaseButton>
             <BaseButton variant="danger" @click="executeReset" :disabled="isResetting" class="flex-1">
-              <Icon v-if="isResetting" icon="lucide:loader-2" class="animate-spin mr-2" />
+              <Icon v-if="isResetting" icon="svg-spinners:ring-resize" class="mr-2" />
+
               {{ isResetting ? 'Borrando...' : 'Confirmar' }}
             </BaseButton>
           </div>

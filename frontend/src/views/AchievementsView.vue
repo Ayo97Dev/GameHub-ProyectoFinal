@@ -3,6 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useAchievementStore } from '../stores/achievement'
 import { useGameStore } from '../stores/game'
+import BaseLoading from '../components/ui/BaseLoading.vue'
+
 
 const achievementStore = useAchievementStore()
 const gameStore = useGameStore()
@@ -119,10 +121,12 @@ onMounted(() => {
       </div>
     </div>
 
-    <div v-if="achievementStore.isLoading && achievementStore.achievements.length === 0" class="flex flex-col items-center justify-center py-24 gh-panel bg-black/40">
-      <Icon icon="lucide:loader-2" class="text-6xl text-neon-pink animate-spin mb-4" />
-      <p class="font-pixel text-2xl text-neon-pink uppercase blink tracking-widest">Cargando registros...</p>
-    </div>
+    <BaseLoading 
+      v-if="achievementStore.isLoading && achievementStore.achievements.length === 0" 
+      message="Cargando registros..." 
+      submessage="Sincronizando hitos de la cuenta" 
+    />
+
 
     <div v-else class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       <article

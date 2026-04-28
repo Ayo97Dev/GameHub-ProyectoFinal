@@ -60,7 +60,9 @@ GameHub presenta una variedad de experiencias con dos sistemas de diseño distin
 2.  **Descenso al Abismo**: RPG de mazmorras.
 3.  **Proyecto Cortafuegos**: Tower Defense táctico.
 4.  **Connect 4**: Puzzle clásico.
-5.  **Quiz**: Trivia (Sin hacer).
+5.  **Battleship**: hundir la flota.
+6.  **Chess**: Ajedrez.
+7.  **Quiz**: Trivia (Sin hacer).
 
 ---
 

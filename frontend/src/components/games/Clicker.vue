@@ -3,6 +3,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useClickerStore } from '../../stores/games/clicker'
 import { useInventoryStore } from '../../stores/inventory'
 import { Icon } from '@iconify/vue'
+import BaseLoading from '../ui/BaseLoading.vue'
+
 
 const emit = defineEmits(['live-score'])
 
@@ -10,18 +12,18 @@ const clicker = useClickerStore()
 const inventory = useInventoryStore()
 
 const UPGRADES = [
-  { id: 1,  name: 'AUTO_CLICK.BAT',   description: '+0.1 DPS',         icon: 'lucide:bot', tier: 1, type: 'dps'   },
-  { id: 2,  name: 'FAST_FINGERS.EXE', description: '+1 clic',          icon: 'lucide:hand', tier: 1, type: 'click' },
-  { id: 3,  name: 'CLICK_BOT_v1',     description: '+2 DPS',           icon: 'lucide:cpu', tier: 1, type: 'dps'   },
-  { id: 4,  name: 'AGILE_HANDS.DLL',  description: '+4 clic',          icon: 'lucide:mouse-pointer-2', tier: 1, type: 'click' },
-  { id: 5,  name: 'TURBO_ENGINE.SYS', description: '+20 DPS',          icon: 'lucide:rocket', tier: 2, type: 'dps'   },
-  { id: 6,  name: 'POWER_GLOVE.CFG',  description: '+25 clic',         icon: 'lucide:zap', tier: 2, type: 'click' },
-  { id: 7,  name: 'NEURAL_NET.BIN',   description: '+200 DPS',         icon: 'lucide:brain', tier: 2, type: 'dps'   },
-  { id: 8,  name: 'TURBO_REFLEX.SO',  description: '+100 clic',        icon: 'lucide:activity', tier: 2, type: 'click' },
-  { id: 9,  name: 'QUANTUM_DRIVE',    description: '+800 DPS',         icon: 'lucide:atom', tier: 3, type: 'dps'   },
-  { id: 10, name: 'DARK_PULSE',       description: '+600 clic',        icon: 'lucide:moon', tier: 3, type: 'click' },
-  { id: 11, name: 'UNIV_CORE.INF',    description: '+6.000 DPS',       icon: 'lucide:sun', tier: 3, type: 'dps'   },
-  { id: 12, name: 'COSMIC_HAND',      description: '+2.500 clic',      icon: 'lucide:sparkles', tier: 3, type: 'click' },
+  { id: 1,  name: 'CLICK_AUTOMÁTICO.BAT', description: '+0.1 DPS',         icon: 'game-icons:robot-grab', tier: 1, type: 'dps'   },
+  { id: 2,  name: 'DEDOS_RÁPIDOS.EXE',    description: '+1 por clic',      icon: 'game-icons:palm', tier: 1, type: 'click' },
+  { id: 3,  name: 'BOT_DE_CLICK_v1',      description: '+2 DPS',           icon: 'game-icons:processor', tier: 1, type: 'dps'   },
+  { id: 4,  name: 'MANOS_ÁGILES.DLL',     description: '+4 por clic',      icon: 'game-icons:hand-wing', tier: 1, type: 'click' },
+  { id: 5,  name: 'MOTOR_TURBO.SYS',      description: '+20 DPS',          icon: 'game-icons:rocket', tier: 2, type: 'dps'   },
+  { id: 6,  name: 'GUANTE_DE_PODER.CFG',  description: '+25 por clic',     icon: 'game-icons:metal-hand', tier: 2, type: 'click' },
+  { id: 7,  name: 'RED_NEURAL.BIN',       description: '+200 DPS',         icon: 'game-icons:brain', tier: 2, type: 'dps'   },
+  { id: 8,  name: 'REFLEJO_TURBO.SO',     description: '+100 por clic',    icon: 'game-icons:heart-beats', tier: 2, type: 'click' },
+  { id: 9,  name: 'IMPULSOR_CUÁNTICO',    description: '+800 DPS',         icon: 'game-icons:atomic-slashes', tier: 3, type: 'dps'   },
+  { id: 10, name: 'PULSO_OSCURO',         description: '+600 por clic',    icon: 'game-icons:psychic-waves', tier: 3, type: 'click' },
+  { id: 11, name: 'NÚCLEO_UNIVERSAL.INF', description: '+6.000 DPS',       icon: 'game-icons:atom-core', tier: 3, type: 'dps'   },
+  { id: 12, name: 'MANO_CÓSMICA',         description: '+2.500 por clic',  icon: 'game-icons:sparkles', tier: 3, type: 'click' },
 ]
 
 const TIERS = [
@@ -188,12 +190,12 @@ function toggleTier(tierId) {
     <!-- Cinematic Background Glows -->
     <div class="absolute top-1/2 left-1/4 -translate-1/2 size-[600px] bg-neon-cyan/5 blur-[150px] rounded-full pointer-events-none"></div>
 
-    <template v-if="clicker.isLoading">
-        <div class="flex-1 flex flex-col items-center justify-center relative z-20">
-            <div class="size-16 border-b-2 border-neon-cyan rounded-full animate-spin mb-6"></div>
-            <p class="font-pixel text-neon-cyan text-lg animate-pulse tracking-[0.4em]">CONECTANDO_NUCLEO...</p>
-        </div>
-    </template>
+    <BaseLoading 
+      v-if="clicker.isLoading" 
+      message="CONECTANDO_NÚCLEO..." 
+      submessage="Sincronizando flujo de datos" 
+    />
+
 
     <template v-else>
       <!-- HEADER HUD: Unified Sleek Bar -->
@@ -338,15 +340,15 @@ function toggleTier(tierId) {
                    class="w-full py-5 rounded-[10px] bg-black/60 border border-white/5 flex flex-col items-center justify-center transition-all group"
                    :class="clicker.balance >= clicker.prestigeRequiredBalance ? 'hover:bg-gradient-to-r hover:from-neon-pink hover:to-neon-fuchsia border-transparent hover:scale-[1.02] shadow-[0_0_30px_rgba(255,45,85,0.3)]' : 'opacity-60 grayscale cursor-not-allowed'"
                  >
-                    <span class="font-display text-base font-black text-white uppercase tracking-widest group-hover:text-white transition-colors" :class="clicker.balance >= clicker.prestigeRequiredBalance ? 'text-neon-pink' : ''">REINICIO_SISTEMA</span>
+                    <span class="font-display text-base font-black text-white uppercase tracking-widest group-hover:text-white transition-colors" :class="clicker.balance >= clicker.prestigeRequiredBalance ? 'text-neon-pink' : ''">REINICIO_DEL_SISTEMA</span>
                     <span class="font-pixel text-xs mt-1 text-white/50 uppercase tracking-[0.2em] group-hover:text-white/90">CLAVE: {{ formatNumber(clicker.prestigeRequiredBalance) }} CR</span>
                  </button>
               </div>
            </div>
 
            <div class="p-4 sm:p-6 border-b border-white/5 bg-black/20 flex justify-between items-center shrink-0">
-              <h3 class="font-display text-sm font-black text-white uppercase tracking-widest">MODULOS_SISTEMA</h3>
-              <p class="font-pixel text-xs text-white/40 uppercase tracking-widest hidden sm:block">TIEMPO_SESION: {{ formatSessionDuration(sessionElapsedSeconds) }}</p>
+              <h3 class="font-display text-sm font-black text-white uppercase tracking-widest">MÓDULOS_DEL_SISTEMA</h3>
+              <p class="font-pixel text-xs text-white/40 uppercase tracking-widest hidden sm:block">TIEMPO_DE_SESIÓN: {{ formatSessionDuration(sessionElapsedSeconds) }}</p>
            </div>
 
            <!-- Scrollable Dropdown/Accordion Area -->
@@ -433,10 +435,10 @@ function toggleTier(tierId) {
           <div v-for="toast in toastQueue" :key="toast.id" class="gh-glass p-5 bg-black/80 border-neon-cyan/50 pointer-events-auto">
              <div class="flex items-center gap-3 mb-3">
                 <div class="size-8  bg-neon-cyan/10 flex items-center justify-center text-neon-cyan">
-                   <Icon icon="lucide:trophy" />
+                   <Icon icon="game-icons:trophy" />
                 </div>
                 <div class="flex-1">
-                   <p class="font-pixel text-xs uppercase tracking-[0.2em] opacity-40">ACHIEVEMENT</p>
+                   <p class="font-pixel text-xs uppercase tracking-[0.2em] opacity-40">LOGRO_DESBLOQUEADO</p>
                    <h4 class="font-display text-xs font-black text-white uppercase">{{ toast.title }}</h4>
                 </div>
              </div>
