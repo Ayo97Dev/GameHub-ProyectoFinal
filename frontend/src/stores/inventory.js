@@ -7,14 +7,6 @@ export const useInventoryStore = defineStore('inventory', () => {
   const auth = useAuthStore()
   
   const getInitialItems = () => {
-    const saved = localStorage.getItem('gamehub_inventory')
-    if (saved) {
-      try {
-        return JSON.parse(saved)
-      } catch (e) {
-        console.error('Failed to parse inventory from localStorage', e)
-      }
-    }
     return {
       'td_emp': 0,
       'td_overclock': 0,
@@ -23,7 +15,8 @@ export const useInventoryStore = defineStore('inventory', () => {
       'rpg_class_necromancer': 0,
       'rpg_class_berserker': 0,
       'rpg_class_archmage': 0,
-      'rpg_class_assassin': 0
+      'rpg_class_assassin': 0,
+      'rpg_total_gold': 0
     }
   }
 
@@ -66,9 +59,6 @@ export const useInventoryStore = defineStore('inventory', () => {
     }
     items.value[id] += amount
     
-    // Save locally
-    localStorage.setItem('gamehub_inventory', JSON.stringify(items.value))
-    
     // Save to backend if logged in
     if (auth.isLoggedIn) {
       try {
@@ -82,9 +72,6 @@ export const useInventoryStore = defineStore('inventory', () => {
   async function useItem(id, amount = 1) {
     if (hasItem(id, amount)) {
       items.value[id] -= amount
-      
-      // Save locally
-      localStorage.setItem('gamehub_inventory', JSON.stringify(items.value))
       
       // Save to backend if logged in
       if (auth.isLoggedIn) {

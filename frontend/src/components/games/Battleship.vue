@@ -36,6 +36,12 @@ const touchDragging = ref(false)
 const touchShipId = ref(null)
 const lastHoverCell = ref(null)
 
+// ─── Visual Drag State ──────────────────────────────────────────────────────
+const dragMousePos = ref({ x: 0, y: 0 })
+const isTouchDevice = ref(false)
+const dragStartTime = ref(0)
+const isStickyMode = ref(false)
+
 // ─── Game state ──────────────────────────────────────────────────────────────
 const playerBoard = ref([])
 const enemyBoard = ref([])
@@ -119,6 +125,7 @@ function clearPlacementDragState() {
   touchDragging.value = false
   touchShipId.value = null
   lastHoverCell.value = null
+  isStickyMode.value = false
 }
 
 function beginMovePlacedShip(shipId, x, y) {
@@ -134,6 +141,7 @@ function beginMovePlacedShip(shipId, x, y) {
     id: shipId,
     size: shipDef.size,
     name: shipDef.name,
+    icon: shipDef.icon,
     offsetCell
   }
   computeHoverPreview(x, y)
@@ -176,16 +184,24 @@ function handleCellDrop(e, x, y) {
 function handleGlobalMouseUp(e) {
   if (phase.value !== 'placement' || !dragShip.value) return
   
-  if (lastHoverCell.value) {
-    handleCellDrop(e, lastHoverCell.value.x, lastHoverCell.value.y)
+  const duration = Date.now() - dragStartTime.value
+  
+  if (duration > 250) {
+    // Standard Drag & Drop: drop on mouseup
+    if (lastHoverCell.value) {
+      handleCellDrop(e, lastHoverCell.value.x, lastHoverCell.value.y)
+    } else {
+      clearPlacementDragState()
+    }
   } else {
-    // Return ship to dock if dropped outside
-    clearPlacementDragState()
+    // Click detected: enter sticky mode
+    isStickyMode.value = true
   }
 }
 
 // 🔥 FIX PRINCIPAL también aquí
-function startDragFromDock(shipDef) {
+function startDragFromDock(shipDef, event) {
+  dragStartTime.value = Date.now()
   const placed = placedShips.value[shipDef.id]
   dragOrientation.value = placed?.horizontal === false ? 'vertical' : 'horizontal'
 
@@ -197,14 +213,24 @@ function startDragFromDock(shipDef) {
     id: shipDef.id,
     size: shipDef.size,
     name: shipDef.name,
+    icon: shipDef.icon,
     offsetCell: 0
+  }
+
+  if (event) {
+    updateDragMousePos(event)
   }
 }
 
-function startDragFromPlacedCell(x, y) {
+function startDragFromPlacedCell(x, y, event) {
+  dragStartTime.value = Date.now()
   const shipId = getShipIdAt(x, y)
   if (!shipId) return
   beginMovePlacedShip(shipId, x, y)
+  
+  if (event) {
+    updateDragMousePos(event)
+  }
 }
 
 function rotateDragOrientation() {
@@ -223,6 +249,16 @@ function handlePlacementKeydown(event) {
   if (key === 'r') {
     event.preventDefault()
     rotateDragOrientation()
+  } else if (key === 'escape') {
+    event.preventDefault()
+    clearPlacementDragState()
+  }
+}
+
+function handleGlobalContextMenu(e) {
+  if (phase.value === 'placement' && dragShip.value) {
+    e.preventDefault()
+    clearPlacementDragState()
   }
 }
 
@@ -323,7 +359,10 @@ function unplacedShips() {
 
 // Touch drag support
 function handleTouchStart(e, shipDef) {
-  e.preventDefault()
+  isTouchDevice.value = true
+  const touch = e.touches[0]
+  dragMousePos.value = { x: touch.clientX, y: touch.clientY }
+
   const placed = placedShips.value[shipDef.id]
   dragOrientation.value = placed?.horizontal === false ? 'vertical' : 'horizontal'
 
@@ -333,12 +372,21 @@ function handleTouchStart(e, shipDef) {
 
   touchDragging.value = true
   touchShipId.value = shipDef.id
-  dragShip.value = { id: shipDef.id, size: shipDef.size, name: shipDef.name, offsetCell: 0 }
+  dragShip.value = { 
+    id: shipDef.id, 
+    size: shipDef.size, 
+    name: shipDef.name, 
+    icon: shipDef.icon,
+    offsetCell: 0 
+  }
   lastHoverCell.value = null
 }
 
 function handleCellTouchStart(e, x, y, shipId) {
-  e.preventDefault()
+  isTouchDevice.value = true
+  const touch = e.touches[0]
+  dragMousePos.value = { x: touch.clientX, y: touch.clientY }
+
   if (touchDragging.value) {
     handleCellTouchOver(e, x, y)
     return
@@ -354,19 +402,73 @@ function handleCellTouchStart(e, x, y, shipId) {
 
 function handleCellTouchOver(e, x, y) {
   if (!touchDragging.value) return
-  e.preventDefault()
+  const touch = e.touches[0]
+  dragMousePos.value = { x: touch.clientX, y: touch.clientY }
   computeHoverPreview(x, y)
 }
 
 function handleCellTouchDrop(e, x, y) {
   if (!touchDragging.value) return
-  e.preventDefault()
-  const preview = computeHoverPreview(x, y)
-  if (preview && preview.valid) {
-    placeShip(dragShip.value.id, preview.cells)
+  
+  const duration = Date.now() - dragStartTime.value
+  if (duration > 250) {
+    const preview = computeHoverPreview(x, y)
+    if (preview && preview.valid) {
+      placeShip(dragShip.value.id, preview.cells)
+    }
+    clearPlacementDragState()
+  } else {
+    isStickyMode.value = true
+    touchDragging.value = false
   }
-  clearPlacementDragState()
 }
+
+function updateDragMousePos(e) {
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY
+  if (clientX != null && clientY != null) {
+    dragMousePos.value = { x: clientX, y: clientY }
+  }
+}
+
+function handleGlobalMouseMove(e) {
+  if (phase.value !== 'placement' || !dragShip.value) return
+  updateDragMousePos(e)
+  
+  // If not over a cell, check if we need to clear hover preview
+  // but usually computeHoverPreview is called by mouseenter on cells
+}
+
+function handleGlobalTouchMove(e) {
+  if (phase.value !== 'placement' || !dragShip.value) return
+  updateDragMousePos(e)
+  
+  // Find element under touch to trigger hover
+  const touch = e.touches[0]
+  const elem = document.elementFromPoint(touch.clientX, touch.clientY)
+  if (elem && elem.classList.contains('placement-cell')) {
+    // We'd need the coordinates here, but let's stick to the existing touchmove on cells if possible
+    // or improve it here.
+  }
+}
+
+const ghostStyle = computed(() => {
+  if (!dragShip.value) return {}
+  
+  const horizontal = dragOrientation.value === 'horizontal'
+  // Offset to center the "grabbed" cell under cursor
+  // On touch, we offset upwards so the finger doesn't hide the ship
+  const touchOffset = isTouchDevice.value ? 60 : 0
+  
+  return {
+    position: 'fixed',
+    left: `${dragMousePos.value.x}px`,
+    top: `${dragMousePos.value.y - touchOffset}px`,
+    transform: `translate(${horizontal ? '-20px' : '-20px'}, ${horizontal ? '-20px' : '-20px'})`,
+    pointerEvents: 'none',
+    zIndex: 1000
+  }
+})
 
 function handlePlacementCellClick(x, y, shipId, event) {
   if (phase.value !== 'placement') return
@@ -837,6 +939,9 @@ onMounted(async () => {
   window.addEventListener('beforeunload', handleBeforeUnload)
   document.addEventListener('keydown', handlePlacementKeydown, { capture: true })
   window.addEventListener('mouseup', handleGlobalMouseUp)
+  window.addEventListener('mousemove', handleGlobalMouseMove)
+  window.addEventListener('touchmove', handleGlobalTouchMove, { passive: false })
+  window.addEventListener('contextmenu', handleGlobalContextMenu)
 })
 
 onUnmounted(() => {
@@ -846,6 +951,9 @@ onUnmounted(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload)
   document.removeEventListener('keydown', handlePlacementKeydown, { capture: true })
   window.removeEventListener('mouseup', handleGlobalMouseUp)
+  window.removeEventListener('mousemove', handleGlobalMouseMove)
+  window.removeEventListener('touchmove', handleGlobalTouchMove)
+  window.removeEventListener('contextmenu', handleGlobalContextMenu)
   void saveProgress()
   emit('score-change', 0)
 })
@@ -856,6 +964,24 @@ onUnmounted(() => {
     :class="{ 'shake-screen': isShakeActive }"
   >
     <div class="gh-scanlines pointer-events-none absolute inset-0 opacity-20" />
+
+    <!-- GHOST SHIP -->
+    <div 
+      v-if="dragShip" 
+      class="floating-ship-ghost" 
+      :style="ghostStyle"
+    >
+      <div 
+        class="ghost-inner"
+        :class="dragOrientation"
+      >
+        <Icon :icon="dragShip.icon" class="ghost-icon" />
+        <div class="ghost-segments">
+          <div v-for="i in dragShip.size" :key="i" class="ghost-segment" />
+        </div>
+      </div>
+      <div class="ghost-label">{{ dragShip.name }}</div>
+    </div>
 
     <!-- START OVERLAY -->
     <div v-if="gameStatus === 'idle'" class="absolute inset-0 z-50 flex items-center justify-center bg-retro-black/90 backdrop-blur-md">
@@ -987,7 +1113,7 @@ onUnmounted(() => {
                 class="placement-cell"
                 :class="placementCellClass(x, y)"
                 @mouseenter="computeHoverPreview(x, y)"
-                @mousedown="cell.shipId ? startDragFromPlacedCell(x, y) : handleCellDrop($event, x, y)"
+                @mousedown="cell.shipId ? startDragFromPlacedCell(x, y, $event) : handleCellDrop($event, x, y)"
                 @touchstart.prevent="handleCellTouchStart($event, x, y, cell.shipId)"
                 @touchmove.prevent="handleCellTouchOver($event, x, y)"
                 @touchend.prevent="handleCellTouchDrop($event, x, y)"
@@ -1008,7 +1134,7 @@ onUnmounted(() => {
                 :key="`dock-${ship.id}`"
                 class="gh-surface p-2 transition"
                 :class="placedShips[ship.id] ? 'opacity-30 border-white/5' : 'gh-surface-hover border-neon-cyan/30 bg-neon-cyan/5 cursor-grab'"
-                @mousedown="!placedShips[ship.id] ? startDragFromDock(ship) : null"
+                @mousedown="!placedShips[ship.id] ? startDragFromDock(ship, $event) : null"
                 @touchstart.prevent="handleTouchStart($event, ship)"
               >
                 <div class="flex items-center justify-between gap-2">
@@ -1242,7 +1368,7 @@ onUnmounted(() => {
 .placement-cell {
   aspect-ratio: 1 / 1;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 100ms ease;
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
   cursor: pointer;
   position: relative;
 }
@@ -1417,4 +1543,59 @@ onUnmounted(() => {
     font-size: 0.78rem;
   }
 }
-</style>
+/* ── Floating Ghost Ship ────────────────────────────────────────────────── */
+.floating-ship-ghost {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.4));
+  transition: transform 0.1s ease-out;
+}
+
+.ghost-inner {
+  display: flex;
+  background: rgba(0, 242, 255, 0.2);
+  border: 2px solid var(--color-neon-cyan);
+  border-radius: 4px;
+  padding: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.ghost-inner.vertical {
+  flex-direction: column;
+}
+
+.ghost-icon {
+  font-size: 24px;
+  color: var(--color-neon-cyan);
+  margin: 4px;
+}
+
+.ghost-segments {
+  display: flex;
+  gap: 2px;
+}
+
+.vertical .ghost-segments {
+  flex-direction: column;
+}
+
+.ghost-segment {
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 242, 255, 0.4);
+  border: 1px solid rgba(0, 242, 255, 0.6);
+}
+
+.ghost-label {
+  background: var(--color-retro-black);
+  border: 1px solid var(--color-neon-cyan);
+  color: var(--color-neon-cyan);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+</style>

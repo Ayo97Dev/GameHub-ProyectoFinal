@@ -55,50 +55,50 @@
         :class="{ 'damage-shake': isDamaged }"
       >
         <!-- TOP HUD: SYSTEM TELEMETRY -->
-        <header class="h-16 shrink-0 gh-glass border-b border-white/10 flex items-center justify-between px-6 z-40 bg-black/60 shadow-2xl">
+        <header class="h-16 shrink-0 gh-glass border-b border-white/10 flex items-center justify-between px-6 z-40 bg-black/60 shadow-[0_4px_0_#000]">
           <!-- Stats Left -->
           <div class="flex items-center gap-10">
             <div class="flex flex-col">
               <div class="flex items-center gap-2 mb-1">
                 <Icon icon="game-icons:heart-organ" class="text-neon-pink text-xs" />
-                <span class="font-pixel text-xs text-neon-cyan/80 uppercase tracking-widest">NÚCLEO_STB</span>
+                <span class="font-pixel text-xs text-neon-cyan/80 uppercase tracking-[0.2em]">SISTEMA_INTEGRIDAD</span>
               </div>
               <div class="flex items-center gap-4">
-                <div class="w-32 h-2 bg-retro-deep border border-white/5 flex gap-0.5 p-0.5">
-                  <div v-for="i in 10" :key="i" class="flex-1" :class="i <= (gameState.lives/10) ? 'bg-neon-pink shadow-[0_0_5px_#ff2d55]' : 'bg-white/5'"></div>
+                <div class="w-32 h-3 bg-retro-deep border border-white/10 flex gap-0.5 p-0.5 shadow-[2px_2px_0_#000]">
+                  <div v-for="i in 10" :key="i" class="flex-1 transition-all duration-500" :class="i <= (gameState.lives/10) ? 'bg-neon-pink shadow-[0_0_8px_#ff2d55]' : 'bg-white/5'"></div>
                 </div>
-                <span class="font-display text-xl font-black text-neon-pink leading-none">{{ gameState.lives }}%</span>
+                <span class="font-display text-xl font-black text-neon-pink leading-none tracking-tighter">{{ gameState.lives }}%</span>
               </div>
             </div>
 
             <div class="flex flex-col">
               <div class="flex items-center gap-2 mb-0.5">
                 <Icon icon="game-icons:database" class="text-neon-cyan text-[10px]" />
-                <span class="font-pixel text-xs text-white/30 uppercase tracking-tighter">DATOS_RED</span>
+                <span class="font-pixel text-xs text-white/40 uppercase tracking-widest">CRÉDITOS_NODO</span>
               </div>
-              <span class="font-display text-xl font-black text-neon-cyan">{{ gameState.gold }}</span>
+              <span class="font-display text-xl font-black text-neon-cyan tracking-tighter">{{ gameState.gold }}<span class="text-xs ml-1 opacity-50 font-pixel">CR</span></span>
             </div>
           </div>
 
           <!-- Wave Info Center -->
           <div class="flex flex-col items-center">
             <div class="flex items-baseline gap-2">
-              <span class="font-pixel text-xs text-neon-yellow/60 uppercase">OLEADA</span>
-              <span class="font-display text-3xl font-black text-white">#{{ gameState.wave }}</span>
+              <span class="font-pixel text-sm text-neon-yellow uppercase tracking-[0.2em]">OLEADA</span>
+              <span class="font-display text-3xl font-black text-white gh-title-glow">#{{ gameState.wave }}</span>
             </div>
-            <div v-if="gameState.waveActive" class="w-32 mt-1">
-              <div class="h-1 bg-white/5 overflow-hidden">
-                <div class="h-full bg-neon-cyan shadow-[0_0_5px_#00f2ff]" :style="{ width: `${waveProgressPercent}%` }"></div>
+            <div v-if="gameState.waveActive" class="w-40 mt-1">
+              <div class="h-1 bg-white/5 overflow-hidden shadow-[1px_1px_0_#000]">
+                <div class="h-full bg-neon-cyan shadow-[0_0_10px_#00f2ff]" :style="{ width: `${waveProgressPercent}%` }"></div>
               </div>
             </div>
           </div>
 
           <!-- Status Indicators Right -->
           <div class="flex items-center gap-6">
-             <button v-if="!gameState.waveActive" @click="startWave" class="px-6 py-2 bg-neon-cyan text-black font-display text-xs font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-[4px_4px_0_#000]">LANZAR_OLEADA</button>
+             <button v-if="!gameState.waveActive" @click="startWave" class="px-6 py-2 bg-neon-cyan text-black font-display text-sm font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-[4px_4px_0_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1">INICIAR OLEADA</button>
              <div v-else class="flex flex-col items-end">
-                <span class="font-pixel text-[10px] text-white/20 uppercase tracking-widest">MALWARE_ACTIVO</span>
-                <span class="font-display text-sm font-black text-neon-yellow">{{ remainingEnemies }} UNIDADES</span>
+                <span class="font-pixel text-xs text-neon-yellow uppercase tracking-widest animate-pulse">MALWARE_DETECTADO</span>
+                <span class="font-display text-sm font-black text-white">{{ remainingEnemies }} UNIDADES</span>
               </div>
           </div>
         </header>
@@ -111,8 +111,9 @@
         >
           <!-- Global Effects -->
           <div class="absolute inset-0 pointer-events-none z-10 crt-ripple opacity-[0.02]"></div>
-          
-          <!-- Map with Respect Scaling -->
+          <div class="absolute inset-0 pointer-events-none z-30 overflow-hidden opacity-20">
+            <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]"></div>
+          </div>
           <div 
             class="relative origin-center z-20"
             :style="{ transform: `scale(${finalScale}) rotateY(${parallax.y * 5}deg) rotateX(${parallax.x * -5}deg)` }"
@@ -123,7 +124,7 @@
                 <div v-for="key in ['emp', 'overclock', 'purge']" :key="key" class="group relative">
                   <!-- Tooltip: Now deploying downwards -->
                   <div class="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 gh-glass p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center shadow-xl border-white/10 bg-black/90">
-                    <p class="font-pixel text-xs text-white/90 leading-relaxed uppercase">
+                    <p class="font-pixel text-[10px] text-white/90 leading-relaxed uppercase">
                       {{ key === 'emp' ? 'Sobrecarga de pulso: Paraliza a todas las unidades enemigas temporalmente.' : (key === 'overclock' ? 'Frecuencia Crítica: Duplica la cadencia de fuego de todos los nodos de defensa.' : 'Protocolo Purga: Ejecuta una descarga masiva que daña a todas las entidades activas.') }}
                     </p>
                   </div>
@@ -135,18 +136,18 @@
                   >
                     <div class="absolute inset-0 origin-bottom transition-all" :class="`bg-neon-${key==='emp'?'cyan':(key==='overclock'?'yellow':'pink')}/10`" :style="{ height: `${(gameState.cooldowns[key] / (key==='emp'?600:(key==='overclock'?900:1200))) * 100}%` }"></div>
                     
-                    <span v-if="!inventory.hasItem('td_' + key)" class="absolute inset-0 flex items-center justify-center bg-black/80 font-pixel text-[8px] text-neon-pink uppercase z-20">0 USOS - TIENDA</span>
+                    <span v-if="!inventory.hasItem('td_' + key)" class="absolute inset-0 flex items-center justify-center bg-black/80 font-pixel text-xs text-neon-pink uppercase z-20">0 USOS - TIENDA</span>
                     
                     <Icon 
                       :icon="key === 'emp' ? 'game-icons:lightning-shield' : (key === 'overclock' ? 'game-icons:speedometer' : 'game-icons:laser-blast')" 
                       class="text-lg mb-1 relative z-10"
                       :class="`text-neon-${key==='emp'?'cyan':(key==='overclock'?'yellow':'pink')}`"
                     />
-
-                    <span class="font-display text-[9px] font-black uppercase text-white/60 group-hover:text-white relative z-10 text-center leading-tight">
+ 
+                    <span class="font-display text-[10px] font-black uppercase text-white/60 group-hover:text-white relative z-10 text-center leading-tight">
                       {{ key==='emp' ? 'PULSO EMP' : (key==='overclock' ? 'SOBRECARGA' : 'PURGA TOTAL') }}
                     </span>
-                    <span class="font-pixel text-[8px] text-white/40 mt-0.5 relative z-10">{{ inventory.items['td_' + key] || 0 }} USOS</span>
+                    <span class="font-pixel text-xs text-white/40 mt-0.5 relative z-10">{{ inventory.items['td_' + key] || 0 }} USOS</span>
                     <!-- Border glow on hover -->
                     <div class="absolute inset-0 border border-transparent group-hover:border-neon-cyan/30 pointer-events-none"></div>
                   </button>
@@ -165,22 +166,50 @@
                       :style="{ width: cellSize + 'px', height: cellSize + 'px' }"
                       @click="handleMapClick" :data-x="x - 1" :data-y="y - 1"
                     >
-                      <div v-if="gameState.path.length && x - 1 === gameState.path[0].x && y - 1 === gameState.path[0].y" class="absolute inset-0 bg-[#e02fe8]/10 border-2 border-[#e02fe8]/40 animate-pulse flex items-center justify-center z-10">
-                        <div class="size-4 border-2 border-[#e02fe8] rotate-45 shadow-[0_0_10px_#e02fe8]"></div>
+                      <div v-if="gameState.path.length && x - 1 === gameState.path[0].x && y - 1 === gameState.path[0].y" class="absolute inset-0 bg-[#e02fe8]/10 border border-[#e02fe8]/30 flex items-center justify-center z-10 overflow-hidden">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(224,47,232,0.2)_0%,transparent_70%)]"></div>
+                        <Icon icon="game-icons:entry-door" class="text-neon-fuchsia text-xl relative z-10 animate-pulse shadow-[0_0_10px_#e02fe8]" />
                       </div>
-                      <div v-if="gameState.path.length && x - 1 === gameState.path[gameState.path.length-1].x && y - 1 === gameState.path[gameState.path.length-1].y" class="absolute inset-0 bg-neon-pink/20 border-2 border-neon-pink animate-pulse flex items-center justify-center z-10">
-                        <div class="size-6 rounded-full bg-neon-pink/50 border-2 border-white/50 flex items-center justify-center shadow-[0_0_15px_#ff2d55]"><div class="size-2 bg-white rounded-full"></div></div>
+                      <div v-if="gameState.path.length && x - 1 === gameState.path[gameState.path.length-1].x && y - 1 === gameState.path[gameState.path.length-1].y" class="absolute inset-0 bg-neon-pink/10 border border-neon-pink/40 flex items-center justify-center z-10">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(255,45,85,0.2)_0%,transparent_70%)] animate-pulse"></div>
+                        <div class="relative flex items-center justify-center">
+                          <div class="absolute size-8 border border-neon-pink animate-[spin_4s_linear_infinite]"></div>
+                          <div class="absolute size-6 border border-white/30 animate-[spin_3s_linear_infinite_reverse]"></div>
+                          <Icon icon="game-icons:cpu" class="text-neon-pink text-xl relative z-20 drop-shadow-[0_0_8px_rgba(255,45,85,0.8)]" />
+                        </div>
                       </div>
-                      <div v-if="getTowerAt(x - 1, y - 1)" class="tower-hologram" :style="{ '--color': getTowerAt(x - 1, y - 1).color }">
-                         <div class="tower-base"></div>
-                         <div class="tower-core animate-pulse"></div>
+                      <div v-if="getTowerAt(x - 1, y - 1)" class="tower-node" :style="{ '--tower-color': getTowerAt(x - 1, y - 1).color }">
+                         <div class="tower-base-plate shadow-[2px_2px_0_#000]"></div>
+                         <div class="tower-icon-container">
+                            <Icon :icon="getTowerAt(x - 1, y - 1).icon" class="tower-icon" />
+                         </div>
+                         <div class="tower-glow-ring"></div>
                       </div>
                     </div>
                   </div>
                   <div v-if="selectedTower && selectedCell && !isPath(selectedCell.x, selectedCell.y)" class="hologram-range" :style="selectedRangeStyle"></div>
-                  <div v-if="gameState.path.length && !gameState.isPaused" class="path-indicator-pulse" :style="pathIndicatorStyle"><div class="chevron"></div></div>
                   <div v-for="enemy in enemies" :key="enemy.id" class="enemy-hologram" :class="[enemy.shapeClass, { 'is-slowed': enemy.slowTimer > 0, 'is-poisoned': enemy.poisonTicks > 0 }]" :style="{ left: `${enemy.pixelX}px`, top: `${enemy.pixelY}px`, width: `${enemy.sizePx}px`, height: `${enemy.sizePx}px`, '--color': enemy.poisonTicks > 0 ? '#22c55e' : (enemy.slowTimer > 0 ? '#00f2ff' : enemy.baseColor) }"><div class="enemy-body"></div><div class="enemy-hp-bar"><div class="enemy-hp-fill" :style="{ width: `${(enemy.hp / enemy.maxHp) * 100}%` }"></div></div></div>
                   <div v-for="projectile in projectiles" :key="projectile.id" class="energy-bolt" :style="{ left: `${projectile.x}px`, top: `${projectile.y}px`, width: `${projectile.size}px`, height: `${projectile.size}px`, '--color': projectile.color }"></div>
+
+                  <!-- Path SVG Line -->
+                  <svg class="absolute inset-0 pointer-events-none z-[8]" :style="{ width: (mapWidth * cellSize) + 'px', height: (mapHeight * cellSize) + 'px' }">
+                    <path 
+                      :d="svgPathData" 
+                      fill="none" 
+                      stroke="rgba(224, 47, 232, 0.4)" 
+                      stroke-width="4" 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round"
+                    />
+                    <path 
+                      :d="svgPathData" 
+                      fill="none" 
+                      stroke="rgba(255, 45, 85, 0.6)" 
+                      stroke-width="2" 
+                      stroke-dasharray="8 12" 
+                      class="path-line-flow"
+                    />
+                  </svg>
                 </div>
               </div>
             </div>
@@ -188,11 +217,14 @@
         </main>
 
         <!-- BOTTOM DOCK: COMMAND & CONTROLS -->
-        <footer class="h-24 shrink-0 gh-glass border-t border-white/10 flex items-center justify-between px-6 z-40 bg-black/80">
+        <footer class="h-24 shrink-0 gh-glass border-t border-white/10 flex items-center justify-between px-6 z-40 bg-black/80 shadow-[0_-4px_0_#000]">
           <!-- Logs Left -->
-          <div class="w-64 h-16 gh-glass p-2 bg-black/40 border-white/5 overflow-hidden hidden lg:block">
-            <div class="h-full overflow-y-auto space-y-1 custom-scroll scrollbar-none opacity-40">
-              <div v-for="log in gameLogs.slice(0, 3)" :key="log.id" class="font-pixel text-[10px] text-neon-cyan uppercase">> {{ log.text }}</div>
+          <div class="w-64 h-16 gh-glass p-3 bg-black/60 border-white/5 overflow-hidden hidden lg:block shadow-[inset_2px_2px_10px_rgba(0,0,0,0.5)]">
+            <div class="h-full overflow-y-auto space-y-1 custom-scroll scrollbar-none opacity-60">
+              <div v-for="log in gameLogs.slice(0, 4)" :key="log.id" class="font-pixel text-xs text-neon-cyan uppercase flex gap-2">
+                <span class="opacity-30">[{{ log.time }}]</span>
+                <span>{{ log.text }}</span>
+              </div>
             </div>
           </div>
 
@@ -203,28 +235,30 @@
           <div class="flex items-center gap-6">
             <div class="flex flex-col gap-1.5">
                <div class="flex justify-between items-center px-1 mb-0.5">
-                 <span class="font-pixel text-[10px] text-white/20 uppercase">ZOOM: {{ (finalScale * 100).toFixed(0) }}%</span>
+                 <span class="font-pixel text-xs text-white/30 uppercase tracking-widest">MAPA_SCALE: {{ (finalScale * 100).toFixed(0) }}%</span>
                </div>
                <div class="flex gap-1">
-                 <button @click="userZoom -= 0.1" class="size-8 border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center">
+                 <button @click="userZoom -= 0.1" class="size-9 bg-retro-dark border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
                     <Icon icon="game-icons:magnifying-glass" class="rotate-90 scale-x-[-1]" />
                  </button>
-                 <button @click="userZoom = 1.0" class="px-3 h-8 border border-white/10 text-xs font-pixel text-white/20 hover:bg-white/10">RST</button>
-                 <button @click="userZoom += 0.1" class="size-8 border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center">
+                 <button @click="userZoom = 1.0" class="px-3 h-9 bg-retro-dark border border-white/10 text-xs font-pixel text-white/30 hover:bg-white/10 shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none uppercase">RESET</button>
+                 <button @click="userZoom += 0.1" class="size-9 bg-retro-dark border border-white/10 text-xs font-pixel text-white/40 hover:bg-white/10 transition-all flex items-center justify-center shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
                     <Icon icon="game-icons:magnifying-glass" />
                  </button>
                </div>
             </div>
 
             <div class="flex flex-col gap-1.5">
-               <span class="font-pixel text-[10px] text-white/20 uppercase text-center">VELOCIDAD</span>
+               <span class="font-pixel text-xs text-white/30 uppercase text-center tracking-widest">TEMPO_SISTEMA</span>
                <div class="flex gap-1">
-                 <button @click="gameState.isPaused = !gameState.isPaused" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all flex items-center justify-center gap-2" :class="gameState.isPaused ? 'bg-neon-pink text-black' : 'text-white/40 hover:bg-white/10'">
+                 <button @click="gameState.isPaused = !gameState.isPaused" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all flex items-center justify-center gap-2 shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none" :class="gameState.isPaused ? 'bg-neon-pink text-black' : 'bg-retro-dark text-white/40 hover:bg-white/10'">
                     <Icon :icon="gameState.isPaused ? 'game-icons:play-button' : 'game-icons:pause-button'" />
+                    <span>{{ gameState.isPaused ? 'RESUME' : 'PAUSE' }}</span>
                  </button>
-                 <button @click="gameState.speed = 1; gameState.isPaused = false" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all" :class="gameState.speed === 1 && !gameState.isPaused ? 'bg-neon-cyan text-black' : 'text-white/40 hover:bg-white/10'">x1</button>
-                 <button @click="gameState.speed = 2; gameState.isPaused = false" class="px-4 py-1.5 border border-white/10 text-xs font-pixel transition-all flex items-center justify-center gap-2" :class="gameState.speed === 2 && !gameState.isPaused ? 'bg-neon-yellow text-black' : 'text-white/40 hover:bg-white/10'">
-                    <Icon icon="game-icons:fast-forward" />
+                 <button @click="gameState.speed = 1; gameState.isPaused = false" class="w-10 h-9 border border-white/10 text-xs font-pixel transition-all shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none" :class="gameState.speed === 1 && !gameState.isPaused ? 'bg-neon-cyan text-black' : 'bg-retro-dark text-white/40 hover:bg-white/10'">x1</button>
+                 <button @click="gameState.speed = 2; gameState.isPaused = false" class="px-3 h-9 border border-white/10 text-xs font-pixel transition-all flex items-center justify-center gap-2 shadow-[2px_2px_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none" :class="gameState.speed === 2 && !gameState.isPaused ? 'bg-neon-yellow text-black' : 'bg-retro-dark text-white/40 hover:bg-white/10'">
+                    <Icon icon="game-icons:forward-field" />
+                    <span>TURBO</span>
                  </button>
                </div>
             </div>
@@ -250,11 +284,11 @@
 
           <div class="grid grid-cols-2 gap-4 mb-10">
              <div class="p-4 bg-white/5 border border-white/5">
-                <p class="font-pixel text-[10px] text-white/30 uppercase mb-1">OLEADAS</p>
+                <p class="font-pixel text-xs text-white/30 uppercase mb-1">OLEADAS</p>
                 <p class="font-display text-3xl font-black text-white">{{ gameState.wave - 1 }}</p>
              </div>
              <div class="p-4 bg-white/5 border border-white/5">
-                <p class="font-pixel text-[10px] text-white/30 uppercase mb-1">DATOS_PERDIDOS</p>
+                <p class="font-pixel text-xs text-white/30 uppercase mb-1">DATOS_PERDIDOS</p>
                 <p class="font-display text-3xl font-black text-neon-cyan">{{ (gameState.wave - 1) * 100 }}</p>
              </div>
           </div>
@@ -279,68 +313,82 @@
           <div class="p-6 overflow-auto max-h-[450px] custom-scroll">
              <!-- MENU CONSTRUCCIÓN -->
              <div v-if="!selectedTower">
-                <p class="font-pixel text-xs text-neon-cyan font-bold uppercase mb-4 tracking-[0.2em]">MÓDULOS_DISPONIBLES</p>
-                <div class="space-y-3">
+                <p class="font-pixel text-xs text-neon-cyan font-bold uppercase mb-4 tracking-[0.3em]">MÓDULOS_CONSTRUCCIÓN</p>
+                <div class="space-y-2">
                    <div 
                      v-for="(type, key) in towerTypes" :key="key" 
                      @click="buildTower(key)"
-                     class="group relative flex items-center p-3  border border-white/10 transition-all cursor-pointer bg-white/5 hover:border-neon-cyan/40 hover:bg-white/10"
+                     class="group relative flex items-center p-3 border border-white/5 transition-all cursor-pointer bg-white/5 hover:border-neon-cyan/40 hover:bg-neon-cyan/5 shadow-[2px_2px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
                      :class="{ 'opacity-30 grayscale cursor-not-allowed': gameState.gold < type.cost }"
                    >
-                      <div class="size-10  shrink-0 border border-white/10 relative overflow-hidden mr-4 flex items-center justify-center" :style="{ backgroundColor: type.color }">
-                         <div class="absolute inset-0 bg-gradient-to-tr from-black/40 to-transparent"></div>
-                         <Icon :icon="type.icon" class="text-white text-xl relative z-10" />
+                      <div class="size-10 shrink-0 border border-white/10 relative overflow-hidden mr-4 flex items-center justify-center bg-black/40" :style="{ '--c': type.color }">
+                         <div class="absolute inset-0 opacity-20" :style="{ backgroundColor: 'var(--c)' }"></div>
+                         <Icon :icon="type.icon" class="text-white text-xl relative z-10" :style="{ color: type.color }" />
                       </div>
                       <div class="flex-1 min-w-0">
                          <div class="flex justify-between items-baseline mb-0.5">
-                            <span class="font-display text-xs font-black uppercase text-white group-hover:text-neon-cyan">{{ type.name }}</span>
+                            <span class="font-display text-[11px] font-black uppercase text-white group-hover:text-neon-cyan">{{ type.name }}</span>
                             <span class="font-pixel text-xs text-neon-yellow">{{ type.cost }}C</span>
                          </div>
-                         <p class="font-sans text-xs font-bold text-white/40 uppercase truncate">{{ type.desc }}</p>
+                         <p class="font-sans text-xs font-medium text-white/40 uppercase truncate tracking-tight">{{ type.desc }}</p>
                       </div>
                    </div>
                 </div>
-             </div>
+              </div>
 
              <!-- MENU UPGRADE -->
-             <div v-else class="space-y-8">
-                <div class="flex items-center gap-5">
-                   <div class="size-16  shrink-0 border-2 border-white/20 shadow-2xl relative overflow-hidden" :style="{ backgroundColor: selectedTower.color }">
-                      <div class="absolute inset-0 bg-gradient-to-tr from-black/60 to-transparent"></div>
+             <div v-else class="space-y-6">
+                <div class="flex items-center gap-5 p-3 bg-white/5 border border-white/10 shadow-[4px_4px_0_#000]">
+                   <div class="size-16 shrink-0 border border-white/20 relative overflow-hidden flex items-center justify-center bg-black/40">
+                      <div class="absolute inset-0 opacity-20" :style="{ backgroundColor: selectedTower.color }"></div>
+                      <Icon :icon="selectedTower.icon" class="text-white text-3xl relative z-10" :style="{ color: selectedTower.color }" />
                    </div>
-                   <div>
-                      <h4 class="font-display text-lg font-black text-white uppercase leading-tight">{{ selectedTower.name }}</h4>
-                      <p class="font-pixel text-xs text-neon-cyan uppercase tracking-widest">LVL_{{ selectedTower.level }}</p>
-                   </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3 text-center">
-                   <div class="p-3 bg-white/5 border border-white/5 ">
-                      <p class="font-pixel text-xs opacity-30 uppercase mb-1">DAÑO</p>
-                      <p class="font-display text-xs font-black text-neon-pink">{{ selectedTower.damage.toFixed(1) }} <span class="text-xs ml-1 opacity-60">→ {{(selectedTower.damage * 1.4).toFixed(1)}}</span></p>
-                   </div>
-                   <div class="p-3 bg-white/5 border border-white/5 ">
-                      <p class="font-pixel text-xs opacity-30 uppercase mb-1">RANGO_SEÑAL</p>
-                      <p class="font-display text-xs font-black text-neon-cyan">{{ selectedTower.range.toFixed(1) }} <span class="text-xs ml-1 opacity-60">→ {{(selectedTower.range + 0.1).toFixed(1)}}</span></p>
+                   <div class="flex-1 min-w-0">
+                      <h4 class="font-display text-lg font-black text-white uppercase leading-tight truncate">{{ selectedTower.name }}</h4>
+                      <p class="font-pixel text-xs text-neon-cyan uppercase tracking-[0.3em]">NIVEL_{{ selectedTower.level }}</p>
                    </div>
                 </div>
-
+ 
+                <div class="grid grid-cols-2 gap-2">
+                   <div class="p-3 bg-retro-dark border border-white/5 shadow-[2px_2px_0_#000]">
+                      <p class="font-pixel text-xs opacity-30 uppercase mb-1 tracking-widest">POTENCIA_FUEGO</p>
+                      <div class="flex items-center justify-between">
+                        <span class="font-display text-xs font-black text-neon-pink">{{ selectedTower.damage.toFixed(1) }}</span>
+                        <Icon icon="game-icons:fast-arrow" class="text-[10px] text-white/20" />
+                        <span class="font-display text-xs font-black text-white">{{(selectedTower.damage * 1.4).toFixed(1)}}</span>
+                      </div>
+                   </div>
+                   <div class="p-3 bg-retro-dark border border-white/5 shadow-[2px_2px_0_#000]">
+                      <p class="font-pixel text-xs opacity-30 uppercase mb-1 tracking-widest">RANGO_ESCÁNER</p>
+                      <div class="flex items-center justify-between">
+                        <span class="font-display text-xs font-black text-neon-cyan">{{ selectedTower.range.toFixed(1) }}</span>
+                        <Icon icon="game-icons:fast-arrow" class="text-[10px] text-white/20" />
+                        <span class="font-display text-xs font-black text-white">{{(selectedTower.range + 0.1).toFixed(1)}}</span>
+                      </div>
+                   </div>
+                </div>
+ 
                 <div class="flex flex-col gap-3">
                    <button 
                      @click="upgradeTower"
                      :disabled="gameState.gold < upgradeCost"
-                     class="w-full py-4  bg-neon-cyan text-black font-display text-sm font-black uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-20 disabled:scale-100"
+                     class="w-full py-4 bg-neon-cyan text-black font-display text-xs font-black uppercase tracking-[0.2em] shadow-[4px_4px_0_#000] transition-all hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:scale-95 disabled:opacity-20 disabled:grayscale"
                    >
-                      ACTUALIZAR ({{ upgradeCost }}C)
+                      ACTUALIZAR_SISTEMA ({{ upgradeCost }}C)
                    </button>
-                   <button @click="confirmSellTower" class="w-full py-2 font-pixel text-xs text-neon-pink/60 hover:text-neon-pink uppercase tracking-widest transition-all">
-                      [RECICLAR_COMPONENTES]
+                   <button 
+                     @click="confirmSellTower" 
+                     class="w-full py-3 font-pixel text-xs uppercase tracking-widest transition-all border border-transparent flex items-center justify-center gap-2"
+                     :class="isSelling ? 'bg-neon-pink/20 text-neon-pink border-neon-pink animate-pulse' : 'text-white/30 hover:text-neon-pink hover:bg-white/5'"
+                   >
+                      <Icon v-if="isSelling" icon="game-icons:alert" />
+                      {{ isSelling ? `¿CONFIRMAR RECICLAJE? (+${selectedTowerSellValue}C)` : `[RECICLAR_MÓDULO: +${selectedTowerSellValue}C]` }}
                    </button>
                 </div>
              </div>
           </div>
        </div>
-    </teleport>
+    </Teleport>
   </div>
 </template>
 
@@ -363,7 +411,7 @@ const parallax = reactive({ x: 0, y: 0 })
 const gameContainer = ref(null)
 const containerWidth = ref(0)
 const userZoom = ref(1.0)
-const pathIndicatorProgress = ref(0)
+const isSelling = ref(false)
 
 const finalScale = computed(() => {
   let autoScale = 1.0
@@ -503,16 +551,13 @@ const waveProgressPercent = computed(() => {
   return Math.max(0, Math.min(((totalWaveEnemies.value - remainingEnemies.value) / totalWaveEnemies.value) * 100, 100))
 })
 
-const pathIndicatorStyle = computed(() => {
-  if (!gameState.path.length) return { display: 'none' }
-  const idx = Math.floor(pathIndicatorProgress.value)
-  if (idx + 1 >= gameState.path.length) return { display: 'none' }
-  const f = pathIndicatorProgress.value - idx
-  const cp = gameState.path[idx], np = gameState.path[idx+1]
-  const px = (cp.x + (np.x-cp.x)*f)*cellSize + cellSize/2
-  const py = (cp.y + (np.y-cp.y)*f)*cellSize + cellSize/2
-  const angle = Math.atan2(np.y - cp.y, np.x - cp.x) * (180 / Math.PI)
-  return { left: `${px}px`, top: `${py}px`, transform: `translate(-50%, -50%) rotate(${angle}deg)` }
+const svgPathData = computed(() => {
+  if (!gameState.path.length) return ''
+  return gameState.path.map((p, i) => {
+    const x = (p.x + 0.5) * cellSize
+    const y = (p.y + 0.5) * cellSize
+    return (i === 0 ? 'M' : 'L') + x + ',' + y
+  }).join(' ')
 })
 
 const enemiesToSpawn = ref(0); const totalWaveEnemies = ref(0)
@@ -525,7 +570,7 @@ const handleMapClick = (e) => {
   const rect = cell.getBoundingClientRect(); clickPosition.value = { x: rect.left, y: rect.top }; selectedCell.value = { x, y }
 }
 
-const closeTooltip = () => { selectedCell.value = null; clickPosition.value = null }
+const closeTooltip = () => { selectedCell.value = null; clickPosition.value = null; isSelling.value = false }
 
 const tooltipPosition = computed(() => {
   viewportVersion.value
@@ -544,7 +589,19 @@ const buildTower = (key) => {
 }
 
 const upgradeTower = () => { if (gameState.gold >= upgradeCost.value && selectedTower.value) { gameState.gold -= upgradeCost.value; selectedTower.value.totalSpent += upgradeCost.value; selectedTower.value.level++; selectedTower.value.damage *= 1.4; selectedTower.value.range += 0.1; addLog(`NODO_NIVEL_${selectedTower.value.level}_UPGRADE`); } }
-const confirmSellTower = () => { if (selectedTower.value && window.confirm(`Reciclar por ${selectedTowerSellValue.value}C?`)) { addLog(`NODO_RECICLADO_+${selectedTowerSellValue.value}C`); gameState.gold += selectedTowerSellValue.value; towers.value = towers.value.filter(t => t.id !== selectedTower.value.id); selectedCell.value = null } }
+const confirmSellTower = () => { 
+  if (!selectedTower.value) return;
+  if (!isSelling.value) {
+    isSelling.value = true;
+    setTimeout(() => { if (selectedCell.value) isSelling.value = false; }, 3000);
+    return;
+  }
+  addLog(`NODO_RECICLADO_+${selectedTowerSellValue.value}C`); 
+  gameState.gold += selectedTowerSellValue.value; 
+  towers.value = towers.value.filter(t => t.id !== selectedTower.value.id); 
+  selectedCell.value = null;
+  isSelling.value = false;
+}
 
 const startWave = () => {
   if (gameState.waveActive || gameState.gameOver) return
@@ -564,7 +621,7 @@ const startWave = () => {
       const arch = pickEnemyArchetype(gameState.wave, enemiesToSpawn.value === totalWaveEnemies.value), hp = Math.round(baseHp * arch.hpMultiplier), sz = Math.max(14, Math.round(cellSize * arch.sizeMultiplier))
       enemies.value.push({
         id: enemyIdCounter++, progress: 0, hp, maxHp: hp, speed: Math.min(baseSpeed * arch.speedMultiplier, 0.22), slowTimer: 0, poisonTicks: 0,
-        reward: Math.max(1, Math.round(baseRew * arch.rewardMultiplier)), pixelX: (gameState.path[0].x * cellSize) + (cellSize-sz)/2, pixelY: (gameState.path[0].y * cellSize) + (cellSize-sz)/2,
+        reward: Math.max(1, Math.round(baseRew * arch.rewardMultiplier)), pixelX: (gameState.path[0].x + 0.5) * cellSize, pixelY: (gameState.path[0].y + 0.5) * cellSize,
         sizePx: sz, shapeClass: arch.shapeClass, damageReduction: arch.damageReduction, baseColor: arch.baseColor
       }); enemiesToSpawn.value--
     } else { clearInterval(spawnInterval); spawnInterval = null }
@@ -617,8 +674,8 @@ const gameTick = () => {
           }
           continue 
         }
-        const f = e.progress - idx, cp = gameState.path[idx], np = gameState.path[idx+1], o = (cellSize - e.sizePx)/2
-        e.pixelX = (cp.x + (np.x-cp.x)*f)*cellSize + o; e.pixelY = (cp.y + (np.y-cp.y)*f)*cellSize + o
+        const f = e.progress - idx, cp = gameState.path[idx], np = gameState.path[idx+1]
+        e.pixelX = (cp.x + (np.x-cp.x)*f + 0.5) * cellSize; e.pixelY = (cp.y + (np.y-cp.y)*f + 0.5) * cellSize
       }
       
       if (e.hp <= 0) { gameState.gold += e.reward; enemies.value.splice(i,1) }
@@ -631,7 +688,24 @@ const gameTick = () => {
         return; 
       }
       const tc = { x:(tw.x+0.5)*cellSize, y:(tw.y+0.5)*cellSize }
-      const tgt = enemies.value.find(e => Math.hypot(e.pixelX+e.sizePx/2 - tc.x, e.pixelY+e.sizePx/2 - tc.y)/cellSize <= tw.range)
+      
+      // Filtrar enemigos en rango
+      const inRange = enemies.value.filter(e => Math.hypot(e.pixelX+e.sizePx/2 - tc.x, e.pixelY+e.sizePx/2 - tc.y)/cellSize <= tw.range)
+      if (inRange.length === 0) return
+
+      let tgt = null
+      const isUtility = tw.effect === 'slow' || tw.effect === 'poison'
+
+      if (isUtility) {
+        // ESTRATEGIA ROUND ROBIN: Rotar entre enemigos para repartir efectos
+        if (!tw.targetIndex) tw.targetIndex = 0
+        tgt = inRange[tw.targetIndex % inRange.length]
+        tw.targetIndex++
+      } else {
+        // ESTRATEGIA FIFO: Atacar al que más ha avanzado (mayor progreso)
+        tgt = inRange.reduce((max, e) => e.progress > max.progress ? e : max, inRange[0])
+      }
+
       if (!tgt) return
       projectiles.value.push({ id: projectileIdCounter++, x:tc.x, y:tc.y, targetId: tgt.id, damage: tw.damage, effect: tw.effect, color: tw.color, speed: tw.effect==='fast'?17:8, size: tw.effect==='fast'?6:10 })
       tw.cooldown = tw.cooldownMax
@@ -650,11 +724,7 @@ const gameTick = () => {
     }
     if (gameState.waveActive && enemiesToSpawn.value === 0 && enemies.value.length === 0) { gameState.waveActive = false; gameState.wave++; store.saveProgress(gameState.wave) }
     
-    // Update path indicator
-    if (gameState.path.length) {
-      pathIndicatorProgress.value += 0.08 * gameState.speed
-      if (pathIndicatorProgress.value >= gameState.path.length - 1) pathIndicatorProgress.value = 0
-    }
+    // Update projectiles logic...
   }
 }
 
@@ -730,58 +800,120 @@ onUnmounted(() => { clearInterval(gameLoopId); clearInterval(spawnInterval); win
 <style scoped>
 .gh-glass { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
 .gh-panel { position: relative; overflow: hidden; }
-.gh-panel::after { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent 48%, rgba(255,255,255,0.05) 50%, transparent 52%); background-size: 200% 200%; animation: shine 10s linear infinite; pointer-events: none; }
-@keyframes shine { 0% { background-position: -100% -100%; } 100% { background-position: 100% 100%; } }
 
-.hologram-cell { border: 1px solid rgba(255, 255, 255, 0.03); cursor: pointer; transition: all 0.2s ease-out; position: relative; }
-.hologram-cell:hover { background: rgba(0, 242, 255, 0.15); box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.3); border-color: rgba(0, 242, 255, 0.5); z-index: 20; }
+.hologram-cell { border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.2s ease-out; position: relative; background: rgba(255, 255, 255, 0.01); }
+.hologram-cell:hover { background: rgba(0, 242, 255, 0.1); box-shadow: inset 0 0 20px rgba(0, 242, 255, 0.2); border-color: rgba(0, 242, 255, 0.4); z-index: 20; }
 .hologram-cell.is-path { 
   background: rgba(224, 47, 232, 0.05);
   border: 1px solid rgba(224, 47, 232, 0.15); 
   z-index: 5;
   position: relative;
 }
-
-.path-indicator-pulse {
+.hologram-cell.is-path::after {
+  content: '';
   position: absolute;
-  width: 24px;
-  height: 24px;
-  z-index: 15;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(224, 47, 232, 0.1) 1px, transparent 1px);
+  background-size: 8px 8px;
+  opacity: 0.3;
+}
+.hologram-cell.is-path::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid rgba(224, 47, 232, 0.1);
   pointer-events: none;
+}
+
+.path-line-flow {
+  animation: pathFlow 2s linear infinite;
+}
+
+@keyframes pathFlow {
+  from { stroke-dashoffset: 20; }
+  to { stroke-dashoffset: 0; }
+}
+.hologram-cell.is-selected { 
+  border: 2px solid #00f2ff; 
+  background: rgba(0, 242, 255, 0.1); 
+  box-shadow: inset 0 0 20px rgba(0, 242, 255, 0.3), 0 0 10px rgba(0, 242, 255, 0.2); 
+  z-index: 25; 
+}
+.hologram-cell.is-selected::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid rgba(0, 242, 255, 0.3);
+  pointer-events: none;
+}
+
+
+.tower-node {
+  position: absolute;
+  inset: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+.tower-base-plate {
+  position: absolute;
+  bottom: 0;
+  width: 90%;
+  height: 90%;
+  background: var(--tower-color);
+  opacity: 0.15;
+  border: 1px solid var(--tower-color);
+}
+
+.tower-icon-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.path-indicator-pulse .chevron {
-  width: 12px;
-  height: 12px;
-  border-right: 3px solid #00f2ff;
-  border-bottom: 3px solid #00f2ff;
-  transform: rotate(-45deg);
-  filter: drop-shadow(0 0 5px #00f2ff);
-  animation: chevronGlow 1s ease-in-out infinite;
+.tower-node:hover .tower-icon-container {
+  transform: translateY(-4px) scale(1.1);
+  border-color: var(--tower-color);
+  box-shadow: 0 0 15px var(--tower-color), 4px 4px 0 rgba(0, 0, 0, 0.8);
 }
 
-@keyframes chevronGlow {
-  0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 2px #00f2ff); }
-  50% { opacity: 1; filter: drop-shadow(0 0 10px #00f2ff); }
+.tower-icon {
+  font-size: 24px;
+  color: var(--tower-color);
+  filter: drop-shadow(0 0 5px var(--tower-color));
 }
 
-.hologram-cell.is-selected { border: 2px solid #00f2ff; background: rgba(0, 242, 255, 0.15); box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.4); z-index: 10; }
+.tower-glow-ring {
+  position: absolute;
+  inset: -2px;
+  border: 1px solid var(--tower-color);
+  opacity: 0.3;
+  animation: towerPulse 2s ease-in-out infinite;
+}
 
+@keyframes towerPulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.6; }
+}
 
-.tower-hologram { position: absolute; inset: 15%; display: flex; flex-direction: column; align-items: center; justify-content: center; transform-style: preserve-3d; }
-.tower-base { width: 80%; height: 4px; background: var(--color); opacity: 0.5; box-shadow: 0 0 10px var(--color); border-radius: 50%; }
-.tower-core { width: 50%; height: 80%; background: var(--color); clip-path: polygon(50% 0%, 100% 100%, 0% 100%); box-shadow: 0 0 15px var(--color); transform: translateY(-2px); }
-
-.enemy-hologram { position: absolute; transform: translate(-50%, -50%); display: flex; align-items:center; justify-content: center; pointer-events: none; z-index: 20; transition: transform 0.1s linear; }
-.enemy-body { width: 100%; height: 100%; background: var(--color); opacity: 0.8; box-shadow: 0 0 10px var(--color); }
-.s-circ .enemy-body { border-radius: 99px; }
+.enemy-hologram { position: absolute; transform: translate(-50%, -50%); display: flex; align-items:center; justify-content: center; pointer-events: none; z-index: 40; transition: transform 0.1s linear; }
+.enemy-body { width: 100%; height: 100%; background: var(--color); opacity: 0.9; box-shadow: 0 0 15px var(--color); border: 1px solid rgba(255,255,255,0.4); }
+.s-circ .enemy-body { border-radius: 0; clip-path: circle(50% at 50% 50%); }
 .s-tria .enemy-body { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
 .s-diam .enemy-body { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
-.s-squa .enemy-body { border-radius: 2px; }
-.s-boss .enemy-body { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); border: 2px solid white; box-shadow: 0 0 20px var(--color); }
+.s-squa .enemy-body { border-radius: 0; }
+.s-boss .enemy-body { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); border: 2px solid white; box-shadow: 0 0 30px var(--color); }
 
 .enemy-hp-bar { position: absolute; top: -8px; left: 0; width: 100%; height: 2px; background: rgba(0,0,0,0.5); }
 .enemy-hp-fill { height: 100%; background: #22c55e; transition: width 0.1s; }

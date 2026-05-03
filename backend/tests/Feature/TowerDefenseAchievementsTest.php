@@ -19,8 +19,8 @@ class TowerDefenseAchievementsTest extends TestCase
     {
         parent::setUp();
         $this->user = User::factory()->create();
-        // Tower Defense game should already exist from migrations
-        $this->towerDefenseGame = Game::where('slug', 'tower-defense')->first();
+        // El juego debería ser creado por el seeder o manualmente aquí
+        $this->towerDefenseGame = Game::where('slug', 'proyecto-cortafuegos')->first();
         if (!$this->towerDefenseGame) {
             $this->towerDefenseGame = $this->createTowerDefenseGame();
         }
@@ -29,9 +29,9 @@ class TowerDefenseAchievementsTest extends TestCase
     private function createTowerDefenseGame(): Game
     {
         return Game::updateOrCreate(
-            ['slug' => 'tower-defense'],
+            ['slug' => 'proyecto-cortafuegos'],
             [
-                'title' => 'Tower Defense',
+                'title' => 'Proyecto Cortafuegos',
                 'description' => 'Defiende tu base de oleadas de enemigos.',
                 'config' => [
                     'allowed_actions' => ['wave_start', 'build_tower', 'upgrade_tower', 'sell_tower', 'complete_wave', 'lose_game'],
@@ -53,12 +53,12 @@ class TowerDefenseAchievementsTest extends TestCase
                 'points_reward' => 25,
                 'rarity' => 'common',
                 'is_active' => true,
-                'condition' => ['field' => 'max_wave', 'operator' => 'greater_than_or_equal', 'value' => 5],
+                'condition' => ['field' => 'max_wave_reached', 'operator' => 'greater_than_or_equal', 'value' => 5],
             ]
         );
 
         // Crear la partida
-        $this->actingAs($this->user)->post('/api/games/tower-defense/play');
+        $this->actingAs($this->user)->post('/api/games/proyecto-cortafuegos/play');
 
         $gameState = [
             'lives' => 20,
@@ -70,7 +70,7 @@ class TowerDefenseAchievementsTest extends TestCase
         ];
 
         // Guardar partida con onda 5
-        $response = $this->actingAs($this->user)->post('/api/games/tower-defense/save', [
+        $response = $this->actingAs($this->user)->post('/api/games/proyecto-cortafuegos/save', [
             'game_state' => $gameState,
             'score' => 5,
             'playtime' => 100,
@@ -101,7 +101,7 @@ class TowerDefenseAchievementsTest extends TestCase
             ]
         );
 
-        $this->actingAs($this->user)->post('/api/games/tower-defense/play');
+        $this->actingAs($this->user)->post('/api/games/proyecto-cortafuegos/play');
 
         $gameState = [
             'lives' => 20,
@@ -119,7 +119,7 @@ class TowerDefenseAchievementsTest extends TestCase
         ];
 
         // Guardar partida con 5 torres
-        $response = $this->actingAs($this->user)->post('/api/games/tower-defense/save', [
+        $response = $this->actingAs($this->user)->post('/api/games/proyecto-cortafuegos/save', [
             'game_state' => $gameState,
             'score' => 2,
             'playtime' => 50,
@@ -150,7 +150,7 @@ class TowerDefenseAchievementsTest extends TestCase
             ]
         );
 
-        $this->actingAs($this->user)->post('/api/games/tower-defense/play');
+        $this->actingAs($this->user)->post('/api/games/proyecto-cortafuegos/play');
 
         // Solo gastamos 150 (150 inicial - 0 final = 150)
         $gameState = [
@@ -163,7 +163,7 @@ class TowerDefenseAchievementsTest extends TestCase
         ];
 
         // Guardar partida
-        $response = $this->actingAs($this->user)->post('/api/games/tower-defense/save', [
+        $response = $this->actingAs($this->user)->post('/api/games/proyecto-cortafuegos/save', [
             'game_state' => $gameState,
             'score' => 2,
             'playtime' => 50,

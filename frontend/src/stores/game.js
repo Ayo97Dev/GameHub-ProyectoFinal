@@ -10,19 +10,15 @@ export const useGameStore = defineStore('game', () => {
   const DEFAULT_GAMES = [
     { slug: 'descenso-al-abismo', title: 'Descenso al Abismo', description: 'Sobrevive a las profundidades en este RPG de exploración táctica.' },
     { slug: 'core-clicker', title: 'CoreClicker', description: 'Optimiza el núcleo del sistema mediante clics de alta frecuencia.' },
-    { slug: 'quiz', title: 'Quiz', description: 'Preguntas rápidas.' },
     { slug: 'connect4', title: 'Conecta 4', description: 'Clásico Conecta 4 contra la IA' },
     { slug: 'proyecto-cortafuegos', title: 'Proyecto Cortafuegos', description: 'Protege la red central contra intrusiones masivas desplegando contramedidas tácticas.' },
     { slug: 'battleship', title: 'Hunde la Flota', description: 'Estrategia naval clásica: localiza y destruye la flota enemiga.' },
-    { slug: 'chess', title: 'Ajedrez', description: 'El juego de reyes: desafía a la IA en un duelo táctico total.' },
+    { slug: 'chess', title: 'Ajedrez', description: 'El juego de reyes: desafía a la IA en un duelo.' },
   ]
 
   const DEFAULT_COVERS = {
-    'space-invaders': '/images/games/wip-quiz.png',
-    'cookie-clicker': '/images/games/wip-quiz.png',
     'descenso-al-abismo': '/images/games/descenso-al-abismo.png',
     'core-clicker': '/images/games/core-clicker.png',
-    'quiz': '/images/games/wip-quiz.png',
     'connect4': '/images/games/connect4.png',
     'proyecto-cortafuegos': '/images/games/proyecto-cortafuegos.png',
     'battleship': '/images/games/battleship.png',

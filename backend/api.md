@@ -74,9 +74,9 @@ Authenticate an existing user and receive an access token.
           "last_played_at": "2026-02-23T10:00:00.000000Z",
           "game": {
             "id": 1,
-            "slug": "space-invaders",
-            "title": "Space Invaders",
-            "description": "Classic arcade shooter."
+            "slug": "chess",
+            "title": "Ajedrez",
+            "description": "El juego de mesa más famoso del mundo."
           }
         }
       ]
@@ -132,15 +132,15 @@ Get a list of all available games.
     "data": [
       {
         "id": 1,
-        "slug": "space-invaders",
-        "title": "Space Invaders",
-        "description": "Classic arcade shooter."
+        "slug": "chess",
+        "title": "Ajedrez",
+        "description": "El juego de mesa más famoso del mundo."
       },
       {
         "id": 2,
-        "slug": "cookie-clicker",
-        "title": "Cookie Clicker",
-        "description": "Click the cookie to earn points."
+        "slug": "core-clicker",
+        "title": "CoreClicker",
+        "description": "Optimiza el núcleo del sistema."
       }
     ]
   }
@@ -294,7 +294,7 @@ Starts a new game session. Optionally loads the previous save.
   {
     "session_id": 42,
     "game_state": { "balance": 0, "click_power": 1, "dps": 0, "upgrades": {}, "total_clicks": 0, "prestige_level": 0 },
-    "game": { "id": 1, "slug": "clicker", "title": "Neon Clicker Rush", "is_active": true }
+    "game": { "id": 1, "slug": "core-clicker", "title": "CoreClicker", "is_active": true }
   }
   ```
 
@@ -316,7 +316,7 @@ Executes a validated action within the game. Rate limited at the per-game config
   - `click` — `payload.count` (int, 1–100): clics en lote procesados de una sola vez.
   - `buy_upgrade` — `payload.upgrade_id` (int): compra una mejora. El coste escala con `baseCost × 1.15^n` donde `n` es el número de veces ya comprada.
   - `prestige` — sin payload.
-- **Available actions (tower-defense):**
+- **Available actions (proyecto-cortafuegos):**
   - `wave_start` — Inicia una nueva oleada.
   - `build_tower` — `payload.type` (string), `payload.x` (int), `payload.y` (int).
   - `upgrade_tower` — `payload.x` (int), `payload.y` (int).

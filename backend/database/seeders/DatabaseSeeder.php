@@ -44,16 +44,6 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        $quiz = Game::firstOrCreate(['slug' => 'quiz'], [
-            'title' => 'Quiz',
-            'category' => 'PUZZLE',
-            'description' => 'Preguntas y respuestas.',
-            'is_active' => true,
-            'config' => [
-                'allowed_actions' => ['answer_question', 'skip_question'],
-                'rate_limit_per_minute' => 120,
-            ],
-        ]);
 
         $connect4 = Game::firstOrCreate(['slug' => 'connect4'], [
             'title' => 'Connect 4',
@@ -66,13 +56,13 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        Game::firstOrCreate(['slug' => 'proyecto-cortafuegos'], [
+        $towerDefense = Game::firstOrCreate(['slug' => 'proyecto-cortafuegos'], [
             'title' => 'Proyecto Cortafuegos',
             'category' => 'DEFENSE',
             'description' => 'Protege la red central contra intrusiones masivas desplegando contramedidas tácticas.',
             'is_active' => true,
             'config' => [
-                'allowed_actions' => [],
+                'allowed_actions' => ['wave_start', 'build_tower', 'upgrade_tower', 'sell_tower', 'complete_wave', 'lose_game'],
                 'rate_limit_per_minute' => 60,
             ],
         ]);
@@ -205,6 +195,13 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'battleship-wins-1',  'title' => 'Bautismo de Fuego',       'description' => 'Gana 1 partida de Battleship.',              'game_id' => $battleship->id, 'points_reward' => 20,  'rarity' => 'common',    'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 1]],
             ['slug' => 'battleship-wins-5',  'title' => 'Comodoro',                'description' => 'Gana 5 partidas de Battleship.',              'game_id' => $battleship->id, 'points_reward' => 60,  'rarity' => 'uncommon',  'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 5]],
             ['slug' => 'battleship-wins-10', 'title' => 'Almirante de la Flota',   'description' => 'Gana 10 partidas de Battleship.',             'game_id' => $battleship->id, 'points_reward' => 150, 'rarity' => 'rare',      'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+
+            // ── Tower Defense: Proyecto Cortafuegos ───────────────────────────
+            ['slug' => 'td-wave-5',         'title' => 'Onda 5',                    'description' => 'Alcanza la oleada 5.',                       'game_id' => $towerDefense->id, 'points_reward' => 25,  'rarity' => 'common',    'condition' => ['field' => 'max_wave_reached', 'operator' => 'greater_than_or_equal', 'value' => 5]],
+            ['slug' => 'td-wave-10',        'title' => 'Onda 10',                   'description' => 'Alcanza la oleada 10.',                      'game_id' => $towerDefense->id, 'points_reward' => 60,  'rarity' => 'uncommon',  'condition' => ['field' => 'max_wave_reached', 'operator' => 'greater_than_or_equal', 'value' => 10]],
+            ['slug' => 'td-wave-20',        'title' => 'Onda 20',                   'description' => 'Alcanza la oleada 20.',                      'game_id' => $towerDefense->id, 'points_reward' => 200, 'rarity' => 'epic',      'condition' => ['field' => 'max_wave_reached', 'operator' => 'greater_than_or_equal', 'value' => 20]],
+            ['slug' => 'td-towers-5',       'title' => 'Defensor Inicial',          'description' => 'Construye 5 torres.',                        'game_id' => $towerDefense->id, 'points_reward' => 15,  'rarity' => 'common',    'condition' => ['field' => 'total_towers_built', 'operator' => 'greater_than_or_equal', 'value' => 5]],
+            ['slug' => 'td-gold-500',       'title' => 'Inversor',                  'description' => 'Gasta 500 de oro.',                         'game_id' => $towerDefense->id, 'points_reward' => 30,  'rarity' => 'uncommon',  'condition' => ['field' => 'total_gold_spent', 'operator' => 'greater_than_or_equal', 'value' => 500]],
 
             // ── Chess: Victorias ──────────────────────────────────────────────
             ['slug' => 'chess-wins-1',       'title' => 'Mate de Pastor',          'description' => 'Gana 1 partida de Ajedrez.',                 'game_id' => $chess->id,      'points_reward' => 20,  'rarity' => 'common',    'condition' => ['field' => 'wins', 'operator' => 'greater_than_or_equal', 'value' => 1]],

@@ -85,11 +85,6 @@ const get = (row, col) => {
   return board.value[row][col].piece
 }
 
-const getPieceImage = (piece) => {
-  if (!piece?.type || !piece?.color) return ''
-  return `/assets/boardKing/${piece.color}-${piece.type}.svg`
-}
-
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 const SAN_PIECE = {
   king: 'K',
@@ -576,7 +571,7 @@ const downloadMoveLog = () => {
   const playerLabel = playerColor.value === 'white' ? 'Blancas' : 'Negras'
 
   const lines = [
-    'Board King - Registro de jugadas',
+    'Ajedrez - Registro de jugadas',
     `Fecha: ${now.toLocaleString()}`,
     `Jugador: ${playerLabel}`,
     `Resultado: ${resultLabel.value ?? 'Sin resultado'}`,
@@ -595,7 +590,7 @@ const downloadMoveLog = () => {
   const anchor = document.createElement('a')
 
   anchor.href = url
-  anchor.download = `board-king-registro-${fileStamp}.txt`
+  anchor.download = `ajedrez-registro-${fileStamp}.txt`
   document.body.appendChild(anchor)
   anchor.click()
   document.body.removeChild(anchor)
@@ -1206,6 +1201,22 @@ const isPossibleMove = (cell) => {
   return legalMovesForSelected.value.some(move => move.row === cell.row && move.col === cell.col)
 }
 
+const isCaptureMove = (cell) => {
+  if (!selected.value || !selected.value.piece) return false
+  if (!isPossibleMove(cell)) return false
+  
+  // Captura normal: hay una pieza enemiga en el destino
+  if (cell.piece && cell.piece.color !== selected.value.piece.color) return true
+  
+  // Captura al paso (En Passant): peón moviéndose en diagonal a una celda vacía
+  if (selected.value.piece.type === 'pawn' && cell.col !== selected.value.col && !cell.piece) {
+    const epCell = getEnPassantCaptureCell(board.value, selected.value, cell, selected.value.piece.color)
+    if (epCell) return true
+  }
+  
+  return false
+}
+
 const getAllLegalMovesForColor = (color) => {
   const legalMoves = []
 
@@ -1453,12 +1464,16 @@ updateCheckState()
                 (rowIndex + colIndex) % 2 === 0 ? 'cell-white' : 'cell-black',
                 selected?.row === cell.row && selected?.col === cell.col ? 'cell-selected' : '',
                 isPossibleMove(cell) ? 'cell-possible' : '',
+                isCaptureMove(cell) ? 'cell-capture' : '',
                 isCheckingAttacker(cell) ? 'cell-check' : ''
               ]"
               @click="handleClick(cell)"
               @dragover="handleDragOver($event)"
               @drop="handleDrop($event, cell)"
             >
+              <div v-if="isCaptureMove(cell)" class="capture-reticle">
+                <Icon icon="mdi:target-variant" />
+              </div>
               <div
                 v-if="cell.piece"
                 class="piece-container flex items-center justify-center w-full h-full cursor-grab active:cursor-grabbing"
@@ -1606,6 +1621,60 @@ updateCheckState()
 
 .cell-possible:hover {
   background-color: rgba(0, 242, 255, 0.1) !important;
+}
+
+.cell-capture {
+  position: relative;
+  z-index: 10;
+}
+
+.cell-capture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 45, 85, 0.15);
+  box-shadow: inset 0 0 15px rgba(255, 45, 85, 0.3);
+  z-index: -1;
+}
+
+.cell-capture::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px dashed var(--color-neon-pink);
+  opacity: 0.8;
+  animation: capture-scan 2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes capture-scan {
+  0% { transform: scale(0.95); opacity: 0.4; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(0.95); opacity: 0.4; }
+}
+
+.capture-reticle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neon-pink);
+  font-size: 24px;
+  pointer-events: none;
+  animation: reticle-rotate 4s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes reticle-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(90deg); }
+}
+
+.cell-capture:hover::after {
+  border-style: solid;
+  opacity: 1;
+  box-shadow: 0 0 15px var(--color-neon-pink);
 }
 
 .cell-check {

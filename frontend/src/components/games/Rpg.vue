@@ -7,6 +7,7 @@
       .font-rpg-body { font-family: 'Bitter', serif; }
     </component>
 
+
     <!-- INITIAL SPLASH SCREEN (Grim Tome Style) -->
     <Transition name="fade-grim">
       <div v-if="phase === 'idle'" class="absolute inset-0 z-[100] flex items-center justify-center bg-[#070707]">
@@ -15,7 +16,6 @@
         
         <div class="relative z-10 flex flex-col items-center gap-10 text-center px-6">
           <div class="space-y-3">
-            <span class="text-[#8c2d1f] font-fantasy text-sm tracking-[0.5em] uppercase opacity-50 animate-pulse">A GameHub Dark Chronicle</span>
             <h1 class="text-6xl md:text-7xl font-fantasy text-[#b8a38a] drop-shadow-[0_10px_20px_rgba(0,0,0,1)] tracking-tighter uppercase leading-none">Descenso al Abismo</h1>
             <div class="h-1 w-32 mx-auto bg-gradient-to-r from-transparent via-[#8c2d1f] to-transparent"></div>
           </div>
@@ -58,15 +58,7 @@
       <Transition name="modal-grim">
         <div v-if="showModal" class="fixed inset-0 z-[99999] flex items-center justify-center bg-black overflow-hidden select-none">
           
-          <!-- EXIT SEAL -->
-          <button 
-            @click="showExitConfirm = true" 
-            class="fixed top-4 right-4 z-[100050] size-14 flex items-center justify-center group transition-transform hover:rotate-12 active:scale-90"
-          >
-            <div class="absolute inset-0 bg-[#8c2d1f] rounded-full shadow-[0_4px_12px_rgba(0,0,0,1)] border-4 border-[#5c1a11] group-hover:bg-[#a63626] transition-colors"></div>
-            <div class="absolute inset-1.5 border-2 border-dashed border-black/30 rounded-full"></div>
-            <Icon icon="game-icons:death-skull" class="relative z-10 text-black text-2xl pointer-events-none" />
-          </button>
+
 
           <!-- Main Parchment Frame -->
           <div class="relative w-full h-full flex flex-col bg-[#24211e] shadow-inner border-[16px] border-double border-[#3c2a1a] z-10">
@@ -91,7 +83,7 @@
             <div class="absolute inset-0 pointer-events-none z-40 bg-[radial-gradient(circle,transparent_50%,rgba(0,0,0,0.3)_130%)]"></div>
 
             <!-- HEADER -->
-            <header class="relative z-[60] p-4 sm:p-5 pr-48 lg:pr-64 flex flex-col md:flex-row items-center justify-between gap-6 border-b-4 border-double border-[#3c2a1a] bg-black/40 backdrop-blur-sm">
+            <header class="relative z-[60] p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-6 border-b-4 border-double border-[#3c2a1a] bg-black/40 backdrop-blur-sm">
               <div class="flex items-center gap-6">
                 <div class="size-14 bg-[#0a0a0a] flex items-center justify-center text-[#8c2d1f] text-3xl border-4 border-[#3c2a1a] shadow-2xl iron-shadow transform -rotate-3">
                   <Icon icon="game-icons:crossed-swords" />
@@ -104,55 +96,101 @@
                     <span v-else>Seleccionando Destino</span>
                   </div>
                   
-                  <!-- XP BAR IN HEADER -->
-                  <div v-if="hero" class="w-full max-w-[240px] mt-2 group/xp relative">
-                    <div class="h-1.5 w-full bg-black/60 border border-[#3c2a1a]/40 p-0.5 shadow-inner relative overflow-hidden">
+                  <!-- XP BAR IN HEADER (Reworked) -->
+                  <div v-if="hero" class="w-full max-w-[280px] mt-3 group/xp relative">
+                    <div class="flex justify-between items-end mb-1 px-1">
+                      <span class="text-[8px] text-[#b8a38a]/40 uppercase tracking-widest font-fantasy">Experiencia</span>
+                      <span class="text-[9px] text-amber-500 font-fantasy">{{ Math.floor(hero.exp / hero.nextLevelExp * 100) }}%</span>
+                    </div>
+                    <div class="h-2.5 w-full bg-black/80 border-2 border-[#3c2a1a] p-0.5 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] relative overflow-hidden group-hover/xp:border-amber-900/40 transition-colors">
                       <div 
-                        class="h-full bg-gradient-to-r from-amber-900 via-amber-600 to-amber-400 transition-all duration-1000 relative z-10" 
+                        class="h-full bg-gradient-to-r from-amber-950 via-amber-600 to-amber-400 transition-all duration-1000 relative z-10" 
                         :style="{ width: (hero.exp/hero.nextLevelExp*100) + '%' }"
-                      ></div>
+                      >
+                        <!-- Spark effect at the end of the bar -->
+                        <div class="absolute right-0 top-0 bottom-0 w-4 bg-white/20 blur-md animate-pulse"></div>
+                      </div>
                       <!-- Gloss effect -->
-                      <div class="absolute inset-0 bg-white/5 z-20 pointer-events-none"></div>
+                      <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent z-20 pointer-events-none"></div>
                     </div>
                     
                     <!-- XP Tooltip on hover -->
-                    <div class="absolute top-full left-0 mt-1 px-2 py-0.5 bg-black/90 border border-[#3c2a1a] text-[8px] text-amber-500 font-fantasy uppercase tracking-tighter opacity-0 group-hover/xp:opacity-100 transition-opacity z-50">
-                      XP: {{ Math.floor(hero.exp) }} / {{ hero.nextLevelExp }}
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-[#0a0a0a] border border-amber-900/40 text-[9px] text-amber-500 font-fantasy uppercase tracking-widest opacity-0 group-hover/xp:opacity-100 transition-all z-50 shadow-2xl translate-y-2 group-hover:translate-y-0">
+                      {{ Math.floor(hero.exp) }} / {{ hero.nextLevelExp }} XP
                     </div>
                   </div>
                 </div>
               </div>
 
               <div class="flex items-center gap-8">
-                <!-- MAP TRACKER -->
-                <div v-if="hero" class="relative flex gap-4 p-2.5 bg-black/30 border border-[#3c2a1a] shadow-inner items-center min-w-[240px] justify-center">
-                  <div class="absolute top-1/2 left-8 right-8 h-0.5 bg-[#3c2a1a]/30 -translate-y-1/2 z-0"></div>
+                <!-- MAP TRACKER (Reworked) -->
+                <div v-if="hero" class="relative flex gap-8 pt-4 pb-7 px-8 bg-black/40 border-2 border-[#3c2a1a] shadow-inner items-center min-w-[320px] justify-center">
+                  <!-- Background Pattern -->
+                  <div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] pointer-events-none"></div>
+                  
+                  <!-- Connecting Line (Base) -->
+                  <div class="absolute top-1/2 left-10 right-10 h-1 bg-[#3c2a1a]/40 -translate-y-1/2 z-0 rounded-full"></div>
+                  
+                  <!-- Connecting Line (Progress) -->
                   <div 
-                    class="absolute top-1/2 left-8 h-0.5 bg-gradient-to-r from-[#8c2d1f] to-white/40 -translate-y-1/2 z-0 transition-all duration-1000"
-                    :style="{ width: ((run.roomInFloor - 1) / 2 * 100) + '%' }"
+                    class="absolute top-1/2 left-10 h-1 bg-gradient-to-r from-[#8c2d1f] to-amber-600 -translate-y-1/2 z-0 transition-all duration-1000 rounded-full"
+                    :style="{ width: ((run.roomInFloor - 1) / 2 * 75) + '%' }"
                   ></div>
 
                   <div
                     v-for="idx in 3"
                     :key="idx"
-                    class="size-4.5 rounded-full border-2 transition-all duration-700 flex items-center justify-center relative z-10"
-                    :class="idx === run.roomInFloor
-                      ? 'bg-white border-white shadow-[0_0_15px_rgba(255,255,255,0.8)] scale-125'
-                      : (idx < run.roomInFloor ? 'bg-[#8c2d1f] border-[#5c1a11] shadow-[0_0_8px_rgba(140,45,31,0.4)]' : 'bg-black/80 border-[#3c2a1a]')"
+                    class="relative z-10 flex flex-col items-center"
                   >
-                    <Icon v-if="idx === 3" :icon="run.floor % 10 === 0 ? 'game-icons:death-skull' : 'game-icons:doorway'" class="text-[8px]" :class="idx <= run.roomInFloor ? 'text-black' : 'text-[#3c2a1a]'" />
+                    <div
+                      class="size-10 rounded-sm border-2 transition-all duration-700 flex items-center justify-center bg-[#0a0a0a] transform rotate-45"
+                      :class="idx === run.roomInFloor
+                        ? 'border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)] scale-110 bg-[#1a1a1a]'
+                        : (idx < run.roomInFloor ? 'border-[#8c2d1f] bg-[#240a0a]' : 'border-[#3c2a1a] opacity-40')"
+                    >
+                      <div class="-rotate-45">
+                        <Icon 
+                          v-if="idx === 3" 
+                          :icon="run.floor % 10 === 0 ? 'game-icons:death-skull' : 'game-icons:doorway'" 
+                          class="size-5" 
+                          :class="idx <= run.roomInFloor ? 'text-amber-500' : 'text-[#3c2a1a]'" 
+                        />
+                        <Icon 
+                          v-else-if="idx < run.roomInFloor" 
+                          icon="game-icons:check-mark" 
+                          class="size-4 text-emerald-500" 
+                        />
+                        <span v-else class="font-fantasy text-[10px]" :class="idx === run.roomInFloor ? 'text-white' : 'text-[#b8a38a]/20'">{{ idx }}</span>
+                      </div>
+                    </div>
+                    <!-- Label -->
+                    <span 
+                      class="absolute -bottom-5 font-fantasy text-[7px] uppercase tracking-tighter whitespace-nowrap transition-colors"
+                      :class="idx === run.roomInFloor ? 'text-amber-500' : 'text-[#b8a38a]/20'"
+                    >
+                      {{ idx === 3 ? (run.floor % 10 === 0 ? 'Guardián' : 'Escaleras') : 'Sala ' + idx }}
+                    </span>
                   </div>
                 </div>
                 
-                <div class="flex gap-3">
+                <div class="flex items-center gap-4">
                     <button @click="phase = 'classSelect'" class="group relative px-6 py-2 transition-all">
                         <div class="absolute inset-0 bg-[#0a0a0a] border border-[#3c2a1a] group-hover:bg-black group-hover:border-[#b8a38a]/40 transition-colors"></div>
-                        <span class="relative z-10 font-fantasy text-[10px] uppercase text-[#b8a38a] group-hover:text-white">Cambiar Senda</span>
+                        <span class="relative z-10 font-fantasy text-[10px] uppercase text-[#b8a38a] group-hover:text-white">Cambiar Clase</span>
                     </button>
-                    <button @click="saveRun" class="group relative px-6 py-2 overflow-hidden transition-all shadow-lg">
+                    <button @click="saveAndExit" class="group relative px-6 py-2 overflow-hidden transition-all shadow-lg">
                         <div class="absolute inset-0 bg-[#8c2d1f] border border-white/10 group-hover:scale-105 transition-transform"></div>
                         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-paper.png')] opacity-20"></div>
-                        <span class="relative z-10 font-fantasy text-[10px] uppercase text-white tracking-widest">Sellar Gesta</span>
+                        <span class="relative z-10 font-fantasy text-[10px] uppercase text-white tracking-widest">Guardar partida</span>
+                    </button>
+                    <!-- EXIT SEAL (MOVED) -->
+                    <button 
+                      @click="showExitConfirm = true" 
+                      class="relative size-11 flex items-center justify-center group transition-transform hover:rotate-12 active:scale-90"
+                    >
+                      <div class="absolute inset-0 bg-[#8c2d1f] rounded-full shadow-[0_4px_12px_rgba(0,0,0,1)] border-4 border-[#5c1a11] group-hover:bg-[#a63626] transition-colors"></div>
+                      <div class="absolute inset-1 border-2 border-dashed border-black/30 rounded-full"></div>
+                      <Icon icon="game-icons:skull-crossed-bones" class="relative z-10 text-black text-xl pointer-events-none" />
                     </button>
                 </div>
               </div>
@@ -164,7 +202,7 @@
               <!-- CLASS SELECTION SCREEN -->
               <div v-if="phase === 'classSelect'" class="absolute inset-0 z-[100] bg-[#1a1714] p-8 overflow-auto custom-scroll flex flex-col items-center">
                 <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] pointer-events-none"></div>
-                <h2 class="text-4xl font-fantasy text-[#b8a38a] mb-12 uppercase tracking-[0.2em] relative z-10">Escoge tu Senda</h2>
+                <h2 class="text-4xl font-fantasy text-[#b8a38a] mb-12 uppercase tracking-[0.2em] relative z-10">Escoge tu Clase</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl w-full pb-20 relative z-10">
                   <div 
                     v-for="c in classes" 
@@ -173,7 +211,7 @@
                     class="group relative p-6 bg-[#0a0a0a] border-4 border-[#3c2a1a] transition-all flex flex-col gap-4 transform hover:-translate-y-2"
                     :class="unlockedClasses.includes(c.id) ? 'hover:border-[#8c2d1f] cursor-pointer' : 'opacity-60 grayscale cursor-not-allowed'"
                   >
-                    <div class="flex items-center justify-between border-b border-[#3c2a1a] pb-2">
+                    <div class="flex items-center justify-between border-b border-[#3c2a1a] pb-2 relative z-10">
                       <span class="font-fantasy text-xl text-[#b8a38a] group-hover:text-white uppercase">{{ c.name }}</span>
                       <div class="flex flex-col items-end">
                         <span class="text-[10px] text-[#8c2d1f] font-fantasy uppercase px-2 py-0.5 bg-black border border-[#8c2d1f]/30">{{ c.role }}</span>
@@ -243,7 +281,13 @@
                               class="size-48 sm:size-60 bg-[#0a0a0a] border-[8px] border-double border-[#3c2a1a] flex items-center justify-center transition-all duration-700 transform relative z-10 overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,1)]"
                               :class="{ 'border-[#b8a38a]/30 shadow-[0_0_40px_rgba(184,163,138,0.1),inset_0_0_40px_rgba(0,0,0,1)]': turn === 'hero' && phase === 'combat' }"
                             >
-                               <Icon icon="game-icons:shield-echoes" class="size-36 text-[#b8a38a]/20 drop-shadow-md" />
+                               <img 
+                                 v-if="!heroImageError" 
+                                 :src="getUnitAvatar(hero)" 
+                                 @error="handleHeroImageError"
+                                 class="absolute inset-0 w-full h-full object-cover object-top opacity-80 group-hover:opacity-100 transition-opacity"
+                               />
+                               <Icon v-if="heroImageError" icon="game-icons:shield-echoes" class="size-36 text-[#b8a38a]/20 drop-shadow-md" />
                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             </div>
                             <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 px-8 py-2 bg-[#1a1a1a] text-[#b8a38a] font-fantasy text-xs uppercase tracking-[0.3em] shadow-2xl border-2 border-[#3c2a1a] z-20">{{ hero.className }}</div>
@@ -324,15 +368,24 @@
                          </div>
                       </div>
 
-                      <!-- ENEMY AVATAR -->
-                      <div v-if="enemy" class="flex flex-col items-center group" :class="{ 'animate-shake': hitEnemy }">
+                      <!-- ENEMY AVATAR / VICTORY SUMMARY -->
+                      <div class="flex flex-col items-center min-h-[400px] justify-center">
+                        <Transition name="fade-grim" mode="out-in">
+                          <!-- ACTIVE COMBAT -->
+                          <div v-if="enemy && phase === 'combat'" :key="'enemy-' + enemy.id" class="flex flex-col items-center group" :class="{ 'animate-shake': hitEnemy }">
                          <div class="relative">
                             <div v-if="turn === 'enemy' && phase === 'combat'" class="absolute inset-0 bg-red-950/20 blur-[60px] rounded-full scale-150 animate-pulse"></div>
                             <div 
                               class="size-48 sm:size-60 bg-black/80 border-[8px] border-double border-red-950/40 flex items-center justify-center transition-all duration-700 transform relative z-10 shadow-[inset_0_0_50px_rgba(0,0,0,1)]"
                               :class="{ 'border-red-900 shadow-[0_0_40px_rgba(153,27,27,0.1),inset_0_0_50px_rgba(0,0,0,1)]': turn === 'enemy' && phase === 'combat' }"
                             >
-                               <Icon icon="game-icons:death-skull" class="size-36 text-red-950/10" />
+                               <img 
+                                 v-if="!enemyImageError" 
+                                 :src="getUnitAvatar(enemy, true)" 
+                                 @error="handleEnemyImageError"
+                                 class="absolute inset-0 w-full h-full object-cover object-top opacity-70 group-hover:opacity-90 transition-opacity"
+                               />
+                               <Icon v-if="enemyImageError" icon="game-icons:death-skull" class="size-36 text-red-950/10" />
                             </div>
                             <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 px-8 py-2 bg-[#1a0505] text-red-700 font-fantasy text-xs uppercase tracking-[0.3em] shadow-2xl border-2 border-red-950 z-20">{{ enemy.name }}</div>
 
@@ -382,7 +435,50 @@
                             </div>
                          </div>
                       </div>
-                   </div>
+
+                      <!-- VICTORY REWARDS -->
+                      <div v-else-if="phase === 'victory' && !showBossVictory" :key="'victory'" class="flex flex-col items-center">
+                        <div class="relative p-10 bg-black/40 border-4 border-double border-[#3c2a1a] shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col items-center gap-6">
+                          <Icon icon="game-icons:laurels-trophy" class="size-20 text-amber-500/40 animate-pulse" />
+                          <div class="text-center space-y-1">
+                            <p class="font-fantasy text-2xl text-amber-500 uppercase tracking-[0.2em] drop-shadow-lg">Victoria</p>
+                            <p class="text-[10px] text-[#b8a38a]/40 uppercase tracking-widest italic">El enemigo ha sido purgado</p>
+                          </div>
+
+                          <div class="flex gap-8 border-t border-[#3c2a1a]/40 pt-4 w-full justify-center">
+                            <div class="flex flex-col items-center">
+                              <div class="flex items-center gap-2 text-amber-400">
+                                <Icon icon="game-icons:coins" class="text-xl" />
+                                <span class="font-fantasy text-xl font-bold">+{{ lastRewards.gold }}</span>
+                              </div>
+                              <span class="text-[8px] text-[#b8a38a]/40 uppercase tracking-widest">Oro</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                              <div class="flex items-center gap-2 text-blue-400">
+                                <Icon icon="game-icons:star-shuriken" class="text-xl" />
+                                <span class="font-fantasy text-xl font-bold">+{{ lastRewards.xp }}</span>
+                              </div>
+                              <span class="text-[8px] text-[#b8a38a]/40 uppercase tracking-widest">Experiencia</span>
+                            </div>
+                          </div>
+
+                          <button 
+                            @click="advanceRoom" 
+                            class="mt-4 px-6 py-2 bg-[#1a1a1a] border border-[#3c2a1a] text-[#b8a38a] font-fantasy text-[10px] uppercase tracking-widest hover:bg-[#3c2a1a] hover:text-white transition-all shadow-xl"
+                          >
+                            Continuar
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- NO ENEMY (Idle/Other phases) -->
+                      <div v-else :key="'none'" class="opacity-20 grayscale flex flex-col items-center gap-4">
+                        <Icon icon="game-icons:empty-chessboard" class="size-24 text-[#3c2a1a]" />
+                        <p class="font-fantasy text-[10px] uppercase tracking-widest text-[#3c2a1a]">Esperando encuentro...</p>
+                      </div>
+                    </Transition>
+                  </div>
+               </div>
                 </div>
 
                 <!-- COMMAND BAR -->
@@ -459,7 +555,10 @@
               <aside v-if="hero && phase !== 'classSelect'" class="w-full lg:w-[320px] flex flex-col gap-6 relative z-[70]">
                 <!-- INVENTORY -->
                 <div class="p-4 bg-black/60 border-4 border-[#3c2a1a] shadow-inner flex flex-col gap-3 relative">
-                  <p class="font-fantasy text-xs text-[#b8a38a]/80 border-b border-[#3c2a1a]/40 pb-1 uppercase tracking-widest">Alforja</p>
+                  <div class="flex items-center gap-3 border-b border-[#3c2a1a]/40 pb-2 mb-1">
+                    <Icon icon="game-icons:chest" class="text-[#b8a38a]/60 text-lg" />
+                    <p class="font-fantasy text-sm text-[#b8a38a] uppercase tracking-[0.2em]">Botín</p>
+                  </div>
                   <div class="grid grid-cols-3 gap-2">
                     <div 
                       v-for="(item, idx) in 6" :key="idx"
@@ -497,7 +596,12 @@
 
                 <div class="flex-1 p-6 bg-black/60 border-8 border-double border-[#3c2a1a] shadow-inner flex flex-col min-h-0 relative">
                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/old-wall.png')] opacity-10 pointer-events-none"></div>
-                   <p class="font-fantasy text-xl text-[#b8a38a]/80 mb-4 pb-2 border-b border-[#3c2a1a]/40 relative z-10 uppercase tracking-widest">Cronicón</p>
+                   <div class="flex justify-between items-center border-b border-[#3c2a1a]/40 mb-4 pb-2 relative z-10">
+                       <p class="font-fantasy text-xl text-[#b8a38a]/80 uppercase tracking-widest">Cronicón</p>
+                       <button @click="unstuck" class="text-[9px] text-amber-900/40 hover:text-amber-600 transition-colors uppercase font-fantasy" title="Reiniciar Piso si te quedas atascado">
+                          Desatascar
+                       </button>
+                    </div>
                    <div class="flex-1 overflow-auto space-y-4 font-serif text-[11px] custom-scroll pr-3 italic leading-relaxed relative z-10">
                       <TransitionGroup name="log-grim">
                         <div v-for="(line, idx) in log" :key="idx" class="flex gap-3 items-start py-2 border-b border-[#3c2a1a]/10 transition-all" :class="idx === 0 ? 'text-[#b8a38a] font-bold opacity-100 scale-105 origin-left' : 'text-[#b8a38a]/40'">
@@ -513,7 +617,7 @@
                   class="p-4 bg-black border-y-4 border-[#3c2a1a] shadow-xl flex items-center justify-between transition-all duration-500 relative overflow-hidden"
                   :class="{ 'border-amber-600 shadow-[0_0_30px_rgba(245,158,11,0.2)]': goldFlash }"
                 >
-                  <span class="relative z-10 font-fantasy text-[#b8a38a]/30 text-[10px] uppercase tracking-[0.4em]">Botín Arcano</span>
+                  <span class="relative z-10 font-fantasy text-[#b8a38a]/30 text-[10px] uppercase tracking-[0.4em]">Botín</span>
                   <div class="relative z-10 flex items-center gap-3">
                     <Icon icon="game-icons:coins" class="text-[#b8a38a] text-2xl" :class="{ 'animate-bounce text-amber-500': goldFlash }" />
                     <span class="font-fantasy text-[#b8a38a] text-2xl tracking-tighter">{{ run.gold }}</span>
@@ -521,11 +625,96 @@
                 </div>
               </aside>
 
+            <!-- RESULT MODAL -->
+            <div v-if="showResultModal" class="absolute inset-0 z-[250] bg-black/90 backdrop-blur-md flex items-center justify-center p-8">
+              <div class="max-w-md w-full bg-[#1a1714] border-[10px] border-double border-[#3c2a1a] p-10 text-center space-y-8 relative shadow-[0_0_100px_rgba(0,0,0,1)] animate-modal-grim">
+                <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] pointer-events-none"></div>
+                
+                <div class="space-y-4">
+                  <Icon :icon="resultData.icon" class="size-20 mx-auto" :class="resultData.type === 'success' ? 'text-emerald-500' : (resultData.type === 'treasure' ? 'text-amber-500' : 'text-[#b8a38a]')" />
+                  <h3 class="text-3xl font-fantasy uppercase tracking-[0.3em]" :class="resultData.type === 'success' ? 'text-emerald-500' : (resultData.type === 'treasure' ? 'text-amber-500' : 'text-[#b8a38a]')">{{ resultData.title }}</h3>
+                </div>
+
+                <p class="text-[#b8a38a] font-serif italic text-lg leading-relaxed border-y border-[#3c2a1a]/40 py-6">{{ resultData.text }}</p>
+
+                <!-- REWARDS LIST -->
+                <div v-if="resultData.rewards && resultData.rewards.length > 0" class="flex flex-wrap justify-center gap-4 py-2">
+                  <div 
+                    v-for="(rw, i) in resultData.rewards" 
+                    :key="i"
+                    class="flex items-center gap-2 px-3 py-1 bg-black/40 border border-[#3c2a1a] rounded-sm"
+                  >
+                    <span class="text-[8px] text-[#b8a38a]/40 uppercase tracking-widest">{{ rw.label }}:</span>
+                    <span 
+                      class="font-fantasy text-xs" 
+                      :class="rw.value > 0 ? 'text-emerald-500' : (rw.value < 0 ? 'text-red-500' : 'text-[#b8a38a]')"
+                    >
+                      {{ rw.value > 0 ? '+' : '' }}{{ rw.value }}
+                    </span>
+                  </div>
+                </div>
+
+                <button 
+                  @click="showResultModal = false" 
+                  class="w-full py-4 bg-[#0a0a0a] border-2 border-[#3c2a1a] text-[#b8a38a] font-fantasy uppercase tracking-widest hover:bg-[#3c2a1a] hover:text-white transition-all shadow-xl"
+                >
+                  Continuar
+                </button>
+              </div>
+            </div>
+
+            <!-- LEVEL UP MODAL -->
+            <div v-if="showLevelUpModal && levelUpStats" class="absolute inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-8">
+              <div class="max-w-md w-full bg-[#1a1714] border-[10px] border-double border-amber-600/40 p-10 text-center space-y-8 relative shadow-[0_0_100px_rgba(184,163,138,0.2)] animate-modal-grim">
+                <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] pointer-events-none"></div>
+                
+                <div class="space-y-2">
+                  <Icon icon="game-icons:levelup" class="size-20 text-amber-500 mx-auto animate-bounce" />
+                  <h3 class="text-3xl font-fantasy text-amber-500 uppercase tracking-[0.3em]">Nivel Aumentado</h3>
+                  <p class="text-[#b8a38a] font-fantasy text-lg uppercase tracking-widest">Ahora eres Nivel {{ levelUpStats.level }}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-left font-fantasy text-xs uppercase border-y border-[#3c2a1a]/40 py-6">
+                  <div class="flex justify-between items-center text-[#b8a38a]/60">
+                    <span>Vida Máxima</span>
+                    <span class="text-red-500 font-bold">+{{ levelUpStats.hp }}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-[#b8a38a]/60">
+                    <span>Maná Máximo</span>
+                    <span class="text-blue-500 font-bold">+{{ levelUpStats.mp }}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-[#b8a38a]/60">
+                    <span>Ataque</span>
+                    <span class="text-amber-500 font-bold">+{{ levelUpStats.attack }}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-[#b8a38a]/60">
+                    <span>Defensa</span>
+                    <span class="text-slate-400 font-bold">+{{ levelUpStats.defense }}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-[#b8a38a]/60">
+                    <span>P. Mágico</span>
+                    <span class="text-blue-400 font-bold">+{{ levelUpStats.magicAttack }}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-[#b8a38a]/60">
+                    <span>D. Mágica</span>
+                    <span class="text-purple-400 font-bold">+{{ levelUpStats.magicDefense }}</span>
+                  </div>
+                </div>
+
+                <button 
+                  @click="showLevelUpModal = false" 
+                  class="w-full py-4 bg-amber-600/10 border-2 border-amber-600/40 text-amber-500 font-fantasy uppercase tracking-widest hover:bg-amber-600 hover:text-black transition-all"
+                >
+                  Continuar la Gesta
+                </button>
+              </div>
+            </div>
+
             <!-- PATH SELECTION OVERLAY -->
             <div v-if="phase === 'pathSelect'" class="absolute inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-8">
               <div class="max-w-4xl w-full text-center space-y-12">
                 <div class="space-y-2">
-                  <h3 class="text-4xl font-fantasy text-[#b8a38a] uppercase tracking-[0.4em]">Elige tu Senda</h3>
+                  <h3 class="text-4xl font-fantasy text-[#b8a38a] uppercase tracking-[0.4em]">Elige tu Clase</h3>
                   <p class="text-[#b8a38a]/40 font-serif italic">"Dos caminos se abren ante ti, pero solo uno lleva a la gloria."</p>
                 </div>
 
@@ -733,6 +922,7 @@ import playerSkillsData from '../../assets/json/skills_player.json'
 import enemySkillsData from '../../assets/json/skills_enemy.json'
 import eventsData from '../../assets/json/events.json'
 import bossesData from '../../assets/json/bosses.json'
+import rpgAssets from '../../assets/json/rpg_assets.json'
 
 const GAME_SLUG = 'descenso-al-abismo'
 const isLoading = ref(false); const error = ref(null); const sessionId = ref(null); const log = ref([]); 
@@ -742,6 +932,14 @@ const hasSave = ref(false);
 const saveSummary = ref(null);
 const playStartTime = ref(null);
 const totalTimePlayed = ref(0);
+const heroImageError = ref(false);
+const enemyImageError = ref(false);
+const lastRewards = ref({ gold: 0, xp: 0 });
+const showLevelUpModal = ref(false);
+const levelUpStats = ref(null);
+const showResultModal = ref(false);
+const resultData = ref({ title: '', text: '', icon: '', type: '', rewards: [] });
+
 
 const classes = classesData.classes
 const allEnemies = enemiesData.enemies
@@ -757,7 +955,6 @@ function clone(obj) { return JSON.parse(JSON.stringify(obj)) }
 
 // PERSISTENCE & META-PROGRESSION
 const inventoryStore = useInventoryStore()
-const totalGold = ref(parseInt(localStorage.getItem('rpg_total_gold') || '0'))
 
 const unlockedClasses = computed(() => {
   const defaults = ["warrior", "paladin", "rogue", "mage", "hunter", "cleric"]
@@ -769,9 +966,7 @@ const unlockedClasses = computed(() => {
   return [...defaults, ...purchased]
 })
 
-function saveMeta() {
-  localStorage.setItem('rpg_total_gold', totalGold.value.toString())
-}
+// saveMeta removed
 
 function makeHero(classId = 'warrior') {
   const c = classes.find(cl => cl.id === classId) || classes[0]
@@ -786,6 +981,7 @@ function makeHero(classId = 'warrior') {
     magicAttack: c.stats.magicAttack, magicDefense: c.stats.magicDefense,
     speed: c.stats.speed, critRate: c.stats.critRate, evasion: c.stats.evasion,
     guard: false, skillCooldowns: {}, skills: skills.map(s => s.id),
+    selectedImage: rpgAssets.classes[c.id]?.[randInt(0, (rpgAssets.classes[c.id]?.length || 1) - 1)] || null,
     inventory: [],
     statuses: []
   }
@@ -803,20 +999,33 @@ function gainExp(amount) {
 function levelUp() {
   const h = hero.value
   const c = classes.find(cl => cl.id === h.classId)
+  const lu = c.levelUp
+  
+  levelUpStats.value = {
+    level: h.level + 1,
+    hp: lu.hp,
+    mp: lu.mp,
+    attack: lu.attack,
+    defense: lu.defense,
+    magicAttack: lu.magicAttack,
+    magicDefense: lu.magicDefense,
+    speed: lu.speed
+  }
+  
   h.level++
   h.exp -= h.nextLevelExp
   h.nextLevelExp = Math.floor(h.nextLevelExp * 1.3)
   
   // Stats increase
-  const lu = c.levelUp
-  h.maxHp += lu.hp; h.hp = h.maxHp
-  h.maxMp += lu.mp; h.mp = h.maxMp
+  h.maxHp += lu.hp
+  h.maxMp += lu.mp
   h.attack += lu.attack
   h.defense += lu.defense
   h.magicAttack += lu.magicAttack
   h.magicDefense += lu.magicDefense
   h.speed += lu.speed
   
+  showLevelUpModal.value = true
   pushLog(`¡NIVEL AUMENTADO! Ahora eres nivel ${h.level}.`)
 }
 
@@ -856,6 +1065,7 @@ function makeEnemy(floor = 1, isBoss = false) {
     skills: base.skills,
     skillCooldowns: {},
     isBoss,
+    selectedImage: (isBoss ? rpgAssets.bosses : rpgAssets.enemies)[base.id]?.[randInt(0, ((isBoss ? rpgAssets.bosses : rpgAssets.enemies)[base.id]?.length || 1) - 1)] || null,
     statuses: []
   }
 }
@@ -873,6 +1083,7 @@ const bossRewards = ref({ gold: 0, xp: 0, item: null })
 
 function selectClass(cid) {
   run.value.hero = makeHero(cid)
+  heroImageError.value = false // Reset error state for new class
   phase.value = 'room'
   pushLog(`Elegida clase: ${hero.value.className}.`)
   resetRunLocal()
@@ -899,6 +1110,7 @@ function enterRoom(forcedType = null) {
   if (r.roomInFloor === 3) {
     if (r.floor % 10 === 0) {
       r.enemy = makeEnemy(r.floor, true)
+      enemyImageError.value = false // Reset error state for boss
       phase.value = 'combat'
       pushLog(`¡UN GUARDIÁN DEL ABISMO! Es ${enemy.value.name}.`)
     } else {
@@ -921,17 +1133,27 @@ function enterRoom(forcedType = null) {
   // Execute type
   if (type === 'combat') {
     r.enemy = makeEnemy(r.floor)
+    enemyImageError.value = false // Reset error state for new enemy
     phase.value = 'combat'
     pushLog(`Piso ${r.floor}: Aparece un ${enemy.value.name}.`)
   } else if (type === 'camp') {
-    phase.value = 'camp'
     const h = randInt(20, 40); hero.value.hp = Math.min(hero.value.maxHp, hero.value.hp + h)
+    showResult('Descanso Reconfortante', `Has encontrado un lugar seguro para recuperar fuerzas.`, 'game-icons:campfire', 'success', [
+      { label: 'Vida', value: h }
+    ])
     pushLog(`Descanso: Recuperas ${h} HP.`)
+    phase.value = 'camp'
   } else if (type === 'treasure') {
-    phase.value = 'treasure'
-    pushLog(`¡Has encontrado un cofre olvidado!`)
     const gold = randInt(20, 50); r.gold += gold; triggerGoldFlash()
-    if (Math.random() > 0.5) addItem(allItems[randInt(0, allItems.length - 1)].id)
+    const rewards = [{ label: 'Oro', value: gold }]
+    if (Math.random() > 0.5) {
+      const item = allItems[randInt(0, allItems.length - 1)]
+      addItem(item.id)
+      rewards.push({ label: 'Objeto', value: item.name })
+    }
+    showResult('Cofre Olvidado', `¡Has encontrado un cofre entre los escombros!`, 'game-icons:locked-chest', 'treasure', rewards)
+    pushLog(`¡Has encontrado un cofre olvidado!`)
+    phase.value = 'treasure'
   } else if (type === 'event') {
     phase.value = 'event'
     currentEvent.value = events[randInt(0, events.length - 1)]
@@ -1139,20 +1361,61 @@ function buyItem(idx) {
   pushLog(`Comprado: ${item.name}.`)
 }
 
+function getUnitAvatar(unit, isEnemy = false) {
+  if (!unit) return null
+  const baseFolder = isEnemy ? (unit.isBoss ? 'bosses' : 'enemies') : 'classes'
+  const id = isEnemy ? (unit.id || unit.classId) : unit.classId
+  let fileName = unit.selectedImage
+  
+  if (!fileName) {
+    const cat = isEnemy ? (unit.isBoss ? 'bosses' : 'enemies') : 'classes'
+    const available = rpgAssets[cat]?.[id]
+    if (available && available.length > 0) {
+      unit.selectedImage = available[randInt(0, available.length - 1)]
+      fileName = unit.selectedImage
+    }
+  }
+  
+  if (!fileName) {
+    const cat = isEnemy ? (unit.isBoss ? 'bosses' : 'enemies') : 'classes'
+    const fallback = rpgAssets[cat]?.[id]?.[0]
+    if (fallback) fileName = fallback
+  }
+
+  const finalFileName = fileName || 'avatar.png'
+  return `${import.meta.env.BASE_URL}images/RPG/${baseFolder}/${id}/${finalFileName}`.replace(/\/+/g, '/')
+}
+
+function handleHeroImageError(e) { heroImageError.value = true }
+function handleEnemyImageError(e) { enemyImageError.value = true }
+
 function exitGame() { showModal.value = false; phase.value = 'idle'; showExitConfirm.value = false; }
+
+function unstuck() {
+  if (!hero.value) return
+  pushLog("REESTABLECIENDO FLUJO TEMPORAL...")
+  run.value.roomInFloor = 1
+  run.value.enemy = null
+  currentEvent.value = null
+  showResultModal.value = false
+  showLevelUpModal.value = false
+  showBossVictory.value = false
+  phase.value = 'room'
+  enterRoom()
+}
 
 function endCombatIfNeeded() {
   if (enemy.value.hp <= 0) { 
     phase.value = 'victory'; 
     const gold = randInt(15, 30) * (enemy.value.isBoss ? 5 : 1); 
     run.value.gold += gold; 
-    totalGold.value += gold;
-    saveMeta();
+    inventoryStore.addItems('rpg_total_gold', gold);
     triggerGoldFlash();
     
     const xp = (20 + (run.value.floor * 5)) * (enemy.value.isBoss ? 4 : 1)
     gainExp(xp)
     
+    lastRewards.value = { gold, xp };
     pushLog(`¡Victoria! Has obtenido ${gold} oro.`); 
     
     if (enemy.value.isBoss) {
@@ -1179,6 +1442,11 @@ function endCombatIfNeeded() {
 function triggerGoldFlash() { goldFlash.value = true; setTimeout(() => { goldFlash.value = false }, 1000) }
 function triggerHitHero() { hitHero.value = true; setTimeout(() => { hitHero.value = false }, 500) }
 function triggerHitEnemy() { hitEnemy.value = true; setTimeout(() => { hitEnemy.value = false }, 500) }
+
+function showResult(title, text, icon = 'game-icons:chest', type = 'info', rewards = []) {
+  resultData.value = { title, text, icon, type, rewards };
+  showResultModal.value = true;
+}
 
 function enemyTurn() {
   if (phase.value !== 'combat' || endCombatIfNeeded()) return
@@ -1385,9 +1653,13 @@ function advanceRoom() {
       phase.value = 'staircase'
       pushLog(`Las escaleras se revelan ante ti.`)
     }
-  } else if (phase.value === 'victory' && run.value.roomInFloor === 3) {
+  } else if (run.value.roomInFloor === 3) {
     phase.value = 'staircase'
-    pushLog(`Tras derrotar al Guardián, el camino al siguiente piso queda libre.`)
+    if (enemy.value && enemy.value.isBoss) {
+      pushLog(`Tras derrotar al Guardián, el camino al siguiente piso queda libre.`)
+    } else {
+      pushLog(`Las escaleras se revelan ante ti.`)
+    }
   }
 }
 
@@ -1436,8 +1708,24 @@ function handleEventChoice(choice) {
     }
   }
 
+  // Collect rewards for modal
+  const rewards = []
+  const statMap = { gold: 'Oro', hp: 'Vida', mp: 'Maná', attack: 'Ataque', defense: 'Defensa', magicAttack: 'P. Mágico', magicDefense: 'D. Mágica', speed: 'Agilidad' }
+  
+  if (action.effects) {
+    for (const effect of action.effects) {
+      if (effect.type === 'stat') {
+        rewards.push({ label: statMap[effect.target] || effect.target, value: effect.value })
+      } else if (effect.type === 'item') {
+        rewards.push({ label: 'Objetos', value: effect.count || 1 })
+      }
+    }
+  }
+  if (rewards.length === 0) rewards.push({ label: 'Destino', value: 'Sin Cambios' })
+
   pushLog(message)
   currentEvent.value = null
+  showResult(action.text || 'Resultado', message, 'game-icons:scroll-unfurled', 'info', rewards)
   phase.value = 'victory'
 }
 
@@ -1452,7 +1740,7 @@ function checkChoiceCondition(choice) {
 }
 
 
-const canAdvanceRoom = computed(() => ['victory', 'treasure', 'camp', 'staircase'].includes(phase.value))
+const canAdvanceRoom = computed(() => ['victory', 'treasure', 'camp', 'staircase', 'shop'].includes(phase.value))
 
 async function startNewRun() { 
   try {
@@ -1544,6 +1832,11 @@ async function saveRun() {
   } 
 }
 
+async function saveAndExit() {
+  await saveRun()
+  phase.value = 'idle'
+}
+
 function applyLoadedState(s) { 
   if (!s) return
   run.value = { 
@@ -1553,6 +1846,24 @@ function applyLoadedState(s) {
     enemy: s.enemy || null, 
     gold: s.gold || 0 
   }; 
+  
+  // Backfill selectedImage for old saves
+  if (run.value.hero && !run.value.hero.selectedImage) {
+    const h = run.value.hero
+    const available = rpgAssets.classes[h.classId]
+    if (available && available.length > 0) {
+      h.selectedImage = available[randInt(0, available.length - 1)]
+    }
+  }
+  if (run.value.enemy && !run.value.enemy.selectedImage) {
+    const e = run.value.enemy
+    const cat = e.isBoss ? 'bosses' : 'enemies'
+    const available = rpgAssets[cat]?.[e.id]
+    if (available && available.length > 0) {
+      e.selectedImage = available[randInt(0, available.length - 1)]
+    }
+  }
+
   phase.value = s.phase || 'room'; 
   turn.value = s.turn || 'hero'; 
   log.value = s.log || [] 
@@ -1572,12 +1883,12 @@ onMounted(() => {
 .custom-scroll::-webkit-scrollbar-thumb:hover { background: #8c2d1f; }
 
 /* GRIM FADE */
-.fade-grim-enter-active, .fade-grim-leave-active { transition: all 1s ease-in-out; }
-.fade-grim-enter-from, .fade-grim-leave-to { opacity: 0; filter: blur(20px); }
+.fade-grim-enter-active, .fade-grim-leave-active { transition: all 0.4s ease-in-out; }
+.fade-grim-enter-from, .fade-grim-leave-to { opacity: 0; filter: blur(10px); }
 
 /* MODAL GRIM UNFOLD */
-.modal-grim-enter-active { animation: grim-unfold 1.2s cubic-bezier(0.23, 1, 0.32, 1); }
-.modal-grim-leave-active { transition: all 0.6s ease-in; opacity: 0; filter: blur(10px); }
+.modal-grim-enter-active { animation: grim-unfold 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+.modal-grim-leave-active { transition: all 0.3s ease-in; opacity: 0; filter: blur(10px); }
 
 @keyframes grim-unfold {
   0% { transform: scaleY(0.001) scaleX(0); opacity: 0; }

@@ -8,7 +8,6 @@ import BaseLoading from '../components/ui/BaseLoading.vue'
 
 const gameStore = useGameStore()
 const uptime = ref('00:00:00')
-const selectedFilter = ref('TODOS')
 const selectedSort = ref('POPULAR')
 
 let uptimeInterval = null
@@ -46,23 +45,13 @@ const featuredGame = computed(() => {
   return games.find(g => g.slug === 'descenso-al-abismo') || games[0]
 })
 
-const categories = computed(() => {
-  const games = gameStore.games || []
-  const cats = new Set(games.map(g => g.category).filter(Boolean))
-  return ['TODOS', ...Array.from(cats).sort()]
-})
+
 
 const filteredGames = computed(() => {
   const allGames = Array.isArray(gameStore.games) ? gameStore.games : []
   if (allGames.length === 0) return []
 
   let list = allGames.filter(g => g.slug !== featuredGame.value?.slug)
-  
-  // Filtering logic
-  if (selectedFilter.value !== 'TODOS') {
-    list = list.filter(g => g.category === selectedFilter.value)
-  }
-
   // Sorting logic
   const result = [...list]
   if (selectedSort.value === 'ALFABÉTICO') {
@@ -229,33 +218,9 @@ const toggleSort = () => {
       <div class="space-y-12">
          
          <!-- FILTERS PANEL (Aesthetic similar to Leaderboard View Header) -->
-         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Category Filter -->
-            <div class="md:col-span-3 gh-panel p-6 bg-black border-4 border-neon-cyan shadow-[8px_8px_0px_#000] relative overflow-hidden flex flex-col sm:flex-row sm:items-center gap-6">
-               <div class="gh-scanlines absolute inset-0 opacity-10 pointer-events-none"></div>
-               
-               <div class="relative z-10 flex items-center gap-3 shrink-0 border-r-2 border-white/10 pr-6 mr-2 hidden sm:flex">
-                  <Icon icon="lucide:filter" class="text-neon-cyan text-xl" />
-                  <span class="font-pixel text-[10px] text-white/30 uppercase tracking-[0.2em]">Filtros de<br/>subsistema</span>
-               </div>
-
-               <div class="relative z-10 flex flex-wrap gap-3">
-                  <button 
-                    v-for="cat in categories" 
-                    :key="cat"
-                    @click="selectedFilter = cat"
-                    class="px-5 py-2 border-2 font-display text-[10px] font-black uppercase tracking-[0.2em] relative group"
-                    :class="selectedFilter === cat 
-                      ? 'bg-neon-cyan text-black border-black shadow-none translate-x-[2px] translate-y-[2px]' 
-                      : 'bg-retro-dark text-white/40 border-white/5 hover:border-white/20 hover:text-white shadow-[4px_4px_0px_#000] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]'"
-                  >
-                    {{ cat }}
-                  </button>
-               </div>
-            </div>
-
+         <div class="flex justify-end">
             <!-- Sort Toggle -->
-            <div class="gh-panel p-6 bg-black border-4 border-neon-yellow shadow-[8px_8px_0px_#000] relative overflow-hidden">
+            <div class="gh-panel p-6 bg-black border-4 border-neon-yellow shadow-[8px_8px_0px_#000] relative overflow-hidden min-w-[280px]">
                <div class="gh-scanlines absolute inset-0 opacity-10 pointer-events-none"></div>
                <button @click="toggleSort" class="relative z-10 w-full h-full flex flex-col items-center justify-center gap-1 group">
                   <span class="font-pixel text-[9px] text-white/30 uppercase tracking-widest group-hover:text-neon-yellow transition-colors">Orden de salida:</span>
@@ -298,7 +263,6 @@ const toggleSort = () => {
             <Icon icon="lucide:search-x" class="text-6xl text-white/10" />
             <div class="text-center">
                <p class="font-pixel text-xl text-white/20 uppercase tracking-widest">No se encontraron módulos activos</p>
-               <button @click="selectedFilter = 'TODOS'" class="mt-4 font-display text-xs font-black text-neon-cyan uppercase underline underline-offset-4 hover:text-white transition-colors">Reiniciar filtros</button>
             </div>
          </div>
       </div>

@@ -1,0 +1,175 @@
+{
+  "classes": {
+    "archmage": ["Archmage.png"],
+    "assassin": ["Assassin.png"],
+    "berserker": ["Berserker.png"],
+    "cleric": ["T1qGDIc.png"],
+    "hunter": ["Hunter.png"],
+    "mage": ["Mage.png"],
+    "necromancer": ["Necromancer.png"],
+    "paladin": ["Paladin.png"],
+    "rogue": ["Rogue.png"],
+    "warrior": ["Warrior.png"]
+  },
+  "enemies": {
+    "banshee": [
+      "banshee.png"
+    ],
+    "basilisk": [
+      "basilisk.png"
+    ],
+    "bear": [
+      "cave-bear.png"
+    ],
+    "centaur": [
+      "centaur.png"
+    ],
+    "chimera": [
+      "chimera.png"
+    ],
+    "demon": [
+      "babau.png",
+      "salamander.png",
+      "sard.png"
+    ],
+    "draconic": [
+      "dracolisk.png"
+    ],
+    "dullahan": [
+      "dullahan.png"
+    ],
+    "dwarf": [
+      "duergar-bombardier.png",
+      "duergar-sharpshooter.png",
+      "duergar-taskmaster.png"
+    ],
+    "elf": [
+      "drow-fighter.png",
+      "drow-priestess.png",
+      "drow-rogue.png"
+    ],
+    "gargoyle": [
+      "gargoyle.png"
+    ],
+    "ghost": [
+      "ghost-commoner.png",
+      "ghost-mage.png"
+    ],
+    "ghoul": [
+      "ghoul.png"
+    ],
+    "giant": [
+      "skeletal-giant.png"
+    ],
+    "gnoll": [
+      "gnoll-cultist.png",
+      "gnoll-hunter.png",
+      "gnoll-sergeant.png"
+    ],
+    "gnome": [
+      "deep-gnome-rockwarden.png",
+      "deep-gnome-scout.png",
+      "deep-gnome-warrior.png"
+    ],
+    "goblin": [
+      "goblin-commando.png",
+      "goblin-dog.png",
+      "goblin-pyro.png",
+      "goblin-war-chanter.png",
+      "goblin-warrior.png"
+    ],
+    "griffin": [
+      "griffon.png"
+    ],
+    "harpy": [
+      "harpy.png"
+    ],
+    "human": [
+      "sacristan.png",
+      "soulbound-doll.png"
+    ],
+    "kobold": [
+      "kobold-dragon-mage.png",
+      "kobold-scout.png",
+      "kobold-warrior.png"
+    ],
+    "mantichore": [
+      "manticore.png"
+    ],
+    "minotaur": [
+      "minotaur.png"
+    ],
+    "naga": [
+      "spirit-naga.png"
+    ],
+    "ogre": [
+      "ogre-boss.png"
+    ],
+    "orc": [
+      "orc-brute.png",
+      "orc-warchief.png",
+      "orc-warrior.png"
+    ],
+    "rat": [
+      "rat-swarm.png"
+    ],
+    "roc": [
+      "roc.png"
+    ],
+    "satyr": [
+      "satyr.png"
+    ],
+    "skeleton": [
+      "skeletal-champion.png",
+      "skeletal-hulk.png",
+      "skeleton-guard.png"
+    ],
+    "troll": [
+      "cavern-troll.png",
+      "frost-troll.png",
+      "jotund-troll.png",
+      "troll-king.png",
+      "troll.png",
+      "two-headed-troll.png"
+    ],
+    "vampire": [
+      "vampire-count.png",
+      "vampire-spawn.png"
+    ],
+    "wolf": [
+      "dire-wolf.png",
+      "winter-wolf.png",
+      "wolf.png"
+    ],
+    "wyvern": [
+      "wyvern.png"
+    ],
+    "zombie": [
+      "plague-zombie.png",
+      "void-zombie.png",
+      "zombie-brute.png",
+      "zombie-hulk.png",
+      "zombie-shambler.png"
+    ]
+  },
+  "bosses": {
+    "demon": [
+      "cacodaemon.png"
+    ],
+    "dragon": [
+      "adult-magma-dragon.png"
+    ],
+    "giant": [
+      "taiga-giant.png"
+    ],
+    "hydra": [
+      "hydra.png"
+    ],
+    "lich": [
+      "lich.png"
+    ],
+    "minotaur": [
+      "minotaur.png"
+    ]
+  }
+}

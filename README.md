@@ -62,7 +62,6 @@ GameHub presenta una variedad de experiencias con dos sistemas de diseño distin
 4.  **Connect 4**: Puzzle clásico.
 5.  **Battleship**: hundir la flota.
 6.  **Chess**: Ajedrez.
-7.  **Quiz**: Trivia (Sin hacer).
 
 ---
 

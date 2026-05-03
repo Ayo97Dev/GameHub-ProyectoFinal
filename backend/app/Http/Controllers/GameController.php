@@ -184,8 +184,8 @@ class GameController extends Controller
     {
         return match ($game->slug) {
             'connect4' => new Connect4GameService($user, $game),
-            'clicker' => new ClickerGameService($user, $game),
-            'tower-defense' => new TowerDefenseGameService($user, $game),
+            'core-clicker' => new ClickerGameService($user, $game),
+            'proyecto-cortafuegos' => new TowerDefenseGameService($user, $game),
             'descenso-al-abismo' => new \App\Services\Games\RpgGameService($user, $game),
             default => new ClickerGameService($user, $game), // fallback genérico
         };
