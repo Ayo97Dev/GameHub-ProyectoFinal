@@ -61,7 +61,7 @@ import { RouterLink } from 'vue-router'
 </template>
 
 <style scoped>
-@reference "../../style.css";
+@reference "../../../style.css";
 
 .warning-stripes {
   background-image: linear-gradient(

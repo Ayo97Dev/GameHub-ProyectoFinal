@@ -6,47 +6,13 @@
     <div class="absolute inset-0 bg-gradient-to-b from-neon-cyan/5 via-transparent to-neon-pink/5 pointer-events-none"></div>
 
     <!-- SELECCIÓN INICIAL -->
-    <div v-if="gameMode === 'choice'" class="relative z-40 flex flex-col items-center justify-center flex-1 p-6">
-      <div class="gh-glass max-w-xl w-full p-10 text-center border-white/5 shadow-2xl bg-black/60">
-        <div class="flex items-center justify-center gap-4 mb-8">
-           <div class="h-px w-12 bg-neon-cyan"></div>
-           <p class="font-pixel text-neon-cyan text-lg tracking-[0.4em] uppercase">COMANDO_ESTRATÉGICO</p>
-           <div class="h-px w-12 bg-neon-cyan"></div>
-        </div>
-        
-        <h1 class="font-display text-2xl sm:text-3xl font-black text-white mb-6 gh-title-glow tracking-[-0.05em]">PROYECTO CORTAFUEGOS</h1>
-        <p class="font-sans text-xs font-medium uppercase text-white/40 mb-12 max-w-sm mx-auto leading-relaxed">
-          CONSTRUYE NODOS DE DEFENSA PARA PROTEGER EL NÚCLEO DEL REACTOR CONTRA LA INFILTRACIÓN DE MALWARE.
-        </p>
-        
-        <BaseLoading 
-          v-if="store.isLoading" 
-          message="CONECTANDO_NÚCLEO..." 
-          submessage="Sincronizando protocolos de defensa" 
-        />
-
-        
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            v-if="store.savedGame"
-            @click="startGame(true)"
-            class="gh-glass border-neon-blue/30 p-6 flex flex-col items-center hover:bg-neon-blue/10 transition-all group"
-          >
-            <span class="font-pixel text-xs text-neon-blue mb-2">RECUPERAR_ESTADO</span>
-            <span class="font-display text-xl text-white font-black">SOL_OLEADA_{{ store.savedGame.wave }}</span>
-          </button>
-          
-          <button
-            @click="startGame(false)"
-            class="gh-glass border-neon-cyan/30 p-6 flex flex-col items-center hover:bg-neon-cyan/10 transition-all group"
-            :class="{ 'sm:col-span-2': !store.savedGame }"
-          >
-            <span class="font-pixel text-xs text-neon-cyan mb-2">INICIANDO_PROCESO</span>
-            <span class="font-display text-xl text-white font-black">NUEVO_DESPLIEGUE</span>
-          </button>
-        </div>
-      </div>
-    </div>
+    <TowerDefenseChoice 
+      v-if="gameMode === 'choice'"
+      :is-loading="store.isLoading"
+      :has-saved-game="!!store.savedGame"
+      :saved-wave="store.savedGame ? store.savedGame.wave : 1"
+      @start-game="startGame"
+    />
     
     <!-- INTERFAZ DE JUEGO: COMMAND CONSOLE LAYOUT -->
     <template v-else-if="gameMode === 'playing'">
@@ -55,53 +21,15 @@
         :class="{ 'damage-shake': isDamaged }"
       >
         <!-- TOP HUD: SYSTEM TELEMETRY -->
-        <header class="h-16 shrink-0 gh-glass border-b border-white/10 flex items-center justify-between px-6 z-40 bg-black/60 shadow-[0_4px_0_#000]">
-          <!-- Stats Left -->
-          <div class="flex items-center gap-10">
-            <div class="flex flex-col">
-              <div class="flex items-center gap-2 mb-1">
-                <Icon icon="game-icons:heart-organ" class="text-neon-pink text-xs" />
-                <span class="font-pixel text-xs text-neon-cyan/80 uppercase tracking-[0.2em]">SISTEMA_INTEGRIDAD</span>
-              </div>
-              <div class="flex items-center gap-4">
-                <div class="w-32 h-3 bg-retro-deep border border-white/10 flex gap-0.5 p-0.5 shadow-[2px_2px_0_#000]">
-                  <div v-for="i in 10" :key="i" class="flex-1 transition-all duration-500" :class="i <= (gameState.lives/10) ? 'bg-neon-pink shadow-[0_0_8px_#ff2d55]' : 'bg-white/5'"></div>
-                </div>
-                <span class="font-display text-xl font-black text-neon-pink leading-none tracking-tighter">{{ gameState.lives }}%</span>
-              </div>
-            </div>
-
-            <div class="flex flex-col">
-              <div class="flex items-center gap-2 mb-0.5">
-                <Icon icon="game-icons:database" class="text-neon-cyan text-[10px]" />
-                <span class="font-pixel text-xs text-white/40 uppercase tracking-widest">CRÉDITOS_NODO</span>
-              </div>
-              <span class="font-display text-xl font-black text-neon-cyan tracking-tighter">{{ gameState.gold }}<span class="text-xs ml-1 opacity-50 font-pixel">CR</span></span>
-            </div>
-          </div>
-
-          <!-- Wave Info Center -->
-          <div class="flex flex-col items-center">
-            <div class="flex items-baseline gap-2">
-              <span class="font-pixel text-sm text-neon-yellow uppercase tracking-[0.2em]">OLEADA</span>
-              <span class="font-display text-3xl font-black text-white gh-title-glow">#{{ gameState.wave }}</span>
-            </div>
-            <div v-if="gameState.waveActive" class="w-40 mt-1">
-              <div class="h-1 bg-white/5 overflow-hidden shadow-[1px_1px_0_#000]">
-                <div class="h-full bg-neon-cyan shadow-[0_0_10px_#00f2ff]" :style="{ width: `${waveProgressPercent}%` }"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Status Indicators Right -->
-          <div class="flex items-center gap-6">
-             <button v-if="!gameState.waveActive" @click="startWave" class="px-6 py-2 bg-neon-cyan text-black font-display text-sm font-black uppercase hover:scale-105 active:scale-95 transition-all shadow-[4px_4px_0_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1">INICIAR OLEADA</button>
-             <div v-else class="flex flex-col items-end">
-                <span class="font-pixel text-xs text-neon-yellow uppercase tracking-widest animate-pulse">MALWARE_DETECTADO</span>
-                <span class="font-display text-sm font-black text-white">{{ remainingEnemies }} UNIDADES</span>
-              </div>
-          </div>
-        </header>
+        <TowerDefenseHeader
+          :lives="gameState.lives"
+          :gold="gameState.gold"
+          :wave="gameState.wave"
+          :wave-active="gameState.waveActive"
+          :wave-progress-percent="waveProgressPercent"
+          :remaining-enemies="remainingEnemies"
+          @start-wave="startWave"
+        />
 
         <!-- BATTLEFIELD VIEWPORT: RESERVED SPACE -->
         <main 
@@ -268,126 +196,28 @@
     </template>
 
     <!-- PANTALLA DE DERROTA: FALLO TOTAL -->
-    <div v-else-if="gameMode === 'gameOver'" class="relative z-40 flex flex-col items-center justify-center flex-1 p-6">
-       <div class="gh-glass max-w-md w-full p-10 text-center border-neon-pink/30 bg-black/80 backdrop-blur-2xl shadow-[0_0_50px_rgba(255,45,85,0.2)]">
-          <div class="mb-8 flex flex-col items-center">
-             <div class="size-16 border-2 border-neon-pink flex items-center justify-center mb-4 rotate-45 animate-pulse">
-                <span class="font-display text-4xl text-neon-pink -rotate-45">!</span>
-             </div>
-             <span class="font-pixel text-neon-pink text-xs uppercase tracking-[0.3em] mb-2">FALLO_CRÍTICO_SISTEMA</span>
-             <h2 class="font-display text-5xl font-black text-white leading-tight tracking-tighter">FALLO_TOTAL</h2>
-          </div>
-
-          <p class="font-sans text-xs font-bold text-white/40 uppercase mb-8 leading-relaxed">
-             EL NÚCLEO DEL REACTOR HA SIDO TOTALMENTE COMPROMETIDO. EL MALWARE HA TOMADO EL CONTROL DE LOS SISTEMAS DE DEFENSA.
-          </p>
-
-          <div class="grid grid-cols-2 gap-4 mb-10">
-             <div class="p-4 bg-white/5 border border-white/5">
-                <p class="font-pixel text-xs text-white/30 uppercase mb-1">OLEADAS</p>
-                <p class="font-display text-3xl font-black text-white">{{ gameState.wave - 1 }}</p>
-             </div>
-             <div class="p-4 bg-white/5 border border-white/5">
-                <p class="font-pixel text-xs text-white/30 uppercase mb-1">DATOS_PERDIDOS</p>
-                <p class="font-display text-3xl font-black text-neon-cyan">{{ (gameState.wave - 1) * 100 }}</p>
-             </div>
-          </div>
-
-          <button 
-            @click="resetToChoice"
-            class="w-full py-5 bg-neon-pink text-black font-display text-xs font-black uppercase shadow-[6px_6px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none active:scale-95 transition-all"
-          >
-            REINICIAR_PROTOCOLO_DEFENSA
-          </button>
-       </div>
-    </div>
+    <TowerDefenseGameOver
+      v-else-if="gameMode === 'gameOver'"
+      :wave="gameState.wave"
+      @reset="resetToChoice"
+    />
     
     <!-- FLOATING TOOLTIP -->
     <Teleport to="body">
-       <div v-if="selectedCell" class="fixed z-[100] w-[300px] sm:w-[340px] gh-glass bg-black/95 p-0 border-white/20 shadow-4xl overflow-hidden backdrop-blur-3xl scale-in-anim" :style="tooltipPosition">
-          <header class="p-4 border-b border-white/10 flex justify-between items-center bg-white/5">
-             <h3 class="font-display text-xs font-black text-white uppercase tracking-widest">COORD_UNIDAD_{{ selectedCell.x }}_{{ selectedCell.y }}</h3>
-             <button @click="closeTooltip" class="text-white/40 hover:text-neon-pink">✕</button>
-          </header>
-
-          <div class="p-6 overflow-auto max-h-[450px] custom-scroll">
-             <!-- MENU CONSTRUCCIÓN -->
-             <div v-if="!selectedTower">
-                <p class="font-pixel text-xs text-neon-cyan font-bold uppercase mb-4 tracking-[0.3em]">MÓDULOS_CONSTRUCCIÓN</p>
-                <div class="space-y-2">
-                   <div 
-                     v-for="(type, key) in towerTypes" :key="key" 
-                     @click="buildTower(key)"
-                     class="group relative flex items-center p-3 border border-white/5 transition-all cursor-pointer bg-white/5 hover:border-neon-cyan/40 hover:bg-neon-cyan/5 shadow-[2px_2px_0_#000] hover:translate-x-1 hover:translate-y-1 hover:shadow-none"
-                     :class="{ 'opacity-30 grayscale cursor-not-allowed': gameState.gold < type.cost }"
-                   >
-                      <div class="size-10 shrink-0 border border-white/10 relative overflow-hidden mr-4 flex items-center justify-center bg-black/40" :style="{ '--c': type.color }">
-                         <div class="absolute inset-0 opacity-20" :style="{ backgroundColor: 'var(--c)' }"></div>
-                         <Icon :icon="type.icon" class="text-white text-xl relative z-10" :style="{ color: type.color }" />
-                      </div>
-                      <div class="flex-1 min-w-0">
-                         <div class="flex justify-between items-baseline mb-0.5">
-                            <span class="font-display text-[11px] font-black uppercase text-white group-hover:text-neon-cyan">{{ type.name }}</span>
-                            <span class="font-pixel text-xs text-neon-yellow">{{ type.cost }}C</span>
-                         </div>
-                         <p class="font-sans text-xs font-medium text-white/40 uppercase truncate tracking-tight">{{ type.desc }}</p>
-                      </div>
-                   </div>
-                </div>
-              </div>
-
-             <!-- MENU UPGRADE -->
-             <div v-else class="space-y-6">
-                <div class="flex items-center gap-5 p-3 bg-white/5 border border-white/10 shadow-[4px_4px_0_#000]">
-                   <div class="size-16 shrink-0 border border-white/20 relative overflow-hidden flex items-center justify-center bg-black/40">
-                      <div class="absolute inset-0 opacity-20" :style="{ backgroundColor: selectedTower.color }"></div>
-                      <Icon :icon="selectedTower.icon" class="text-white text-3xl relative z-10" :style="{ color: selectedTower.color }" />
-                   </div>
-                   <div class="flex-1 min-w-0">
-                      <h4 class="font-display text-lg font-black text-white uppercase leading-tight truncate">{{ selectedTower.name }}</h4>
-                      <p class="font-pixel text-xs text-neon-cyan uppercase tracking-[0.3em]">NIVEL_{{ selectedTower.level }}</p>
-                   </div>
-                </div>
- 
-                <div class="grid grid-cols-2 gap-2">
-                   <div class="p-3 bg-retro-dark border border-white/5 shadow-[2px_2px_0_#000]">
-                      <p class="font-pixel text-xs opacity-30 uppercase mb-1 tracking-widest">POTENCIA_FUEGO</p>
-                      <div class="flex items-center justify-between">
-                        <span class="font-display text-xs font-black text-neon-pink">{{ selectedTower.damage.toFixed(1) }}</span>
-                        <Icon icon="game-icons:fast-arrow" class="text-[10px] text-white/20" />
-                        <span class="font-display text-xs font-black text-white">{{(selectedTower.damage * 1.4).toFixed(1)}}</span>
-                      </div>
-                   </div>
-                   <div class="p-3 bg-retro-dark border border-white/5 shadow-[2px_2px_0_#000]">
-                      <p class="font-pixel text-xs opacity-30 uppercase mb-1 tracking-widest">RANGO_ESCÁNER</p>
-                      <div class="flex items-center justify-between">
-                        <span class="font-display text-xs font-black text-neon-cyan">{{ selectedTower.range.toFixed(1) }}</span>
-                        <Icon icon="game-icons:fast-arrow" class="text-[10px] text-white/20" />
-                        <span class="font-display text-xs font-black text-white">{{(selectedTower.range + 0.1).toFixed(1)}}</span>
-                      </div>
-                   </div>
-                </div>
- 
-                <div class="flex flex-col gap-3">
-                   <button 
-                     @click="upgradeTower"
-                     :disabled="gameState.gold < upgradeCost"
-                     class="w-full py-4 bg-neon-cyan text-black font-display text-xs font-black uppercase tracking-[0.2em] shadow-[4px_4px_0_#000] transition-all hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none active:scale-95 disabled:opacity-20 disabled:grayscale"
-                   >
-                      ACTUALIZAR_SISTEMA ({{ upgradeCost }}C)
-                   </button>
-                   <button 
-                     @click="confirmSellTower" 
-                     class="w-full py-3 font-pixel text-xs uppercase tracking-widest transition-all border border-transparent flex items-center justify-center gap-2"
-                     :class="isSelling ? 'bg-neon-pink/20 text-neon-pink border-neon-pink animate-pulse' : 'text-white/30 hover:text-neon-pink hover:bg-white/5'"
-                   >
-                      <Icon v-if="isSelling" icon="game-icons:alert" />
-                      {{ isSelling ? `¿CONFIRMAR RECICLAJE? (+${selectedTowerSellValue}C)` : `[RECICLAR_MÓDULO: +${selectedTowerSellValue}C]` }}
-                   </button>
-                </div>
-             </div>
-          </div>
-       </div>
+      <TowerDefenseTooltip
+        :selected-cell="selectedCell"
+        :tooltip-position="tooltipPosition"
+        :selected-tower="selectedTower"
+        :tower-types="towerTypes"
+        :gold="gameState.gold"
+        :upgrade-cost="upgradeCost"
+        :selected-tower-sell-value="selectedTowerSellValue"
+        :is-selling="isSelling"
+        @close="closeTooltip"
+        @build-tower="buildTower"
+        @upgrade="upgradeTower"
+        @sell="confirmSellTower"
+      />
     </Teleport>
   </div>
 </template>
@@ -395,9 +225,13 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useTowerDefenseStore } from '../../stores/games/towerdefense'
-import { useInventoryStore } from '../../stores/inventory'
-import BaseLoading from '../ui/BaseLoading.vue'
+import TowerDefenseChoice from './TowerDefenseChoice.vue'
+import TowerDefenseGameOver from './TowerDefenseGameOver.vue'
+import TowerDefenseHeader from './TowerDefenseHeader.vue'
+import TowerDefenseTooltip from './TowerDefenseTooltip.vue'
+import { useTowerDefenseStore } from '../../../stores/games/towerdefense'
+import { useInventoryStore } from '../../../stores/inventory'
+import BaseLoading from '../../ui/BaseLoading.vue'
 
 
 const emit = defineEmits(['live-score'])

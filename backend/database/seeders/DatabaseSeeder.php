@@ -218,5 +218,49 @@ class DatabaseSeeder extends Seeder
                 array_merge($data, ['is_active' => true])
             );
         }
+
+        // ── Jugadores Bot para la Leaderboard ───────────────────────────
+        $bots = [
+            ['name' => 'CyberNinja', 'email' => 'ninja@gamehub.test'],
+            ['name' => 'PixelKnight', 'email' => 'knight@gamehub.test'],
+            ['name' => 'RetroGamer88', 'email' => 'retro@gamehub.test'],
+            ['name' => 'NeonGhost', 'email' => 'ghost@gamehub.test'],
+            ['name' => 'BitMaster', 'email' => 'bit@gamehub.test'],
+            ['name' => 'VoidWalker', 'email' => 'void@gamehub.test'],
+            ['name' => 'SynthWave', 'email' => 'synth@gamehub.test'],
+            ['name' => 'GlitchArt', 'email' => 'glitch@gamehub.test'],
+            ['name' => 'DataDaemon', 'email' => 'data@gamehub.test'],
+            ['name' => 'BinaryBard', 'email' => 'bard@gamehub.test'],
+        ];
+
+        foreach ($bots as $botData) {
+            $user = User::firstOrCreate(
+                ['email' => $botData['email']],
+                ['name' => $botData['name'], 'password' => Hash::make('password')]
+            );
+
+            // Generar stats para cada juego
+            $games = Game::all();
+            foreach ($games as $game) {
+                $highScore = match ($game->slug) {
+                    'core-clicker' => rand(5000, 500000),
+                    'descenso-al-abismo' => rand(5, 80),
+                    'connect4' => rand(1, 40),
+                    'proyecto-cortafuegos' => rand(5, 35),
+                    'battleship' => rand(1, 25),
+                    'chess' => rand(1, 15),
+                    default => rand(10, 100),
+                };
+
+                \App\Models\GameStat::updateOrCreate(
+                    ['user_id' => $user->id, 'game_id' => $game->id],
+                    [
+                        'high_score' => $highScore,
+                        'time_played' => rand(300, 3600), // 5 min a 1 hora
+                        'last_played_at' => now()->subDays(rand(0, 7)),
+                    ]
+                );
+            }
+        }
     }
 }

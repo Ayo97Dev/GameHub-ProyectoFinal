@@ -1,7 +1,10 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useBattleshipStore } from '../../stores/games/battleship'
+import BattleshipHeader from './BattleshipHeader.vue'
+import BattleshipPlacement from './BattleshipPlacement.vue'
+import BattleshipPlaying from './BattleshipPlaying.vue'
+import { useBattleshipStore } from '../../../stores/games/battleship'
 
 const emit = defineEmits(['score-change', 'game-completed'])
 
@@ -1043,262 +1046,60 @@ onUnmounted(() => {
     </div>
 
     <!-- Header -->
-    <header class="relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-      <div>
-        <p class="font-pixel text-[10px] uppercase tracking-[0.3em] text-neon-cyan">Conquista de los Océanos // Modo Estrategia</p>
-        <h2 class="gh-title-glow font-display mt-1 text-3xl font-black text-white">Estrategia Naval</h2>
-        <p class="font-sans mt-2 max-w-2xl text-xs text-retro-white/70">
-          <template v-if="phase === 'placement'">DESPLIEGUE: Posiciona tu flota en el tablero táctico.</template>
-          <template v-else>COMBATE: Detecta y elimina la amenaza enemiga.</template>
-        </p>
-      </div>
-
-      <button
-        type="button"
-        class="gh-surface-hover gh-surface bg-neon-cyan/10 px-4 py-2 font-display text-sm font-bold text-neon-cyan transition disabled:opacity-50"
-        :disabled="isLoading"
-        @click="handleNewGameClick"
-      >
-        {{ isLoading ? 'Sincronizando...' : 'Nueva Misión' }}
-      </button>
-    </header>
-
-    <div v-if="syncError" class="relative z-10 mt-2 border border-neon-pink/30 bg-neon-pink/10 p-2 font-pixel text-[11px] text-neon-pink uppercase">
-      ERROR DE SINCRONIZACIÓN: {{ syncError }}
-    </div>
+    <BattleshipHeader
+      :phase="phase"
+      :is-loading="isLoading"
+      :sync-error="syncError"
+      @new-game="handleNewGameClick"
+    />
 
     <!-- FASE DE PREPARACION  -->
     <template v-if="phase === 'placement'">
-      <div class="relative z-10 mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
-
-        <!-- Placement board -->
-        <article class="gh-panel bg-retro-black/50 p-4">
-          <div class="flex items-center justify-between gap-2 flex-wrap mb-4">
-            <h3 class="font-pixel text-xs font-bold uppercase tracking-widest text-neon-cyan">Zona de Despliegue</h3>
-            <div class="flex flex-col gap-1 items-end">
-              <div class="flex gap-2">
-                <button
-                  type="button"
-                  class="gh-surface-hover gh-surface bg-white/5 px-3 py-1 font-pixel text-[10px] text-white"
-                  @click="randomizePlacement"
-                >Generar Aleatorio</button>
-                <button
-                  type="button"
-                  class="gh-surface-hover gh-surface bg-neon-pink/10 px-3 py-1 font-pixel text-[10px] text-neon-pink"
-                  @click="resetPlacement"
-                >Limpiar Tablero</button>
-              </div>
-              <p v-if="dragShip" class="font-pixel text-[9px] text-neon-cyan animate-pulse">
-                Presiona <span class="text-white border border-white/30 px-1 rounded">R</span> para rotar el barco
-              </p>
-            </div>
-          </div>
-
-          <!-- Grid -->
-          <div
-            class="placement-grid select-none"
-            @mouseleave="lastHoverCell = null"
-          >
-            <!-- Column labels -->
-            <span class="axis-cell" />
-            <span v-for="col in COL_LABELS" :key="`pc-col-${col}`" class="axis-cell">{{ col }}</span>
-
-            <!-- Rows -->
-            <template v-for="(row, y) in placementBoard" :key="`pc-row-${y}`">
-              <span class="axis-cell">{{ ROW_LABELS[y] }}</span>
-
-              <div
-                v-for="(cell, x) in row"
-                :key="`pc-cell-${x}-${y}`"
-                class="placement-cell"
-                :class="placementCellClass(x, y)"
-                @mouseenter="computeHoverPreview(x, y)"
-                @mousedown="cell.shipId ? startDragFromPlacedCell(x, y, $event) : handleCellDrop($event, x, y)"
-                @touchstart.prevent="handleCellTouchStart($event, x, y, cell.shipId)"
-                @touchmove.prevent="handleCellTouchOver($event, x, y)"
-                @touchend.prevent="handleCellTouchDrop($event, x, y)"
-                @click="handlePlacementCellClick(x, y, cell.shipId, $event)"
-              />
-            </template>
-          </div>
-        </article>
-
-        <!-- Ship dock + confirm -->
-        <aside class="space-y-4">
-          <div class="gh-panel bg-retro-black/50 p-4">
-            <p class="font-pixel text-[10px] uppercase tracking-widest text-neon-cyan">Arsenal Disponible</p>
-            
-            <div class="mt-4 space-y-3">
-              <div
-                v-for="ship in SHIP_DEFS"
-                :key="`dock-${ship.id}`"
-                class="gh-surface p-2 transition"
-                :class="placedShips[ship.id] ? 'opacity-30 border-white/5' : 'gh-surface-hover border-neon-cyan/30 bg-neon-cyan/5 cursor-grab'"
-                @mousedown="!placedShips[ship.id] ? startDragFromDock(ship, $event) : null"
-                @touchstart.prevent="handleTouchStart($event, ship)"
-              >
-                <div class="flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-2">
-                    <Icon :icon="ship.icon" class="text-lg text-neon-cyan" :class="{ 'opacity-50': placedShips[ship.id] }" />
-                    <span class="font-display text-[10px] font-bold uppercase">{{ ship.name }}</span>
-                  </div>
-                  <span class="font-pixel text-[10px] text-white/50">{{ ship.size }}U</span>
-                </div>
-                <div class="mt-2 flex gap-1">
-                  <span
-                    v-for="i in ship.size"
-                    :key="i"
-                    class="h-1.5 flex-1 bg-neon-cyan/40"
-                    :class="{ 'bg-neon-cyan': !placedShips[ship.id] }"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Progress indicator -->
-          <div class="gh-panel border-white/10 bg-white/5 p-3">
-            <div class="flex items-center justify-between font-pixel">
-              <span class="text-[10px] uppercase tracking-widest text-white/60">Estado del Despliegue</span>
-              <span class="text-[10px] text-neon-cyan">{{ Object.keys(placedShips).length }} / {{ SHIP_DEFS.length }}</span>
-            </div>
-            <div class="mt-2 h-1 bg-white/10">
-              <div
-                class="h-full bg-neon-cyan transition-all duration-300"
-                :style="{ width: `${(Object.keys(placedShips).length / SHIP_DEFS.length) * 100}%` }"
-              />
-            </div>
-          </div>
-
-          <!-- Confirm button -->
-          <button
-            type="button"
-            class="gh-surface w-full py-4 font-display text-sm font-black uppercase tracking-widest transition"
-            :class="placementComplete
-              ? 'gh-surface-hover border-neon-cyan bg-neon-cyan/20 text-neon-cyan'
-              : 'cursor-not-allowed border-white/10 bg-white/5 text-white/20'"
-            :disabled="!placementComplete"
-            @click="confirmPlacement"
-          >
-            {{ placementComplete ? 'Iniciar Operación' : 'Esperando Despliegue' }}
-          </button>
-        </aside>
-      </div>
+      <BattleshipPlacement
+        :placement-board="placementBoard"
+        :C-O-L_-L-A-B-E-L-S="COL_LABELS"
+        :R-O-W_-L-A-B-E-L-S="ROW_LABELS"
+        :drag-ship="dragShip"
+        :placed-ships="placedShips"
+        :S-H-I-P_-D-E-F-S="SHIP_DEFS"
+        :placement-complete="placementComplete"
+        :placement-cell-class="placementCellClass"
+        @randomize="randomizePlacement"
+        @reset="resetPlacement"
+        @mouseleave-grid="lastHoverCell = null"
+        @compute-hover-preview="computeHoverPreview"
+        @start-drag-placed="startDragFromPlacedCell"
+        @cell-drop="handleCellDrop"
+        @touch-start-cell="handleCellTouchStart"
+        @touch-over-cell="handleCellTouchOver"
+        @touch-drop-cell="handleCellTouchDrop"
+        @cell-click="handlePlacementCellClick"
+        @start-drag-dock="startDragFromDock"
+        @touch-start-dock="handleTouchStart"
+        @confirm="confirmPlacement"
+      />
     </template>
 
     <!-- BATTLE PHASE -->
     <template v-else>
-      <div class="relative z-10 mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="gh-panel border-white/10 bg-white/5 p-3">
-          <p class="font-pixel text-[9px] uppercase tracking-widest text-white/50">Historial de Victorias</p>
-          <p class="font-pixel mt-1 text-2xl font-black tabular-nums text-neon-cyan">{{ score }}</p>
-        </div>
-        <div class="gh-panel border-white/10 bg-white/5 p-3">
-          <p class="font-pixel text-[9px] uppercase tracking-widest text-white/50">Ratio de Precisión</p>
-          <p class="font-pixel mt-1 text-2xl font-black tabular-nums text-white">{{ playerAccuracy }}%</p>
-        </div>
-        <div class="gh-panel border-white/10 bg-white/5 p-3">
-          <p class="font-pixel text-[9px] uppercase tracking-widest text-white/50">Objetivos Enemigos</p>
-          <p class="font-pixel mt-1 text-2xl font-black tabular-nums text-neon-pink">{{ SHIP_DEFS.length - enemyShipsSunk }} / {{ SHIP_DEFS.length }}</p>
-        </div>
-        <div class="gh-panel border-white/10 bg-white/5 p-3">
-          <p class="font-pixel text-[9px] uppercase tracking-widest text-white/50">Estado de la Misión</p>
-          <p class="mt-1 font-pixel text-[11px] font-bold uppercase text-neon-cyan">{{ statusText }}</p>
-        </div>
-      </div>
-
-      <div class="relative z-10 mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_320px]">
-        <!-- Player board -->
-        <article class="gh-panel bg-retro-black/50 p-4">
-          <div class="flex items-center justify-between gap-2 mb-4 border-b border-white/5 pb-2">
-            <h3 class="font-pixel text-xs font-bold uppercase tracking-widest text-neon-cyan">Estado de la Flota Aliada</h3>
-            <span class="font-pixel text-[10px] text-neon-pink">Bajas: {{ playerShipsSunk }} / {{ SHIP_DEFS.length }}</span>
-          </div>
-          <div class="battle-grid">
-            <span class="axis-cell" />
-            <span v-for="col in COL_LABELS" :key="`p-col-${col}`" class="axis-cell">{{ col }}</span>
-            <template v-for="(row, y) in playerBoard" :key="`p-row-${y}`">
-              <span class="axis-cell">{{ ROW_LABELS[y] }}</span>
-              <button
-                v-for="(cell, x) in row"
-                :key="`p-cell-${x}-${y}`"
-                type="button"
-                class="battle-cell"
-                :class="[
-                  playerCellClass(cell),
-                  lastImpactCoord?.x === x && lastImpactCoord?.y === y && lastImpactCoord?.board === 'player' ? 'cell-impact' : ''
-                ]"
-                disabled
-              >{{ playerCellMarker(cell) }}</button>
-            </template>
-          </div>
-        </article>
-
-        <!-- Enemy board -->
-        <article class="gh-panel border-neon-cyan/20 bg-retro-black/50 p-4 shadow-[0_0_20px_rgba(0,242,255,0.05)]">
-          <div class="flex items-center justify-between gap-2 mb-4 border-b border-white/5 pb-2">
-            <h3 class="font-pixel text-xs font-bold uppercase tracking-widest text-neon-cyan">Radar Táctico Enemigo</h3>
-            <span class="font-pixel text-[10px] text-white/50">Escaneos Realizados: {{ playerShots }}</span>
-          </div>
-          <div class="battle-grid">
-            <span class="axis-cell" />
-            <span v-for="col in COL_LABELS" :key="`e-col-${col}`" class="axis-cell">{{ col }}</span>
-            <template v-for="(row, y) in enemyBoard" :key="`e-row-${y}`">
-              <span class="axis-cell">{{ ROW_LABELS[y] }}</span>
-              <button
-                v-for="(cell, x) in row"
-                :key="`e-cell-${x}-${y}`"
-                type="button"
-                class="battle-cell"
-                :class="[
-                  enemyCellClass(cell), 
-                  canShoot && !isTargeted(cell) ? 'gh-surface-hover cursor-pointer border-neon-cyan/40 bg-neon-cyan/5' : 'cursor-not-allowed opacity-80',
-                  lastImpactCoord?.x === x && lastImpactCoord?.y === y && lastImpactCoord?.board === 'enemy' ? 'cell-impact' : ''
-                ]"
-                :disabled="!canShoot || isTargeted(cell)"
-                @click="fireAtEnemy(x, y)"
-              >{{ enemyCellMarker(cell) }}</button>
-            </template>
-          </div>
-        </article>
-
-        <!-- Sidebar -->
-        <aside class="space-y-4">
-          <div class="gh-panel border-white/5 bg-white/2 p-4">
-            <p class="font-pixel text-[10px] uppercase tracking-widest text-white/50 mb-3">Lista de Objetivos</p>
-            <div class="space-y-2">
-                <div
-                  v-for="ship in enemyShipStatus"
-                  :key="`enemy-ship-${ship.id}`"
-                  class="flex items-center justify-between border border-white/10 px-3 py-2 font-pixel"
-                  :class="ship.sunk ? 'bg-neon-pink/10 text-neon-pink border-neon-pink/30' : 'bg-white/5 text-white/80'"
-                >
-                  <div class="flex items-center gap-2">
-                    <Icon :icon="ship.icon" class="text-base" />
-                    <span class="text-[11px] uppercase">{{ ship.name }}</span>
-                  </div>
-                  <span class="text-[10px]">{{ ship.sunk ? 'ELIMINADO' : `${ship.hits}/${ship.size}` }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="gh-panel border-white/5 bg-white/2 p-4">
-            <p class="font-pixel text-[10px] uppercase tracking-widest text-white/50 mb-3">Bitácora de Combate</p>
-            <div class="log-scroll space-y-2 pr-2">
-              <p
-                v-for="entry in battleLog"
-                :key="entry.id"
-                class="border-l-2 px-3 py-1 font-pixel text-[11px]"
-                :class="{
-                  'border-neon-cyan text-neon-cyan': entry.tone === 'good',
-                  'border-neon-pink text-neon-pink': entry.tone === 'bad',
-                  'border-white/20 text-white/60': entry.tone === 'neutral'
-                }"
-              >> {{ entry.text }}</p>
-            </div>
-          </div>
-        </aside>
-      </div>
+      <BattleshipPlaying
+        :score="score"
+        :player-accuracy="playerAccuracy"
+        :enemy-ships-sunk="enemyShipsSunk"
+        :S-H-I-P_-D-E-F-S="SHIP_DEFS"
+        :status-text="statusText"
+        :player-ships-sunk="playerShipsSunk"
+        :C-O-L_-L-A-B-E-L-S="COL_LABELS"
+        :R-O-W_-L-A-B-E-L-S="ROW_LABELS"
+        :player-board="playerBoard"
+        :last-impact-coord="lastImpactCoord"
+        :player-shots="playerShots"
+        :enemy-board="enemyBoard"
+        :can-shoot="canShoot"
+        :enemy-ship-status="enemyShipStatus"
+        :battle-log="battleLog"
+        @fire-at-enemy="fireAtEnemy"
+      />
     </template>
   </section>
 </template>

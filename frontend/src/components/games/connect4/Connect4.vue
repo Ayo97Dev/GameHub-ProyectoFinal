@@ -153,7 +153,7 @@
 <script setup>
 import { ref, computed, reactive, onMounted, onUnmounted, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useConnect4Store } from '../../stores/games/connect4'
+import { useConnect4Store } from '../../../stores/games/connect4'
 
 const ROWS = 6; const COLS = 7; const AI_DEPTH = 5; const AI_RESPONSE_DELAY_MS = 600
 const connect4 = useConnect4Store()

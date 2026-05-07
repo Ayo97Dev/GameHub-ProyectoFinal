@@ -9,49 +9,13 @@
 
 
     <!-- INITIAL SPLASH SCREEN (Grim Tome Style) -->
-    <Transition name="fade-grim">
-      <div v-if="phase === 'idle'" class="absolute inset-0 z-[100] flex items-center justify-center bg-[#070707]">
-        <!-- Flickering Shadow Overlay -->
-        <div class="absolute inset-0 opacity-30 animate-flicker pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(60,40,20,0.4),transparent_70%)]"></div>
-        
-        <div class="relative z-10 flex flex-col items-center gap-10 text-center px-6">
-          <div class="space-y-3">
-            <h1 class="text-6xl md:text-7xl font-fantasy text-[#b8a38a] drop-shadow-[0_10px_20px_rgba(0,0,0,1)] tracking-tighter uppercase leading-none">Descenso al Abismo</h1>
-            <div class="h-1 w-32 mx-auto bg-gradient-to-r from-transparent via-[#8c2d1f] to-transparent"></div>
-          </div>
-          
-          <div class="flex flex-col gap-4">
-            <button 
-              @click="startNewRun" 
-              class="group relative px-12 py-6 transition-all duration-500 transform hover:scale-105 active:scale-95"
-            >
-              <div class="absolute inset-0 bg-[#1a1a1a] border-4 border-[#3c2a1a] shadow-[10px_10px_30px_rgba(0,0,0,0.8)]"></div>
-              <div class="absolute inset-1 border-2 border-[#8c2d1f]/30"></div>
-              <span class="relative z-10 font-fantasy text-3xl text-[#b8a38a] group-hover:text-white uppercase tracking-[0.2em] transition-colors">Nueva Gesta</span>
-            </button>
-
-            <button 
-              v-if="hasSave && saveSummary"
-              @click="loadRun" 
-              class="group relative px-12 py-4 transition-all duration-500 transform hover:scale-105 active:scale-95 overflow-hidden"
-            >
-              <div class="absolute inset-0 bg-[#3c2a1a] border-2 border-[#8c2d1f]/40 shadow-lg"></div>
-              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <div class="relative z-10 flex flex-col items-center">
-                <span class="font-fantasy text-xl text-[#b8a38a] group-hover:text-white uppercase tracking-widest transition-colors">Continuar Gesta</span>
-                <span class="text-[10px] text-amber-600 font-fantasy uppercase tracking-wider mt-1 opacity-80">
-                  {{ saveSummary.className }} • Nivel {{ saveSummary.level }} • Piso {{ saveSummary.floor }}
-                </span>
-              </div>
-            </button>
-          </div>
-
-          <p class="text-[#5c4a3a] font-serif italic text-lg max-w-md leading-relaxed">
-            "Donde la luz se desvanece y la cordura se quiebra, comienza tu verdadera gesta."
-          </p>
-        </div>
-      </div>
-    </Transition>
+    <RpgSplash 
+      :show="phase === 'idle'" 
+      :hasSave="hasSave" 
+      :saveSummary="saveSummary" 
+      @start-new="startNewRun" 
+      @load-run="loadRun" 
+    />
 
     <!-- FULLSCREEN DUNGEON OVERLAY (TELEPORTED TO BODY) -->
     <Teleport to="body">
@@ -83,159 +47,26 @@
             <div class="absolute inset-0 pointer-events-none z-40 bg-[radial-gradient(circle,transparent_50%,rgba(0,0,0,0.3)_130%)]"></div>
 
             <!-- HEADER -->
-            <header class="relative z-[60] p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-6 border-b-4 border-double border-[#3c2a1a] bg-black/40 backdrop-blur-sm">
-              <div class="flex items-center gap-6">
-                <div class="size-14 bg-[#0a0a0a] flex items-center justify-center text-[#8c2d1f] text-3xl border-4 border-[#3c2a1a] shadow-2xl iron-shadow transform -rotate-3">
-                  <Icon icon="game-icons:crossed-swords" />
-                </div>
-                <div>
-                  <h2 class="font-fantasy text-2xl text-[#b8a38a] uppercase tracking-wide drop-shadow-md">Descenso al Abismo</h2>
-                  <div class="flex items-center gap-3 text-[#b8a38a]/70 font-fantasy text-[10px] uppercase tracking-[0.2em]">
-                    <span class="animate-pulse text-[#8c2d1f]">●</span>
-                    <span v-if="hero">{{ hero.className }} • Nivel {{ hero.level }} • PISO {{ run.floor }}</span>
-                    <span v-else>Seleccionando Destino</span>
-                  </div>
-                  
-                  <!-- XP BAR IN HEADER (Reworked) -->
-                  <div v-if="hero" class="w-full max-w-[280px] mt-3 group/xp relative">
-                    <div class="flex justify-between items-end mb-1 px-1">
-                      <span class="text-[8px] text-[#b8a38a]/40 uppercase tracking-widest font-fantasy">Experiencia</span>
-                      <span class="text-[9px] text-amber-500 font-fantasy">{{ Math.floor(hero.exp / hero.nextLevelExp * 100) }}%</span>
-                    </div>
-                    <div class="h-2.5 w-full bg-black/80 border-2 border-[#3c2a1a] p-0.5 shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] relative overflow-hidden group-hover/xp:border-amber-900/40 transition-colors">
-                      <div 
-                        class="h-full bg-gradient-to-r from-amber-950 via-amber-600 to-amber-400 transition-all duration-1000 relative z-10" 
-                        :style="{ width: (hero.exp/hero.nextLevelExp*100) + '%' }"
-                      >
-                        <!-- Spark effect at the end of the bar -->
-                        <div class="absolute right-0 top-0 bottom-0 w-4 bg-white/20 blur-md animate-pulse"></div>
-                      </div>
-                      <!-- Gloss effect -->
-                      <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent z-20 pointer-events-none"></div>
-                    </div>
-                    
-                    <!-- XP Tooltip on hover -->
-                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-[#0a0a0a] border border-amber-900/40 text-[9px] text-amber-500 font-fantasy uppercase tracking-widest opacity-0 group-hover/xp:opacity-100 transition-all z-50 shadow-2xl translate-y-2 group-hover:translate-y-0">
-                      {{ Math.floor(hero.exp) }} / {{ hero.nextLevelExp }} XP
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-8">
-                <!-- MAP TRACKER (Reworked) -->
-                <div v-if="hero" class="relative flex gap-8 pt-4 pb-7 px-8 bg-black/40 border-2 border-[#3c2a1a] shadow-inner items-center min-w-[320px] justify-center">
-                  <!-- Background Pattern -->
-                  <div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] pointer-events-none"></div>
-                  
-                  <!-- Connecting Line (Base) -->
-                  <div class="absolute top-1/2 left-10 right-10 h-1 bg-[#3c2a1a]/40 -translate-y-1/2 z-0 rounded-full"></div>
-                  
-                  <!-- Connecting Line (Progress) -->
-                  <div 
-                    class="absolute top-1/2 left-10 h-1 bg-gradient-to-r from-[#8c2d1f] to-amber-600 -translate-y-1/2 z-0 transition-all duration-1000 rounded-full"
-                    :style="{ width: ((run.roomInFloor - 1) / 2 * 75) + '%' }"
-                  ></div>
-
-                  <div
-                    v-for="idx in 3"
-                    :key="idx"
-                    class="relative z-10 flex flex-col items-center"
-                  >
-                    <div
-                      class="size-10 rounded-sm border-2 transition-all duration-700 flex items-center justify-center bg-[#0a0a0a] transform rotate-45"
-                      :class="idx === run.roomInFloor
-                        ? 'border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)] scale-110 bg-[#1a1a1a]'
-                        : (idx < run.roomInFloor ? 'border-[#8c2d1f] bg-[#240a0a]' : 'border-[#3c2a1a] opacity-40')"
-                    >
-                      <div class="-rotate-45">
-                        <Icon 
-                          v-if="idx === 3" 
-                          :icon="run.floor % 10 === 0 ? 'game-icons:death-skull' : 'game-icons:doorway'" 
-                          class="size-5" 
-                          :class="idx <= run.roomInFloor ? 'text-amber-500' : 'text-[#3c2a1a]'" 
-                        />
-                        <Icon 
-                          v-else-if="idx < run.roomInFloor" 
-                          icon="game-icons:check-mark" 
-                          class="size-4 text-emerald-500" 
-                        />
-                        <span v-else class="font-fantasy text-[10px]" :class="idx === run.roomInFloor ? 'text-white' : 'text-[#b8a38a]/20'">{{ idx }}</span>
-                      </div>
-                    </div>
-                    <!-- Label -->
-                    <span 
-                      class="absolute -bottom-5 font-fantasy text-[7px] uppercase tracking-tighter whitespace-nowrap transition-colors"
-                      :class="idx === run.roomInFloor ? 'text-amber-500' : 'text-[#b8a38a]/20'"
-                    >
-                      {{ idx === 3 ? (run.floor % 10 === 0 ? 'Guardián' : 'Escaleras') : 'Sala ' + idx }}
-                    </span>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-4">
-                    <button @click="phase = 'classSelect'" class="group relative px-6 py-2 transition-all">
-                        <div class="absolute inset-0 bg-[#0a0a0a] border border-[#3c2a1a] group-hover:bg-black group-hover:border-[#b8a38a]/40 transition-colors"></div>
-                        <span class="relative z-10 font-fantasy text-[10px] uppercase text-[#b8a38a] group-hover:text-white">Cambiar Clase</span>
-                    </button>
-                    <button @click="saveAndExit" class="group relative px-6 py-2 overflow-hidden transition-all shadow-lg">
-                        <div class="absolute inset-0 bg-[#8c2d1f] border border-white/10 group-hover:scale-105 transition-transform"></div>
-                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/black-paper.png')] opacity-20"></div>
-                        <span class="relative z-10 font-fantasy text-[10px] uppercase text-white tracking-widest">Guardar partida</span>
-                    </button>
-                    <!-- EXIT SEAL (MOVED) -->
-                    <button 
-                      @click="showExitConfirm = true" 
-                      class="relative size-11 flex items-center justify-center group transition-transform hover:rotate-12 active:scale-90"
-                    >
-                      <div class="absolute inset-0 bg-[#8c2d1f] rounded-full shadow-[0_4px_12px_rgba(0,0,0,1)] border-4 border-[#5c1a11] group-hover:bg-[#a63626] transition-colors"></div>
-                      <div class="absolute inset-1 border-2 border-dashed border-black/30 rounded-full"></div>
-                      <Icon icon="game-icons:skull-crossed-bones" class="relative z-10 text-black text-xl pointer-events-none" />
-                    </button>
-                </div>
-              </div>
-            </header>
+            <RpgHeader 
+              v-if="showModal"
+              :hero="hero" 
+              :run="run" 
+              @change-class="phase = 'classSelect'" 
+              @save-and-exit="saveAndExit" 
+              @exit-confirm="showExitConfirm = true" 
+            />
 
             <!-- MAIN CONTENT AREA -->
             <main class="flex-1 relative z-[70] flex flex-col lg:flex-row min-h-0 gap-8 p-6 lg:p-8 overflow-visible">
               
               <!-- CLASS SELECTION SCREEN -->
-              <div v-if="phase === 'classSelect'" class="absolute inset-0 z-[100] bg-[#1a1714] p-8 overflow-auto custom-scroll flex flex-col items-center">
-                <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] pointer-events-none"></div>
-                <h2 class="text-4xl font-fantasy text-[#b8a38a] mb-12 uppercase tracking-[0.2em] relative z-10">Escoge tu Clase</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl w-full pb-20 relative z-10">
-                  <div 
-                    v-for="c in classes" 
-                    :key="c.id"
-                    @click="unlockedClasses.includes(c.id) && selectClass(c.id)"
-                    class="group relative p-6 bg-[#0a0a0a] border-4 border-[#3c2a1a] transition-all flex flex-col gap-4 transform hover:-translate-y-2"
-                    :class="unlockedClasses.includes(c.id) ? 'hover:border-[#8c2d1f] cursor-pointer' : 'opacity-60 grayscale cursor-not-allowed'"
-                  >
-                    <div class="flex items-center justify-between border-b border-[#3c2a1a] pb-2 relative z-10">
-                      <span class="font-fantasy text-xl text-[#b8a38a] group-hover:text-white uppercase">{{ c.name }}</span>
-                      <div class="flex flex-col items-end">
-                        <span class="text-[10px] text-[#8c2d1f] font-fantasy uppercase px-2 py-0.5 bg-black border border-[#8c2d1f]/30">{{ c.role }}</span>
-                        <span v-if="!unlockedClasses.includes(c.id)" class="text-[9px] text-amber-500 font-fantasy mt-1 flex items-center gap-1">
-                          <Icon icon="game-icons:padlock" class="size-3" /> Tienda Global
-                        </span>
-                      </div>
-                    </div>
-                    <p class="font-serif text-sm italic text-[#b8a38a]/60 leading-tight h-12 overflow-hidden">{{ c.description }}</p>
-                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] font-fantasy text-[#b8a38a]/40 uppercase">
-                      <div class="flex justify-between border-b border-[#3c2a1a]/40 pb-0.5"><span>Vida</span><span class="text-red-500">{{ c.stats.hp }}</span></div>
-                      <div class="flex justify-between border-b border-[#3c2a1a]/40 pb-0.5"><span>Maná</span><span class="text-blue-500">{{ c.stats.mp }}</span></div>
-                      <div class="flex justify-between"><span>Ataque</span><span class="text-amber-500">{{ c.stats.attack }}</span></div>
-                      <div class="flex justify-between"><span>P. Mágico</span><span class="text-blue-400">{{ c.stats.magicAttack }}</span></div>
-                      <div class="flex justify-between"><span>Defensa</span><span class="text-slate-400">{{ c.stats.defense }}</span></div>
-                      <div class="flex justify-between"><span>D. Mágica</span><span class="text-purple-400">{{ c.stats.magicDefense }}</span></div>
-                      <div class="flex justify-between"><span>Agilidad</span><span class="text-green-400">{{ c.stats.speed }}</span></div>
-                      <div class="flex justify-between"><span>Rec. Maná</span><span class="text-blue-300">+{{ c.stats.manaRegen }}</span></div>
-                    </div>
-                    <div v-if="unlockedClasses.includes(c.id)" class="absolute inset-0 bg-[#8c2d1f]/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </div>
-                </div>
-                <button @click="phase = 'idle'" class="mt-8 px-10 py-3 bg-[#3c2a1a] text-[#b8a38a] font-fantasy uppercase tracking-widest hover:bg-[#4d3621]">Regresar</button>
-              </div>
+              <RpgClassSelect 
+                v-if="phase === 'classSelect'"
+                :classes="classes"
+                :unlockedClasses="unlockedClasses"
+                @select-class="selectClass"
+                @go-back="phase = 'idle'"
+              />
 
 
               <!-- EVENT OVERLAY -->
@@ -714,7 +545,7 @@
             <div v-if="phase === 'pathSelect'" class="absolute inset-0 z-[150] bg-black/80 backdrop-blur-sm flex items-center justify-center p-8">
               <div class="max-w-4xl w-full text-center space-y-12">
                 <div class="space-y-2">
-                  <h3 class="text-4xl font-fantasy text-[#b8a38a] uppercase tracking-[0.4em]">Elige tu Clase</h3>
+                  <h3 class="text-4xl font-fantasy text-[#b8a38a] uppercase tracking-[0.4em]">Elige tu senda</h3>
                   <p class="text-[#b8a38a]/40 font-serif italic">"Dos caminos se abren ante ti, pero solo uno lleva a la gloria."</p>
                 </div>
 
@@ -913,16 +744,19 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useInventoryStore } from '../../stores/inventory'
-import gameEngine from '../../lib/gameEngineService'
-import classesData from '../../assets/json/classes.json'
-import enemiesData from '../../assets/json/enemies.json'
-import itemsData from '../../assets/json/items.json'
-import playerSkillsData from '../../assets/json/skills_player.json'
-import enemySkillsData from '../../assets/json/skills_enemy.json'
-import eventsData from '../../assets/json/events.json'
-import bossesData from '../../assets/json/bosses.json'
-import rpgAssets from '../../assets/json/rpg_assets.json'
+import RpgSplash from './RpgSplash.vue'
+import RpgHeader from './RpgHeader.vue'
+import RpgClassSelect from './RpgClassSelect.vue'
+import { useInventoryStore } from '../../../stores/inventory'
+import gameEngine from '../../../lib/gameEngineService'
+import classesData from '../../../assets/json/classes.json'
+import enemiesData from '../../../assets/json/enemies.json'
+import itemsData from '../../../assets/json/items.json'
+import playerSkillsData from '../../../assets/json/skills_player.json'
+import enemySkillsData from '../../../assets/json/skills_enemy.json'
+import eventsData from '../../../assets/json/events.json'
+import bossesData from '../../../assets/json/bosses.json'
+import rpgAssets from '../../../assets/json/rpg_assets.json'
 
 const GAME_SLUG = 'descenso-al-abismo'
 const isLoading = ref(false); const error = ref(null); const sessionId = ref(null); const log = ref([]); 

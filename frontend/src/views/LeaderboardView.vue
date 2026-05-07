@@ -1,24 +1,22 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { useLeaderboardStore } from '../stores/leaderboard'
 import { useGameStore } from '../stores/game'
 import BaseLoading from '../components/ui/BaseLoading.vue'
 
-
 const leaderboardStore = useLeaderboardStore()
 const gameStore = useGameStore()
-
 const route = useRoute()
-const slug  = route.params.slug
 
-const entries = computed(() => leaderboardStore.getEntries(slug))
+const slug = computed(() => route.params.slug)
+const entries = computed(() => leaderboardStore.getEntries(slug.value))
 const top3 = computed(() => entries.value.slice(0, 3))
 const remainingEntries = computed(() => entries.value.slice(3))
-const gameName = computed(() => gameStore.gamesBySlug[slug]?.title ?? slug)
-const isLoading = computed(() => leaderboardStore.isLoading(slug) && entries.value.length === 0)
-const isConnect4 = computed(() => slug === 'connect4')
+const gameName = computed(() => gameStore.gamesBySlug[slug.value]?.title ?? slug.value)
+const isLoading = computed(() => leaderboardStore.isLoading(slug.value) && entries.value.length === 0)
+const isConnect4 = computed(() => slug.value === 'connect4')
 
 const scoreLabel = computed(() => {
   if (isConnect4.value) return 'VICTORIAS'
@@ -27,10 +25,16 @@ const scoreLabel = computed(() => {
 
 onMounted(async () => {
   if (gameStore.games.length === 0) {
-    gameStore.fetchGames()
+    await gameStore.fetchGames()
   }
-  leaderboardStore.fetchLeaderboard(slug)
 })
+
+// Watch for slug changes to refetch data
+watch(slug, (newSlug) => {
+  if (newSlug) {
+    leaderboardStore.fetchLeaderboard(newSlug)
+  }
+}, { immediate: true })
 </script>
 
 <template>
@@ -157,7 +161,7 @@ onMounted(async () => {
                </div>
                <div class="truncate">
                   <h4 class="font-display text-lg font-black text-retro-white uppercase truncate">{{ entry.username }}</h4>
-                  <p class="font-pixel text-[9px] text-white/20 uppercase tracking-widest">ID de usuario: {{ entry.user_id?.slice(0, 8) }}</p>
+                  <p class="font-pixel text-[9px] text-white/20 uppercase tracking-widest">ID de usuario: #{{ entry.user_id }}</p>
                </div>
             </div>
 

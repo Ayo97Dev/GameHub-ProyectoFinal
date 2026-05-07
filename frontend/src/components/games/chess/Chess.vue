@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useChessStore } from '../../stores/games/chess'
+import { useChessStore } from '../../../stores/games/chess'
 
 const emit = defineEmits(['game-completed'])
 const chessStore = useChessStore()
