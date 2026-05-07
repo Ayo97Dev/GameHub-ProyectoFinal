@@ -4,7 +4,11 @@ GameHub es una plataforma Full-Stack de juegos retro-futuristas. Consta de un fr
 
 ## 🚀 Cómo empezar
 
-Todo el entorno está dockerizado para una configuración inmediata.
+Todo el entorno está dockerizado para una configuración inmediata. Elige el modo según tu necesidad:
+
+### 🛠️ Entorno de Desarrollo (Local)
+
+Para levantar el proyecto localmente con Hot-Reload:
 
 1.  **Clonar y Levantar**:
     ```bash
@@ -29,15 +33,45 @@ Todo el entorno está dockerizado para una configuración inmediata.
     docker compose exec frontend npm install
     ```
 
+4.  **Acceso**:
+    - **Frontend:** [http://localhost:5173](http://localhost:5173) (Vite Dev Server)
+    - **API Backend:** [http://localhost:8000](http://localhost:8000)
+    - **URL Principal (HTTPS):** [https://localhost:8443](https://localhost:8443)
+    - **URL Alternativa (HTTP):** [http://localhost:8080](http://localhost:8080)
+
 ---
 
-## 🌐 Acceso a la Aplicación
+### 🌐 Entorno de Producción (Servidor)
 
-La aplicación utiliza un proxy **Nginx** con soporte para **SSL** y **HTTP/2**.
+Para desplegar en un servidor real con HTTPS y optimizaciones de rendimiento:
 
-- **URL Principal (HTTPS):** [https://localhost:8443](https://localhost:8443)
-- **URL Alternativa (HTTP):** [http://localhost:8080](http://localhost:8080)
-- **Backend API (Directo):** [http://localhost:8000](http://localhost:8000) (Solo para desarrollo)
+1.  **Configurar Entorno**:
+    Copia `.envExample` a `.env` y ajusta los valores necesarios (especialmente las contraseñas de DB y `APP_URL`).
+
+2.  **Levantar Servicios**:
+    ```bash
+    docker compose -f docker-compose.prod.yml up -d
+    ```
+
+3.  **Configurar SSL (Certbot)**:
+    Si es la primera vez, genera los certificados para tu dominio:
+    ```bash
+    docker compose -f docker-compose.prod.yml run --rm --entrypoint certbot certbot certonly --webroot --webroot-path=/var/www/certbot --email admin@gamehubs.games --agree-tos --no-eff-email -d gamehubs.games
+    ```
+    Luego recarga Nginx para activar HTTPS:
+    ```bash
+    docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
+    ```
+
+4.  **Inicializar Base de Datos**:
+    ```bash
+    docker compose -f docker-compose.prod.yml exec backend php artisan migrate --seed --force
+    ```
+
+5.  **Acceso**:
+    - **URL Principal:** [https://gamehubs.games](https://gamehubs.games)
+    - **API Backend:** [https://gamehubs.games/api](https://gamehubs.games/api)
+
 
 ---
 

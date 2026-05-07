@@ -8,6 +8,9 @@ import PlayView from '../views/PlayView.vue'
 import LeaderboardView from '../views/LeaderboardView.vue'
 import AchievementsView from '../views/AchievementsView.vue'
 import StoreView from '../views/StoreView.vue'
+import LegalRgpdView from '../views/LegalRgpdView.vue'
+import LegalTermsView from '../views/LegalTermsView.vue'
+import LegalPrivacyView from '../views/LegalPrivacyView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,6 +23,9 @@ const router = createRouter({
     { path: '/leaderboard/:slug', name: 'leaderboard', component: LeaderboardView },
     { path: '/achievements',   name: 'achievements',  component: AchievementsView, meta: { requiresAuth: true } },
     { path: '/store',          name: 'store',         component: StoreView },
+    { path: '/legal/rgpd',     name: 'legal-rgpd',    component: LegalRgpdView },
+    { path: '/legal/terms',    name: 'legal-terms',   component: LegalTermsView },
+    { path: '/legal/privacy',  name: 'legal-privacy', component: LegalPrivacyView },
   ],
 })
 

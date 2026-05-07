@@ -1,0 +1,10 @@
+DB_ROOT_PASSWORD=gamehub_root_secure_pass
+DB_DATABASE=gamehub_db
+DB_USERNAME=gamehub_user
+DB_PASSWORD=gamehub_prod_password
+REDIS_HOST=redis
+# Define el entorno de la aplicación (local, production, etc.)
+APP_ENV=production
+APP_DEBUG=false
+# URL del sitio web con HTTPS
+#APP_URL=https://gamehubs.games

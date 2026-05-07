@@ -61,20 +61,20 @@
            </div>
            
            <div class="flex flex-col gap-3 w-full md:max-w-[320px] lg:w-auto lg:min-w-[240px]">
-              <button class="group flex items-center justify-between gap-4 p-3 bg-white/5 border-l-4 border-white/10 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+              <router-link to="/legal/rgpd" class="group flex items-center justify-between gap-4 p-3 bg-white/5 border-l-4 border-white/10 hover:border-neon-cyan hover:bg-neon-cyan/10 transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:translate-x-[-2px] hover:translate-y-[-2px] text-left">
                  <span class="font-pixel text-[9px] text-white/30 group-hover:text-white uppercase">RGPD</span>
                  <span class="font-display text-xs font-black text-white/60 group-hover:text-neon-cyan uppercase tracking-widest">Protección de Datos</span>
-              </button>
+              </router-link>
               
-              <button class="group flex items-center justify-between gap-4 p-3 bg-white/5 border-l-4 border-white/10 hover:border-neon-pink hover:bg-neon-pink/10 transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+              <router-link to="/legal/terms" class="group flex items-center justify-between gap-4 p-3 bg-white/5 border-l-4 border-white/10 hover:border-neon-pink hover:bg-neon-pink/10 transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:translate-x-[-2px] hover:translate-y-[-2px] text-left">
                  <span class="font-pixel text-[9px] text-white/30 group-hover:text-white uppercase">Terms</span>
                  <span class="font-display text-xs font-black text-white/60 group-hover:text-neon-pink uppercase tracking-widest">Términos de Uso</span>
-              </button>
+              </router-link>
               
-              <button class="group flex items-center justify-between gap-4 p-3 bg-white/5 border-l-4 border-white/10 hover:border-neon-yellow hover:bg-neon-yellow/10 transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:translate-x-[-2px] hover:translate-y-[-2px]">
+              <router-link to="/legal/privacy" class="group flex items-center justify-between gap-4 p-3 bg-white/5 border-l-4 border-white/10 hover:border-neon-yellow hover:bg-neon-yellow/10 transition-all duration-300 shadow-[4px_4px_0px_rgba(0,0,0,0.3)] hover:translate-x-[-2px] hover:translate-y-[-2px] text-left">
                  <span class="font-pixel text-[9px] text-white/30 group-hover:text-white uppercase">Priv</span>
                  <span class="font-display text-xs font-black text-white/60 group-hover:text-neon-yellow uppercase tracking-widest">Privacidad</span>
-              </button>
+              </router-link>
            </div>
         </div>
 

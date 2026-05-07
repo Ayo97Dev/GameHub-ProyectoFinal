@@ -1,10 +1,14 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
+import { useAuthStore } from '../stores/auth'
 import { useInventoryStore } from '../stores/inventory'
 import BaseLoading from '../components/ui/BaseLoading.vue'
 
 
+const router = useRouter()
+const auth = useAuthStore()
 const inventory = useInventoryStore()
 
 const selectedCategory = ref('todos')
@@ -166,6 +170,12 @@ const clearCart = () => {
 
 const startPayment = () => {
   if (cart.value.length === 0) return
+  
+  if (!auth.isLoggedIn) {
+    router.push({ name: 'login' })
+    return
+  }
+  
   showPaymentMethods.value = true
 }
 
