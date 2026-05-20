@@ -1,4 +1,10 @@
 <script setup>
+/**
+ * STORE VIEW
+ * 
+ * Punto de venta de items y mejoras globales.
+ * Gestiona el catálogo de productos, el carrito de compra y la pasarela de pago simulada.
+ */
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
@@ -13,6 +19,10 @@ const inventory = useInventoryStore()
 
 const selectedCategory = ref('todos')
 
+/**
+ * CATÁLOGO DE PRODUCTOS
+ * Define los items disponibles organizados por juego de origen.
+ */
 const items = [
   // Tower Defense
   { 

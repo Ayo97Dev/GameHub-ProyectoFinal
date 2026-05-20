@@ -1,3 +1,8 @@
+/**
+ * GAME STORE
+ * 
+ * Gestiona el catálogo de juegos, portadas, rutas y telemetría global.
+ */
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../lib/axios'
@@ -7,6 +12,10 @@ export const useGameStore = defineStore('game', () => {
   const hasFetched = ref(false)
   let pendingRequest = null
 
+  /**
+   * DATOS ESTÁTICOS / FALLBACK
+   * Definimos los juegos "base" por si la API falla o para carga instantánea.
+   */
   const DEFAULT_GAMES = [
     { slug: 'descenso-al-abismo', title: 'Descenso al Abismo', description: 'Sobrevive a las profundidades en este RPG de exploración táctica.' },
     { slug: 'core-clicker', title: 'CoreClicker', description: 'Optimiza el núcleo del sistema mediante clics de alta frecuencia.' },
@@ -16,6 +25,10 @@ export const useGameStore = defineStore('game', () => {
     { slug: 'chess', title: 'Ajedrez', description: 'El juego de reyes: desafía a la IA en un duelo.' },
   ]
 
+  /**
+   * MAPEO DE PORTADAS
+   * Vincula cada slug con su imagen correspondiente en el directorio de assets.
+   */
   const DEFAULT_COVERS = {
     'descenso-al-abismo': '/images/games/descenso-al-abismo.png',
     'core-clicker': '/images/games/core-clicker.png',
@@ -25,6 +38,10 @@ export const useGameStore = defineStore('game', () => {
     'chess': '/images/games/chess.png'
   }
 
+  /**
+   * PRESENTACIÓN DE DATOS
+   * Inyecta la portada y la ruta de navegación a los datos crudos del juego.
+   */
   function withPresentation(game) {
     return {
       ...game,
@@ -39,6 +56,10 @@ export const useGameStore = defineStore('game', () => {
 
   const games = ref(defaultGames())
 
+  /**
+   * SINCRONIZACIÓN DE CATÁLOGO
+   * Fusiona los datos que vienen de la DB con nuestra configuración local (portadas).
+   */
   function mergeWithDefaults(apiGames) {
     const merged = new Map(defaultGames().map(game => [game.slug, game]))
 
@@ -49,6 +70,10 @@ export const useGameStore = defineStore('game', () => {
     return Array.from(merged.values())
   }
 
+  /**
+   * RECUPERACIÓN DE JUEGOS
+   * Consulta la API y actualiza el catálogo reactivo.
+   */
   async function fetchGames(options = {}) {
     const { force = false } = options
 
@@ -88,6 +113,10 @@ export const useGameStore = defineStore('game', () => {
     return pendingRequest
   }
 
+  /**
+   * BUSCADOR POR SLUG
+   * Acceso rápido O(1) para encontrar un juego específico.
+   */
   const gamesBySlug = computed(() => {
     return games.value.reduce((acc, game) => {
       acc[game.slug] = game
@@ -95,6 +124,10 @@ export const useGameStore = defineStore('game', () => {
     }, {})
   })
 
+  /**
+   * TELEMETRÍA GLOBAL
+   * Información en tiempo real sobre usuarios y sesiones activas.
+   */
   const telemetry = ref({
     active_users: 0,
     active_sessions: 0,

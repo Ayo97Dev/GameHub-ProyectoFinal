@@ -5,9 +5,16 @@ namespace App\Services;
 use App\Models\Achievement;
 use App\Models\User;
 
+/**
+ * ACHIEVEMENT SERVICE
+ * 
+ * Motor de reglas para el desbloqueo de logros.
+ * Centraliza la lógica de validación de condiciones basadas en el estado del juego.
+ */
 class AchievementService
 {
     /**
+     * PROCESAR LOGROS
      * Comprueba condiciones y desbloquea los logros que correspondan.
      * triggerData debe incluir: score, upgrades (array id=>count), total_clicks,
      * prestige_level, total_upgrades_bought, max_upgrade_count.

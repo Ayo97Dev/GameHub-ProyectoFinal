@@ -1,4 +1,10 @@
 <script setup>
+/**
+ * ACHIEVEMENTS VIEW
+ * 
+ * Galería de trofeos e hitos del jugador.
+ * Clasifica los logros por rareza y juego, mostrando el progreso global de completado.
+ */
 import { ref, onMounted, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useAchievementStore } from '../stores/achievement'
@@ -12,6 +18,10 @@ const gameStore = useGameStore()
 const selectedGame = ref('all')
 const sortBy = ref('recent') // recent, old, rarity
 
+/**
+ * ESTILOS DE RAREZA
+ * Mapeo estético según el nivel de dificultad del logro.
+ */
 const RARITY_STYLES = {
   common:    { label: 'Nivel 1 // Común',    color: 'text-retro-white', border: 'border-white/20', bg: 'bg-retro-dark' },
   uncommon:  { label: 'Nivel 2 // Poco común',  color: 'text-neon-cyan',  border: 'border-neon-cyan', bg: 'bg-neon-cyan/5' },

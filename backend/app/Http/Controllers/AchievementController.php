@@ -8,8 +8,18 @@ use App\Models\Game;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * ACHIEVEMENT CONTROLLER
+ * 
+ * Gestiona la visualización de logros y trofeos.
+ * Permite consultar el catálogo completo de logros o los específicos de un juego.
+ */
 class AchievementController extends Controller
 {
+    /**
+     * CATÁLOGO GLOBAL DE LOGROS
+     * Devuelve todos los logros activos y marca cuáles han sido desbloqueados por el usuario.
+     */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -24,6 +34,10 @@ class AchievementController extends Controller
         return response()->json(['data' => $achievements]);
     }
 
+    /**
+     * LOGROS POR JUEGO
+     * Lista los logros vinculados a un módulo específico (slug).
+     */
     public function byGame(Request $request, string $slug): JsonResponse
     {
         $game = Game::active()->where('slug', $slug)->firstOrFail();

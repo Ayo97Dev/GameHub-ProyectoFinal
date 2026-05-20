@@ -2,6 +2,12 @@
 
 namespace App\Services;
 
+/**
+ * BASE GAME SERVICE
+ * 
+ * Clase abstracta que define el contrato para todos los juegos de la plataforma.
+ * Proporciona métodos comunes para persistencia, sesiones y telemetría.
+ */
 use App\Models\Game;
 use App\Models\GameSave;
 use App\Models\GameSession;
@@ -16,7 +22,8 @@ abstract class GameService
     ) {}
 
     /**
-     * Guarda el progreso en game_saves y actualiza game_stats.
+     * PERSISTENCIA DE PROGRESO
+     * Guarda el estado serializado (JSON) y actualiza el récord personal (high score).
      */
     public function saveProgress(array $state, int $score, int $playtime = 0): GameSave
     {
@@ -30,6 +37,7 @@ abstract class GameService
             'game_id' => $this->game->id,
         ]);
 
+        // Solo actualizamos si la puntuación actual supera el récord histórico.
         if ($score > $stat->high_score) {
             $stat->high_score = $score;
         }
@@ -42,7 +50,7 @@ abstract class GameService
     }
 
     /**
-     * Carga el save del usuario para este juego.
+     * CARGA DE PROGRESO
      */
     public function loadProgress(): ?GameSave
     {
@@ -52,11 +60,12 @@ abstract class GameService
     }
 
     /**
-     * Crea una sesión de juego con estado inicial.
+     * GESTIÓN DE SESIONES
+     * Crea una nueva sesión activa. Si ya existía una abierta, la marca como ABANDONADA.
      */
     public function createSession(array $initialState): GameSession
     {
-        // Abandonar sesión anterior activa si existe
+        // Limpieza de sesiones huérfanas
         GameSession::where('user_id', $this->user->id)
             ->where('game_id', $this->game->id)
             ->where('status', 'in_progress')
@@ -72,8 +81,9 @@ abstract class GameService
     }
 
     /**
-     * Retorna metadatos sobre la partida para verificaciones de logros.
-     * Debe ser sobrescrito por cada servicio de juego.
+     * METADATOS DE LOGROS
+     * Cada juego debe devolver un array con sus métricas específicas 
+     * (ej: número de clicks, piezas colocadas) para que el AchievementService las evalúe.
      */
     public function getGameMetadata(array $state): array
     {
@@ -81,7 +91,8 @@ abstract class GameService
     }
 
     /**
-     * Cierra la sesión, guarda progreso y comprueba logros.
+     * FINALIZACIÓN DE SESIÓN
+     * Cierra el ciclo de juego y dispara la comprobación de logros.
      */
     public function completeSession(GameSession $session, int $finalScore, int $duration): array
     {
@@ -94,6 +105,7 @@ abstract class GameService
 
         $this->saveProgress($session->session_data ?? [], $finalScore, $duration);
 
+        // EVALUACIÓN DE LOGROS
         $achievementService = new AchievementService;
         $triggerData = array_merge(
             ['score' => $finalScore, 'duration' => $duration],
@@ -112,9 +124,10 @@ abstract class GameService
         ];
     }
 
+    /**
+     * CONTRATO OBLIGATORIO PARA SUBCLASES
+     */
     abstract public function executeAction(string $action, array $payload): array;
-
     abstract protected function validateAction(string $action, array $payload): bool;
-
     abstract public function getInitialState(): array;
 }

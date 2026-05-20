@@ -8,12 +8,17 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\PersonalAccessToken;
 
+/**
+ * TELEMETRY CONTROLLER
+ * 
+ * Orquestador de la monitorización en tiempo real.
+ * Proporciona datos sobre usuarios activos, sesiones de juego y estado del servidor.
+ */
 class TelemetryController extends Controller
 {
     /**
-     * Get real-time telemetry data.
-     *
-     * @return JsonResponse
+     * OBTENER TELEMETRÍA GLOBAL
+     * Genera un reporte del estado actual del ecosistema (Uptime, Usuarios, Sesiones).
      */
     public function index(): JsonResponse
     {

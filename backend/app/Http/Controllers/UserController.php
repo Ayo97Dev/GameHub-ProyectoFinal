@@ -7,8 +7,18 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
+/**
+ * USER CONTROLLER
+ * 
+ * Gestiona la información del perfil del usuario.
+ * Incluye la actualización de datos biográficos, avatar y seguridad (contraseña).
+ */
 class UserController extends Controller
 {
+    /**
+     * ACTUALIZAR PERFIL
+     * Modifica el nombre, biografía e imagen de avatar del usuario autenticado.
+     */
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -23,7 +33,7 @@ class UserController extends Controller
         $user->bio = $request->bio;
 
         if ($request->hasFile('avatar')) {
-            // Delete old avatar if exists
+            // Eliminamos el avatar antiguo si existe y es local.
             if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
                 Storage::disk('public')->delete($user->avatar);
             }
@@ -40,6 +50,10 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * ACTUALIZAR CONTRASEÑA
+     * Valida la contraseña actual y establece una nueva con confirmación.
+     */
     public function updatePassword(Request $request)
     {
         $request->validate([

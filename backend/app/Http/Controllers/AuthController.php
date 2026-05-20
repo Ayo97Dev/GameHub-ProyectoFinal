@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+/**
+ * AUTH CONTROLLER
+ * 
+ * Gestiona el ciclo de vida de la sesión del usuario.
+ * Utiliza Laravel Sanctum para la emisión y validación de tokens API.
+ */
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
@@ -12,6 +18,10 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    /**
+     * REGISTRO DE USUARIO
+     * Crea un nuevo perfil y emite el primer token de acceso.
+     */
     public function register(RegisterRequest $request)
     {
         $user = User::create([
@@ -20,6 +30,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Cargamos relaciones para que el frontend reciba el perfil completo.
         $user->load(['gameStats.game', 'inventoryItems']);
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -31,6 +42,10 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * INICIO DE SESIÓN
+     * Valida credenciales y genera un nuevo token.
+     */
     public function login(LoginRequest $request)
     {
         if (! Auth::attempt($request->only('email', 'password'))) {
@@ -51,6 +66,10 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * CIERRE DE SESIÓN
+     * Invalida el token actual en la base de datos.
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -60,6 +79,10 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * PERFIL DE USUARIO
+     * Devuelve los datos del usuario autenticado con sus estadísticas y logros.
+     */
     public function user(Request $request)
     {
         $user = $request->user()->load(['gameStats.game', 'inventoryItems']);

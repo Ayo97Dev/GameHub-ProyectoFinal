@@ -1,3 +1,9 @@
+/**
+ * ACHIEVEMENT STORE
+ * 
+ * Gestiona el catálogo de logros desbloqueables y el progreso del usuario.
+ * Proporciona acceso centralizado a los hitos alcanzados en cada juego.
+ */
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../lib/axios'
@@ -9,6 +15,11 @@ export const useAchievementStore = defineStore('achievement', () => {
   const hasFetched = ref(false)
   let pendingRequest = null
 
+  /**
+   * RECUPERAR LOGROS
+   * Obtiene la lista completa de logros y el estado de desbloqueo para el usuario actual.
+   * Implementa cache local y control de peticiones concurrentes.
+   */
   async function fetchAchievements(force = false) {
     const authStore = useAuthStore()
     if (!authStore.isLoggedIn) {

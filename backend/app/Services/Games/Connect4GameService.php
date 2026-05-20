@@ -2,6 +2,12 @@
 
 namespace App\Services\Games;
 
+/**
+ * CONNECT 4 SERVICE
+ * 
+ * Este juego es mayoritariamente CLIENT-SIDE. 
+ * El servicio solo gestiona el contador de victorias/derrotas para el leaderboard.
+ */
 use App\Services\GameService;
 
 class Connect4GameService extends GameService
@@ -14,6 +20,10 @@ class Connect4GameService extends GameService
         ];
     }
 
+    /**
+     * ACCIONES
+     * Connect4 no procesa acciones en el servidor (el tablero se gestiona en Vue).
+     */
     public function executeAction(string $action, array $payload): array
     {
         return [
@@ -28,7 +38,7 @@ class Connect4GameService extends GameService
     }
 
     /**
-     * Retorna metadatos sobre la partida para verificaciones de logros.
+     * METADATOS PARA LOGROS
      */
     public function getGameMetadata(array $state): array
     {

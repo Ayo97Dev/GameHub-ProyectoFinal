@@ -6,10 +6,17 @@ use App\Models\InventoryItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * INVENTORY CONTROLLER
+ * 
+ * Gestiona los items y consumibles del usuario.
+ * Permite el seguimiento de recursos desbloqueados y la sincronización con el cliente.
+ */
 class InventoryController extends Controller
 {
     /**
-     * Get user inventory.
+     * OBTENER INVENTARIO
+     * Recupera todos los items vinculados al usuario como pares clave-valor.
      */
     public function index()
     {
@@ -22,7 +29,8 @@ class InventoryController extends Controller
     }
 
     /**
-     * Update (add/remove) items in inventory.
+     * ACTUALIZAR ITEM
+     * Añade o resta cantidad a un item específico del inventario.
      */
     public function update(Request $request)
     {
@@ -58,7 +66,8 @@ class InventoryController extends Controller
     }
 
     /**
-     * Bulk sync inventory (e.g., from localStorage on first login).
+     * SINCRONIZACIÓN MASIVA (Bulk Sync)
+     * Sobrescribe o crea items en bloque, útil para persistir datos desde LocalStorage.
      */
     public function sync(Request $request)
     {

@@ -1,4 +1,11 @@
 <script setup>
+/**
+ * PLAY VIEW
+ * 
+ * Orquestador principal de la experiencia de juego.
+ * Carga dinámicamente el componente del juego basado en el slug de la URL
+ * y gestiona la telemetría en tiempo real (puntuación, tiempo de sesión, leaderboard).
+ */
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGameStore } from '../stores/game'
@@ -9,6 +16,8 @@ import { useBattleshipStore } from '../stores/games/battleship'
 import { useChessStore } from '../stores/games/chess'
 import { useLeaderboardStore } from '../stores/leaderboard'
 import api from '../lib/axios'
+
+// Motores de Juego (Lazy Loading implícito mediante imports)
 import Rpg from '../components/games/rpg/Rpg.vue'
 import Clicker from '../components/games/clicker/Clicker.vue'
 import Quiz from '../components/games/quiz/Quiz.vue'
@@ -17,7 +26,7 @@ import Towerdefense from '../components/games/towerdefense/Towerdefense.vue'
 import Battleship from '../components/games/battleship/Battleship.vue'
 import Chess from '../components/games/chess/Chess.vue'
 
-// Helper para debounce
+// Helper para evitar saturar la API con peticiones de leaderboard
 function useDebouncedFunction(fn, delay = 300) {
   let timeoutId = null
   return function(...args) {
@@ -35,8 +44,12 @@ const battleship = useBattleshipStore()
 const chess = useChessStore()
 const leaderboardStore = useLeaderboardStore()
 
+// Datos del juego actual desde el store central
 const game = computed(() => gameStore.gamesBySlug[route.params.slug])
 
+/**
+ * Títulos estéticos si el juego aún no ha cargado los metadatos de la DB
+ */
 const FALLBACK_TITLE_BY_SLUG = {
   'core-clicker': 'CORE_SYNC.EXE',
   'descenso-al-abismo': 'ABISMO_INIT.EXE',
@@ -56,7 +69,7 @@ const leaderboard = computed(() => leaderboardStore.getEntries(route.params.slug
 const towerDefenseScore = ref(0)
 const debouncedFetchLeaderboard = useDebouncedFunction(fetchLeaderboard, 300)
 
-// Session Stats
+// Estadísticas de Sesión Activa
 const sessionTime = ref('00:00')
 const sessionSeconds = ref(0)
 const onlinePlayers = computed(() => gameStore.telemetry.games_telemetry[route.params.slug] ?? 0)
@@ -65,6 +78,10 @@ function updateSessionStats() {
   gameStore.fetchTelemetry()
 }
 
+/**
+ * FACTORY DE COMPONENTES
+ * Resuelve qué componente Vue renderizar según el slug actual.
+ */
 const gameComponent = computed(() => {
   if (route.params.slug === 'descenso-al-abismo')     return Rpg
   if (route.params.slug === 'core-clicker') return Clicker
@@ -76,6 +93,10 @@ const gameComponent = computed(() => {
   return null
 })
 
+/**
+ * MAPEADO DE PUNTUACIONES EN VIVO
+ * Cada juego tiene su propia métrica de éxito (balance, victorias, oleadas).
+ */
 const liveScore = computed(() => {
   if (route.params.slug === 'core-clicker') return Math.floor(clicker.balance)
   if (route.params.slug === 'connect4') return connect4.wins
@@ -105,7 +126,7 @@ function handleLiveScore(value) {
 }
 
 async function fetchLeaderboard() {
-  leaderboardStore.fetchLeaderboard(route.params.slug, true) // Force true to get fresh scores while playing
+  leaderboardStore.fetchLeaderboard(route.params.slug, true) 
 }
 
 let statsInterval = null
@@ -114,6 +135,7 @@ onMounted(() => {
   fetchLeaderboard()
   updateSessionStats()
   
+  // Cronómetro de sesión y actualización de telemetría cada 10s
   statsInterval = setInterval(() => {
     sessionSeconds.value++
     const m = Math.floor(sessionSeconds.value / 60).toString().padStart(2, '0')
@@ -130,8 +152,9 @@ onUnmounted(() => {
   if (statsInterval) clearInterval(statsInterval)
 })
 
+// Reinicio de estados locales cuando el usuario cambia de juego sin recargar la página
 watch(() => route.params.slug, () => {
-  towerDefenseScore.value = 0 // Reset score when changing game
+  towerDefenseScore.value = 0 
   sessionSeconds.value = 0
   sessionTime.value = '00:00'
   updateSessionStats()

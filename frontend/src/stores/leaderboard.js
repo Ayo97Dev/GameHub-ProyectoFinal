@@ -1,3 +1,9 @@
+/**
+ * LEADERBOARD STORE
+ * 
+ * Gestiona los rankings mundiales segmentados por juego.
+ * Implementa un sistema de mapeo (Map) para almacenar múltiples clasificaciones de forma eficiente.
+ */
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '../lib/axios'
@@ -11,6 +17,11 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
   // Pending requests mapping slug -> promise
   const pendingRequests = new Map()
 
+  /**
+   * RECUPERAR CLASIFICACIÓN
+   * Obtiene el ranking de un juego específico.
+   * Utiliza de-duplicación de peticiones para evitar saturar la red en cargas rápidas.
+   */
   async function fetchLeaderboard(slug, force = false) {
     if (!slug) return []
 

@@ -1,4 +1,10 @@
 <script setup>
+/**
+ * LOGIN VIEW
+ * 
+ * Interfaz de autenticación de usuarios.
+ * Gestiona el envío de credenciales al nodo central y la redirección post-login.
+ */
 import { reactive, ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import BaseButton from '../components/ui/BaseButton.vue'
@@ -17,6 +23,10 @@ const form = reactive({
 const errorMsg = ref(null)
 const isLoading = ref(false)
 
+/**
+ * PROCESAR INICIO DE SESIÓN
+ * Valida el formulario, invoca al store de auth y redirige al perfil si tiene éxito.
+ */
 async function submitLogin() {
   errorMsg.value = null
   isLoading.value = true

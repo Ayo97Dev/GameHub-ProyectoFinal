@@ -1,4 +1,11 @@
 <script setup>
+/**
+ * HOME VIEW
+ * 
+ * Punto de entrada visual a la plataforma.
+ * Gestiona el catálogo de juegos, el filtrado/ordenación y la telemetría global
+ * del servidor (uptime, usuarios activos).
+ */
 import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useGameStore } from '../stores/game'
@@ -12,7 +19,7 @@ const selectedSort = ref('POPULAR')
 
 let uptimeInterval = null
 
-// Simulated uptime counter and real telemetry fetch
+// Inicialización de datos y simulación de Uptime
 onMounted(() => {
   if (gameStore.games.length === 0) {
     gameStore.fetchGames()
@@ -21,14 +28,14 @@ onMounted(() => {
 
   const start = Date.now()
   uptimeInterval = setInterval(() => {
-    // Update Uptime (Local simulation based on server base)
+    // Calculamos el uptime sumando el tiempo transcurrido al valor base del servidor
     const currentUptime = (gameStore.telemetry.server_uptime || 0) + Math.floor((Date.now() - start) / 1000)
     const h = Math.floor(currentUptime / 3600).toString().padStart(2, '0')
     const m = Math.floor((currentUptime % 3600) / 60).toString().padStart(2, '0')
     const s = (currentUptime % 60).toString().padStart(2, '0')
     uptime.value = `${h}:${m}:${s}`
     
-    // Fetch telemetry every 30 seconds
+    // Polling de telemetría cada 30 segundos
     const diff = Math.floor((Date.now() - start) / 1000)
     if (diff % 30 === 0 && diff > 0) {
       gameStore.fetchTelemetry()
@@ -40,19 +47,23 @@ onUnmounted(() => {
   if (uptimeInterval) clearInterval(uptimeInterval)
 })
 
+// El juego destacado (Hero) se selecciona prioritariamente por slug o el primero de la lista
 const featuredGame = computed(() => {
   const games = gameStore.games || []
   return games.find(g => g.slug === 'descenso-al-abismo') || games[0]
 })
 
-
-
+/**
+ * LÓGICA DE FILTRADO Y ORDENACIÓN
+ * Permite alternar entre orden alfabético y popularidad (basada en usuarios online).
+ */
 const filteredGames = computed(() => {
   const allGames = Array.isArray(gameStore.games) ? gameStore.games : []
   if (allGames.length === 0) return []
 
+  // Excluimos el juego destacado del grid principal
   let list = allGames.filter(g => g.slug !== featuredGame.value?.slug)
-  // Sorting logic
+  
   const result = [...list]
   if (selectedSort.value === 'ALFABÉTICO') {
     result.sort((a, b) => (a.title || '').localeCompare(b.title || ''))
@@ -60,7 +71,7 @@ const filteredGames = computed(() => {
     result.sort((a, b) => {
       const playersA = gameStore.telemetry.games_telemetry[a.slug] ?? 0
       const playersB = gameStore.telemetry.games_telemetry[b.slug] ?? 0
-      return playersB - playersA // Mayor a menor
+      return playersB - playersA 
     })
   }
 

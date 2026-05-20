@@ -1,4 +1,10 @@
 <script setup>
+/**
+ * LEADERBOARD VIEW
+ * 
+ * Visualización competitiva de puntuaciones globales.
+ * Presenta el podio de los 3 mejores y la lista extendida de clasificados por juego.
+ */
 import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
@@ -6,10 +12,15 @@ import { useLeaderboardStore } from '../stores/leaderboard'
 import { useGameStore } from '../stores/game'
 import BaseLoading from '../components/ui/BaseLoading.vue'
 
+
 const leaderboardStore = useLeaderboardStore()
 const gameStore = useGameStore()
 const route = useRoute()
 
+/**
+ * DATOS DE CLASIFICACIÓN
+ * Segmenta la lista en podio (Top 3) y el resto para la visualización en lista.
+ */
 const slug = computed(() => route.params.slug)
 const entries = computed(() => leaderboardStore.getEntries(slug.value))
 const top3 = computed(() => entries.value.slice(0, 3))

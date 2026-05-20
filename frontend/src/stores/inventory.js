@@ -1,3 +1,9 @@
+/**
+ * INVENTORY STORE
+ * 
+ * Gestiona los recursos, consumibles y desbloqueos del usuario.
+ * Sincroniza el estado local de items con el almacenamiento persistente en el backend.
+ */
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import api from '../lib/axios'
@@ -6,6 +12,10 @@ import { useAuthStore } from './auth'
 export const useInventoryStore = defineStore('inventory', () => {
   const auth = useAuthStore()
   
+  /**
+   * ESTADO INICIAL
+   * Define las claves de items soportadas por el sistema.
+   */
   const getInitialItems = () => {
     return {
       'td_emp': 0,
@@ -23,14 +33,20 @@ export const useInventoryStore = defineStore('inventory', () => {
   const items = ref(getInitialItems())
   const isLoading = ref(false)
 
-  // Watch for auth changes to sync inventory
+  /**
+   * SINCRONIZACIÓN AUTOMÁTICA
+   * Actualiza el inventario local cuando el usuario se autentica o cambia su perfil.
+   */
   watch(() => auth.user, (newUser) => {
     if (newUser && newUser.inventory) {
       items.value = { ...items.value, ...newUser.inventory }
     }
   }, { immediate: true })
 
-  // Sync with backend when items change (debounced or on action)
+  /**
+   * PERSISTENCIA GLOBAL
+   * Sincroniza todo el estado del inventario con el backend.
+   */
   async function syncWithBackend() {
     if (!auth.isLoggedIn) return
     try {

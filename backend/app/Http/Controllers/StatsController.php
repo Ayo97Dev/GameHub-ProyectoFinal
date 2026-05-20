@@ -8,8 +8,18 @@ use App\Http\Resources\LeaderboardResource;
 use App\Models\Game;
 use App\Models\GameStat;
 
+/**
+ * STATS CONTROLLER
+ * 
+ * Gestiona las estadísticas de rendimiento de los jugadores.
+ * Se encarga de actualizar récords personales y generar rankings globales.
+ */
 class StatsController extends Controller
 {
+    /**
+     * ACTUALIZAR ESTADÍSTICAS
+     * Registra el tiempo jugado y actualiza la puntuación máxima si se supera el récord.
+     */
     public function update(UpdateStatRequest $request, $gameId)
     {
         $stat = GameStat::firstOrCreate(
@@ -35,6 +45,10 @@ class StatsController extends Controller
         return new GameStatResource($stat->load('game'));
     }
 
+    /**
+     * RANKING GLOBAL (Leaderboard)
+     * Obtiene el Top 10 de mejores puntuaciones para un juego específico.
+     */
     public function leaderboard(string $gameIdentifier)
     {
         $game = is_numeric($gameIdentifier)

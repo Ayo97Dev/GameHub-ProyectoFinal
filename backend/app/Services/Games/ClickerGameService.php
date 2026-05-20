@@ -2,6 +2,12 @@
 
 namespace App\Services\Games;
 
+/**
+ * CORE CLICKER SERVICE
+ * 
+ * Implementa la lógica de un juego incremental (Idle/Clicker).
+ * Incluye validaciones anti-cheat (timestamps) y mecánicas de prestigio.
+ */
 use App\Models\Game;
 use App\Models\User;
 use App\Services\GameService;
@@ -10,6 +16,12 @@ class ClickerGameService extends GameService
 {
     private const PRESTIGE_BASE_MIN_BALANCE = 1_000_000;
 
+    /**
+     * CONFIGURACIÓN DE MEJORAS
+     * Tier 1: Mejoras de entrada.
+     * Tier 2: Incrementos significativos.
+     * Tier 3: Bonus legendarios.
+     */
     private const UPGRADES = [
         // ── Tier 1: Básico ──────────────────────────────────────────────
         1 => ['name' => 'Autoclicker',  'cost' => 10,      'dps_bonus' => 0.1,   'click_bonus' => 0,     'tier' => 1],
@@ -47,6 +59,9 @@ class ClickerGameService extends GameService
         ];
     }
 
+    /**
+     * PROCESAMIENTO DE ACCIONES
+     */
     public function executeAction(string $action, array $payload): array
     {
         if (! $this->validateAction($action, $payload)) {
@@ -71,15 +86,19 @@ class ClickerGameService extends GameService
         };
     }
 
+    /**
+     * GESTIÓN DE CLICKS
+     * Incluye una validación de tiempo (±5s) para evitar ataques de repetición.
+     */
     private function handleClick(array $payload): array
     {
-        // Anti-cheat: timestamp debe estar dentro de ±5 segundos
+        // ANTI-CHEAT: Verificación de desfase temporal.
         $now = (int) (microtime(true) * 1000);
         if (abs($now - (int) $payload['timestamp']) > 5000) {
             return ['error' => 'Invalid timestamp', 'code' => 'TIMESTAMP_MISMATCH'];
         }
 
-        // Número de clics en el lote; máximo 100 para prevenir abusos
+        // Límite de ráfaga para prevenir macros masivas.
         $count = max(1, min((int) ($payload['count'] ?? 1), 100));
 
         $progress = $this->loadProgress();
@@ -97,6 +116,10 @@ class ClickerGameService extends GameService
         ];
     }
 
+    /**
+     * COMPRA DE MEJORAS
+     * El coste escala exponencialmente: CosteBase * 1.15^N
+     */
     private function handleBuyUpgrade(array $payload): array
     {
         $upgradeId = (int) $payload['upgrade_id'];
@@ -109,7 +132,6 @@ class ClickerGameService extends GameService
         $progress = $this->loadProgress();
         $state = $progress ? $progress->payload : $this->getInitialState();
 
-        // Coste escalado: baseCost × 1.15^cantidad_ya_comprada
         $currentCount = (int) ($state['upgrades'][$upgradeId] ?? 0);
         $scaledCost = (int) ceil($upgrade['cost'] * (1.15 ** $currentCount));
 
@@ -120,7 +142,8 @@ class ClickerGameService extends GameService
         $state['balance'] -= $scaledCost;
         $state['upgrades'][$upgradeId] = $currentCount + 1;
 
-        // Recalcular DPS y click_power desde cero para evitar desincronización
+        // RECALCULAR ESTADÍSTICAS
+        // Evitamos sumas incrementales para prevenir errores de redondeo acumulados.
         [$dps, $clickPower] = $this->recalcStats($state);
         $state['dps'] = $dps;
         $state['click_power'] = $clickPower;
@@ -136,13 +159,17 @@ class ClickerGameService extends GameService
         ];
     }
 
-    /** Recalcula DPS y click_power a partir del array de mejoras. */
+    /** 
+     * RECALCULO DE STATS
+     * Deriva Click Power y DPS del inventario actual y el nivel de prestigio.
+     */
     private function recalcStats(array $state): array
     {
         $dps = 0.0;
         $prestigeClickBonus = $state['prestige_click_bonus'] ?? (($state['prestige_level'] ?? 0) * 0.5);
         $clickPower = 1.0 + $prestigeClickBonus;
         $dpsMul = $state['prestige_dps_mul'] ?? (1.0 + (($state['prestige_level'] ?? 0) * 0.05));
+        
         foreach ($state['upgrades'] as $upId => $count) {
             $u = self::UPGRADES[(int) $upId] ?? null;
             if ($u) {
@@ -154,6 +181,10 @@ class ClickerGameService extends GameService
         return [$dps * $dpsMul, $clickPower];
     }
 
+    /**
+     * PRESTIGIO (Soft Reset)
+     * Reinicia el progreso a cambio de multiplicadores permanentes de DPS y Click Power.
+     */
     private function handlePrestige(array $payload = []): array
     {
         $progress = $this->loadProgress();
@@ -177,12 +208,14 @@ class ClickerGameService extends GameService
         $prestigeLevel = $currentPrestigeLevel + 1;
         $currentClickBonus = (float) ($state['prestige_click_bonus'] ?? ($currentPrestigeLevel * 0.5));
         $currentDpsMul = (float) ($state['prestige_dps_mul'] ?? (1.0 + ($currentPrestigeLevel * 0.05)));
+        
         $clickIncrement = $this->getPrestigeClickIncrement($currentPrestigeLevel);
         $dpsFactor = $this->getPrestigeDpsFactor($currentPrestigeLevel);
+        
         $newClickBonus = round($currentClickBonus + $clickIncrement, 4);
         $newDpsMul = round($currentDpsMul * $dpsFactor, 4);
 
-        // Prestige: reinicia progreso y acumula bonus permanentes
+        // REINICIO DE ESTADO CON MANTENIMIENTO DE BONUS
         $newState = [
             'balance' => 0,
             'click_power' => 1.0 + $newClickBonus,
@@ -229,7 +262,7 @@ class ClickerGameService extends GameService
     }
 
     /**
-     * Retorna metadatos sobre la partida para verificaciones de logros.
+     * METADATOS PARA LOGROS
      */
     public function getGameMetadata(array $state): array
     {

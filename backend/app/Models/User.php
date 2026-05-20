@@ -2,7 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+/**
+ * USER MODEL
+ * 
+ * Representa a un jugador en la plataforma.
+ * Gestiona la autenticación, perfil y relaciones con el progreso de juegos.
+ */
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,9 +22,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * ATRIBUTOS ASIGNABLES EN MASA
      */
     protected $fillable = [
         'name',
@@ -30,9 +33,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * ATRIBUTOS OCULTOS (SERIALIZACIÓN)
      */
     protected $hidden = [
         'password',
@@ -40,9 +41,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * CASTING DE ATRIBUTOS
      */
     protected function casts(): array
     {
@@ -53,7 +52,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's avatar URL.
+     * ACCESOR DE AVATAR
+     * Normaliza la URL del avatar. Si es una ruta local, añade el prefijo /storage/.
+     * SIEMPRE debe devolver una URL válida o null.
      */
     protected function avatar(): Attribute
     {
@@ -64,27 +65,47 @@ class User extends Authenticatable
         );
     }
 
+    /**
+     * RELACIÓN: ESTADÍSTICAS DE JUEGO
+     * Historial de puntuaciones y tiempo jugado por juego.
+     */
     public function gameStats(): HasMany
     {
         return $this->hasMany(GameStat::class);
     }
 
+    /**
+     * RELACIÓN: PARTIDAS GUARDADAS
+     * Almacena el estado serializado (JSON) de las partidas.
+     */
     public function gameSaves(): HasMany
     {
         return $this->hasMany(GameSave::class);
     }
 
+    /**
+     * RELACIÓN: LOGROS (Achievements)
+     * Muchos a muchos. Registra cuándo se obtuvo cada logro.
+     */
     public function achievements(): BelongsToMany
     {
         return $this->belongsToMany(Achievement::class)
             ->withPivot('earned_at');
     }
 
+    /**
+     * RELACIÓN: SESIONES ACTIVAS
+     * Seguimiento de partidas en curso para telemetría.
+     */
     public function gameSessions(): HasMany
     {
         return $this->hasMany(GameSession::class);
     }
 
+    /**
+     * RELACIÓN: INVENTARIO
+     * Items cosméticos o de juego desbloqueados por el usuario.
+     */
     public function inventoryItems(): HasMany
     {
         return $this->hasMany(InventoryItem::class);

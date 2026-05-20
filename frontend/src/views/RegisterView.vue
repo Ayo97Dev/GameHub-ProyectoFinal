@@ -1,4 +1,10 @@
 <script setup>
+/**
+ * REGISTER VIEW
+ * 
+ * Interfaz de creación de nuevas cuentas.
+ * Gestiona el alta de usuarios y la inicialización de su perfil en la plataforma.
+ */
 import { reactive, ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import BaseButton from '../components/ui/BaseButton.vue'
@@ -19,6 +25,10 @@ const form = reactive({
 const errorMsg = ref(null)
 const isLoading = ref(false)
 
+/**
+ * PROCESAR REGISTRO
+ * Valida los datos del nuevo usuario y efectúa la petición de creación.
+ */
 async function submitRegister() {
   errorMsg.value = null
   isLoading.value = true

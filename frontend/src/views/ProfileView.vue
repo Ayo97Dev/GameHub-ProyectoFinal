@@ -1,4 +1,10 @@
 <script setup>
+/**
+ * PROFILE VIEW
+ * 
+ * Panel de control central del usuario.
+ * Visualiza estadísticas globales, logros desbloqueados y gestiona ajustes de cuenta.
+ */
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
@@ -20,7 +26,10 @@ const router = useRouter()
 const isLoading = ref(true)
 const activeTab = ref('stats') // 'stats' | 'settings'
 
-// Stats Summary
+/**
+ * CÁLCULO DE MÉTRICAS GLOBALES
+ * Agregación de tiempo de juego y progreso en la colección de logros.
+ */
 const totalTimePlayed = computed(() => {
   return authStore.user?.global_stats?.reduce((acc, s) => acc + s.time_played, 0) || 0
 })
@@ -28,6 +37,10 @@ const totalTimePlayed = computed(() => {
 const totalAchievementsCount = computed(() => achievementStore.achievements.length)
 const unlockedAchievementsCount = computed(() => achievementStore.achievements.filter(a => a.unlocked).length)
 
+/**
+ * RESUMEN DE CLASIFICACIONES
+ * Extrae las posiciones Top 10 del usuario en todos los juegos disponibles.
+ */
 const top3Ranks = computed(() => {
   const ranks = []
   if (!authStore.user) return []
