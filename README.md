@@ -1,6 +1,23 @@
-# GameHub
+# Sobre el projecto.
+
+Este proyecto es un **trabajo de final de curso** realizado entre Pedro Barrera y Ayoze Méndez. El objetivo de este proyecto era realizar un aprendizaje que fue el siguiente:
+
+- Arquitectura cercana a una profesional, usando Laravel Octane para mantener Laravel en activo en memoria, MariaDB y cache Redis para aliviar la carga de la Base de datos. En el Frontend usamos VUE y Tailwind.
+- Uso total de Docker en un Monorepo con pipelines para minimizar el error humano.
+- BBDD con una filosofia keep-simple y evitando complejidades grandes gracias a los JSON. (7 Tablas en total en la BD)
+- Uso de las API de forma intensiva, llamadas continuas, uso de JSON para grandes cantidades de datos simultaneos.
+- SPA usando VUE para aglutinar componentes, practicamente toda la pagina es una landing page para los juegos. 
+- Uso de Pinia para la gestion de estados y Axios para las llamadas a la API
+- Autentificaciones basadas en tokens, usuario encriptado en la BBDD.
+- Uso de algoritmos complejos para tener una CPU en ciertos juegos.
+- Juegos con complejidades tecnicas usando la minima cantidad de bibliotecas.
+- Optimizaciones realizadas en la llamada a la API volviendola asincrona.
+- Despliege de pruebas en Digital Ocean, junto a un dominio y usando nginx como proxy inverso para el SSL
+
+# Gamehub.
 
 GameHub es una plataforma Full-Stack de juegos retro-futuristas. Consta de un frontend en Vue 3 (Vite) + Tailwind CSS y un backend de alto rendimiento en Laravel (Octane) con MariaDB y Redis.
+
 
 ## 🚀 Cómo empezar
 
